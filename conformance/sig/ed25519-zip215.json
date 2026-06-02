@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "primitive": "ed25519-verify-strict",
+  "source": "strict-vs-cofactored differentiating low-order-A fixture",
+  "vectors": [
+    {
+      "name": "low-order-A",
+      "public_key_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+      "message_hex": "65643235353139766563746f72732033",
+      "signature_hex": "36684ea91032ba5b1dbab2d02f4debc74c3327f2b3802e2e4d371aa42b12b56b05ba9a796274d80437afa36f1236563f2f3b0aa84cecddc3d20914615ba4fe02",
+      "expected_valid": false,
+      "rejection_category": "low_order_A",
+      "notes": "Cofactored verify accepts (true); strict verify rejects (false). Public key is the order-1 identity-point encoding. Sourced from C2SP CCTV ed25519vectors.json."
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "wallet": "lace",
+  "tamper_variant": "missing-address",
+  "captured_from_positive_fixture": "lace-cose.json",
+  "record_body_cbor_hex": "a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
+  "to_sign_bytes_hex": "63617264616e6f2d706f652d7265636f72642d7369672d7631a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
+  "tamper_signer_pubkey_hex": "1cf3a7c92adbef07f27e7604bacceff1dc1ebbbf3661e8402d01145be6dbce9d",
+  "cose_sign1_bytes_hex": "8443a10127a0f6584017a410e857010345aa35d3f22caacab63da8ceaa81b63d022ab016648f56b53068ea0e6a4e5a47d9b144f5e4aafd629d97aef21310a1a10b18055b1cd770590c",
+  "cose_key_bytes_hex": "a40101032720062158201cf3a7c92adbef07f27e7604bacceff1dc1ebbbf3661e8402d01145be6dbce9d",
+  "expected_normalized_verdict": {
+    "index": 0,
+    "signer_pub_hex": "1cf3a7c92adbef07f27e7604bacceff1dc1ebbbf3661e8402d01145be6dbce9d",
+    "signer_type": "wallet-inline-key",
+    "ok": false,
+    "reason": "WALLET_ADDRESS_MISMATCH"
+  }
+}

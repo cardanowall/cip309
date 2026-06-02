@@ -1,0 +1,22 @@
+{
+  "wallet": "typhon",
+  "captured_at": "1970-01-01T00:00:00Z",
+  "wallet_version": "synthetic-placeholder",
+  "wallet_api_version": "synthetic-placeholder",
+  "browser_user_agent": "synthetic-placeholder",
+  "cardano_network": "mainnet",
+  "record_body_cbor_hex": "a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
+  "to_sign_bytes_hex": "63617264616e6f2d706f652d7265636f72642d7369672d7631a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
+  "stake_addr_hex": "e16e4f01bcab920fc754caa37a68668b47f913b8c0c140fc0f7a75f284",
+  "stake_addr_bech32": "stake1u9hy7qdu4wfql365e23h56rx3drljyaccrq5plq00f6l9pqfdw7zv",
+  "cose_sign1_bytes_hex": "84582aa201276761646472657373581de16e4f01bcab920fc754caa37a68668b47f913b8c0c140fc0f7a75f284a0f6584063bdd17344461042b9b6d6ea878d24016141e70d0117df7e0105c2d66bebad061f9515891c661348b741519b2adea58cbfefab58fa76eb6e46701d6c91c60f05",
+  "cose_key_bytes_hex": "a401010327200621582002480ed90289b4dda8f605dfe58fc063304d5556f2f40884a15f6c05edad6ded",
+  "expected_signer_pubkey_hex": "02480ed90289b4dda8f605dfe58fc063304d5556f2f40884a15f6c05edad6ded",
+  "expected_normalized_verdict": {
+    "index": 0,
+    "signer_pub_hex": "02480ed90289b4dda8f605dfe58fc063304d5556f2f40884a15f6c05edad6ded",
+    "signer_type": "wallet-inline-key",
+    "ok": true,
+    "reason": null
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "primitive": "sealed-poe-unwrap",
+  "source": "reuses wrap-n3 envelope/ciphertext (N=3 recipients, 32-byte plaintext)",
+  "vector": {
+    "name": "n3",
+    "recipient_secrets_hex": [
+      "0001010101010101010101010101010101010101010101010101010101010141",
+      "0002020202020202020202020202020202020202020202020202020202020242",
+      "0003030303030303030303030303030303030303030303030303030303030343"
+    ],
+    "envelope": {
+      "scheme": 1,
+      "aead": "xchacha20-poly1305",
+      "kem": "x25519",
+      "nonce_hex": "202122232425262728292a2b2c2d2e2f3031323334353637",
+      "slots": [
+        {
+          "epk_hex": "ff5d87907f1394b3a131985b894f513de72778ce27b8c10b32f93982a87cda47",
+          "wrap_hex": "2959c1396b5a39e83c490dcaa0f30402af0de5e014ec039efb6f6c8fc285f3edd1d90b68e033346b774cee7e4446afcb"
+        },
+        {
+          "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
+          "wrap_hex": "7a33f052e008726a0d493442cd989a4db003ae03bba17468f24ff28d42a72eaa33c491cdc166b72b1b233bb258d14594"
+        },
+        {
+          "epk_hex": "19d80204bf85f3e1118e1b23410c88f0d0eeced5156f4c5bdf347b14ed7ec63f",
+          "wrap_hex": "aff28d0fcebf959b7a965408e9f686080371c3a28192740de6cfc4d8bf9ab3d12e34c272ad28fc9ee0f3af5fe0f7fb48"
+        }
+      ],
+      "slots_mac_hex": "09de49b54ce73f1dd94827537d215103868fe5a229fb6fa40b5c44b4c23f6e78"
+    },
+    "ciphertext_hex": "03cfdd4f111e6b2bf110c71953b8e2f123eca3d0adbcac26e4a89a67ad8bae88657d0451e186ea846f7e5ef54989abb4",
+    "expected_plaintext_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cip309.org/schemas/hash-map.schema.json",
+  "title": "CIP-309 content-hash map",
+  "description": "A non-empty CBOR map keyed by content-hash algorithm identifier (a text string from the hash-algorithm registry) whose value is the corresponding digest. STRUCTURAL view: each value is modelled as a 32-byte hex string (the only registered digest length), and the map MUST have at least one entry. The key is left OPEN (any non-empty string) — registry membership (UNSUPPORTED_HASH_ALG) and per-algorithm digest-length agreement (HASH_DIGEST_LENGTH_MISMATCH) are domain-pass checks. CBOR byte strings are modelled as lowercase-hex JSON strings; a 32-byte digest is 64 hex characters.",
+  "type": "object",
+  "minProperties": 1,
+  "propertyNames": {
+    "$ref": "defs.schema.json#/$defs/content-hash-alg"
+  },
+  "additionalProperties": {
+    "$ref": "defs.schema.json#/$defs/bytes32"
+  }
+}

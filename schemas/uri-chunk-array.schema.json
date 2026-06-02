@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cip309.org/schemas/uri-chunk-array.schema.json",
+  "title": "CIP-309 chunked URI text array",
+  "description": "A CBOR `[1* tstr .size (1..64)]`: a non-empty array of text-string chunks, each 1..64 bytes, that concatenate to a single absolute URI (e.g. ar://, ipfs://). The `.size` bound is a BYTE-count constraint on the UTF-8 encoding of each chunk, not a code-unit count. A zero-length chunk is rejected with the same CHUNK_TOO_LARGE code as an oversized chunk. STRUCTURAL only: the reconstructed URI's absoluteness, fragment-freeness, allowed scheme set (ar://, ipfs://), and per-scheme body shape (including the IPFS CID profile) are domain-pass checks (INVALID_URI), not expressible here. Note: the `maxLength: 64` below counts UTF-16/Unicode characters, so multi-byte UTF-8 chunks at the 64-byte boundary are admitted permissively here and bounded exactly by the validator.",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 64
+  }
+}

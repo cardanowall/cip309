@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cip309.org/schemas/supersedes.schema.json",
+  "title": "CIP-309 supersedes reference",
+  "description": "A reference to a prior PoE transaction this record supersedes: the 32-byte Cardano transaction hash of the earlier record. Modelled as a 64-character lowercase-hex JSON string (CBOR `bstr` of 32 bytes). A wrong length is reported as SUPERSEDES_TX_INVALID_LENGTH. STRUCTURAL only: whether the referenced transaction exists or is itself a valid CIP-309 record is a chain-resolution concern of the public/recipient verifier, not the structural validator.",
+  "$ref": "defs.schema.json#/$defs/bytes32"
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cip309.org/schemas/merkle-commit.schema.json",
+  "title": "CIP-309 Merkle list commitment",
+  "description": "A single Merkle list-commitment entry: a CLOSED CBOR map `{alg, root, leaf_count, ? uris}` committing to a list of leaves whose count exceeds what inline `items[]` would carry economically. `root` is the 32-byte commitment root (hex string). `leaf_count` is a CBOR unsigned integer >= 1. `uris` (optional) is a non-empty array of chunked URI arrays locating the leaf manifest. STRUCTURAL only: `alg` registry membership (UNSUPPORTED_MERKLE_COMMIT_ALG), per-algorithm root length, and inclusion-proof correctness are domain-pass / recipient-verifier checks. The map is closed: unknown keys are rejected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["alg", "root", "leaf_count"],
+  "properties": {
+    "alg": {
+      "$ref": "defs.schema.json#/$defs/merkle-commit-alg"
+    },
+    "root": {
+      "$ref": "defs.schema.json#/$defs/bytes32"
+    },
+    "leaf_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "uris": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "uri-chunk-array.schema.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "primitive": "merkle-rfc9162-sha256-root",
+  "description": "Positive known-answer vectors for the rfc9162-sha256 list commitment (RFC 9162 §2.1.1): leaf hash = SHA-256(0x00 || d), internal node = SHA-256(0x01 || left || right), split k = largest power of two strictly less than n. Each leaf d is a 32-byte digest; the leaf set is off-chain and the only on-wire artefact is the 32-byte root. Empty trees (n == 0) are forbidden. The six tree sizes 1,2,3,4,5,7 exercise the balanced cases plus the odd-leaf recursion edges (split 3 -> 2+1, 5 -> 4+1, 7 -> 4+3). Every root MUST be byte-identical across conforming implementations.",
+  "alg": "rfc9162-sha256",
+  "vectors": [
+    {
+      "name": "1-leaf",
+      "leaf_count": 1,
+      "leaves": [
+        "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c"
+      ],
+      "root": "b696b144b6e6815fb3e83cbd501bca5b3e509fd0d309d582a8329718b9516ccc"
+    },
+    {
+      "name": "2-leaf",
+      "leaf_count": 2,
+      "leaves": [
+        "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c",
+        "986aad6d251d450b9e7cd0c811e65bc95f95688060d963a83ab6505da350be56"
+      ],
+      "root": "f44b533747be7db04b33260c722d24b7e8bc9231511cc1dd291bb9134cd9aaee"
+    },
+    {
+      "name": "3-leaf",
+      "leaf_count": 3,
+      "leaves": [
+        "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c",
+        "986aad6d251d450b9e7cd0c811e65bc95f95688060d963a83ab6505da350be56",
+        "27f4c2b7157b2e28b1a08e47fce1c3fa27a0f2c8a6760f5995c8a83c9cd1cacc"
+      ],
+      "root": "2c5230105235655a072f552fddcbc78bf5a76e16476c882e8199f9fce20a8f55"
+    },
+    {
+      "name": "4-leaf",
+      "leaf_count": 4,
+      "leaves": [
+        "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c",
+        "986aad6d251d450b9e7cd0c811e65bc95f95688060d963a83ab6505da350be56",
+        "27f4c2b7157b2e28b1a08e47fce1c3fa27a0f2c8a6760f5995c8a83c9cd1cacc",
+        "49707d9c71d5ebf72aaa3ada7a34e152d41811b345366681fc09849e8c634076"
+      ],
+      "root": "93a86cdff4f26f1a7c9793cc7c3ce107102570a81a323902617f7c13670582ee"
+    },
+    {
+      "name": "5-leaf",
+      "leaf_count": 5,
+      "leaves": [
+        "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c",
+        "986aad6d251d450b9e7cd0c811e65bc95f95688060d963a83ab6505da350be56",
+        "27f4c2b7157b2e28b1a08e47fce1c3fa27a0f2c8a6760f5995c8a83c9cd1cacc",
+        "49707d9c71d5ebf72aaa3ada7a34e152d41811b345366681fc09849e8c634076",
+        "e1599f1d13ee839f0fe64c2d5697b9d098ea947053f2fd8033e93b5ea1da8970"
+      ],
+      "root": "03928445a6003ca5f6a925cddb04a508116b06cf80037dca9e579ed41122fb9f"
+    },
+    {
+      "name": "7-leaf",
+      "leaf_count": 7,
+      "leaves": [
+        "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c",
+        "986aad6d251d450b9e7cd0c811e65bc95f95688060d963a83ab6505da350be56",
+        "27f4c2b7157b2e28b1a08e47fce1c3fa27a0f2c8a6760f5995c8a83c9cd1cacc",
+        "49707d9c71d5ebf72aaa3ada7a34e152d41811b345366681fc09849e8c634076",
+        "e1599f1d13ee839f0fe64c2d5697b9d098ea947053f2fd8033e93b5ea1da8970",
+        "7777a46ef6264ec24caf8239bea80bd6b3b1e38e9d3dc4f9daf6ce3722e8ba02",
+        "741c8f1001d6e807fac74c182d15f01fba2ed98375ca7a7cdc6257fdae97b621"
+      ],
+      "root": "90306bf5dca8f89e7b253471148f3795e7a6c857f04924c8309d81375e79d987"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "primitive": "argon2id-v13",
+  "source": "RFC 9106 §A.3 (no-secret-no-ad variant) + low-cost CI-friendly vectors",
+  "vectors": [
+    {
+      "name": "rfc9106-A.3-no-secret-no-ad",
+      "password_hex": "0101010101010101010101010101010101010101010101010101010101010101",
+      "salt_hex": "02020202020202020202020202020202",
+      "mem_size_kb": 32,
+      "iterations": 3,
+      "parallelism": 4,
+      "out_bytes": 32,
+      "expected_hex": "03aab965c12001c9d7d0d2de33192c0494b684bb148196d73c1df1acaf6d0c2e"
+    },
+    {
+      "name": "low-cost-password-somesalt",
+      "password_hex": "70617373776f7264",
+      "salt_hex": "736f6d6573616c74",
+      "mem_size_kb": 8,
+      "iterations": 1,
+      "parallelism": 1,
+      "out_bytes": 16,
+      "expected_hex": "f73a73d271859d21ef45465da12bdf86"
+    },
+    {
+      "name": "low-cost-out64",
+      "password_hex": "70617373776f7264",
+      "salt_hex": "736f6d6573616c74",
+      "mem_size_kb": 8,
+      "iterations": 1,
+      "parallelism": 1,
+      "out_bytes": 64,
+      "expected_hex": "1437f91898f231ac18bc80cbcd32883b34264c2927195fec7a7773226927033688422945a19069302e7e70233131350f89cb8a96daa78cee92f6b8416a5efd6c"
+    }
+  ]
+}

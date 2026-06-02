@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "primitive": "sealed-poe-unwrap",
+  "source": "reuses wrap-n1-empty envelope/ciphertext (N=1 recipient, empty plaintext)",
+  "vector": {
+    "name": "n1-empty",
+    "recipient_secrets_hex": [
+      "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161"
+    ],
+    "envelope": {
+      "scheme": 1,
+      "aead": "xchacha20-poly1305",
+      "kem": "x25519",
+      "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+      "slots": [
+        {
+          "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
+          "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+        }
+      ],
+      "slots_mac_hex": "972bc8e05aa8eff2d59ae1f5a6f65a158a381ea65c265ae202277d25d60dd46c"
+    },
+    "ciphertext_hex": "7602a83065b2f5411a418e534f196afc",
+    "expected_plaintext_hex": ""
+  }
+}

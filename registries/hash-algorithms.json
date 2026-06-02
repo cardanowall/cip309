@@ -1,0 +1,18 @@
+{
+  "registry": "hash-algorithms",
+  "description": "Content-hash algorithm registry. Each identifier names a hash function used to commit to content in a record's `hashes` map and to a Merkle leaf's content digest. The pinned `digest_length_bytes` is the exact byte length the structural validator requires for a digest under that identifier; any other length is a HASH_DIGEST_LENGTH_MISMATCH, and any unregistered identifier is an UNSUPPORTED_HASH_ALG. Additions are additive-only and must ship with conformance vectors.",
+  "entries": [
+    {
+      "identifier": "sha2-256",
+      "description": "SHA-256 from the SHA-2 family. The interoperability baseline content hash.",
+      "digest_length_bytes": 32,
+      "reference": "FIPS 180-4 (Secure Hash Standard)"
+    },
+    {
+      "identifier": "blake2b-256",
+      "description": "BLAKE2b with a 256-bit output. A fast modern alternative to SHA-256 for content commitments.",
+      "digest_length_bytes": 32,
+      "reference": "RFC 7693 (The BLAKE2 Cryptographic Hash and Message Authentication Code)"
+    }
+  ]
+}

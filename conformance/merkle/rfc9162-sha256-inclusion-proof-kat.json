@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "primitive": "merkle-rfc9162-sha256-inclusion-proof",
+  "description": "Positive known-answer vectors for rfc9162-sha256 inclusion (audit) proofs per RFC 9162 §2.1.1 (proof generation) and §2.1.3.2 (proof verification). A proof is the ordered array of 32-byte sibling node hashes from the leaf level up to the root: proof[0] is the leaf-level sibling, proof[len-1] is the top-level sibling. Verification recomputes from leaf = SHA-256(0x00 || leaf_digest), folding each sibling (left child when the running node is a right child, else right child) and MUST equal root after the final fold. The single-leaf tree has an empty proof. Each case lists every leaf position. Tree 'tree-4' is the balanced split (4 -> 2+2); tree 'tree-7' exercises two levels of odd-leaf recursion (7 -> 4+3, right subtree 3 -> 2+1). Roots match the rfc9162-sha256-root-kat vectors. Every proof MUST be produced byte-identically and accepted by conforming verifiers.",
+  "alg": "rfc9162-sha256",
+  "trees": [
+    {
+      "name": "tree-4",
+      "tree_size": 4,
+      "root": "93a86cdff4f26f1a7c9793cc7c3ce107102570a81a323902617f7c13670582ee",
+      "leaves": [
+        "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c",
+        "986aad6d251d450b9e7cd0c811e65bc95f95688060d963a83ab6505da350be56",
+        "27f4c2b7157b2e28b1a08e47fce1c3fa27a0f2c8a6760f5995c8a83c9cd1cacc",
+        "49707d9c71d5ebf72aaa3ada7a34e152d41811b345366681fc09849e8c634076"
+      ],
+      "inclusions": [
+        {
+          "index": 0,
+          "leaf": "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c",
+          "proof": [
+            "7c55458ad0046eaadabc4a77b312225471068b6e98aae84050312dd49fbd5db5",
+            "1e4e22ce45fea38703a4c93994677fdb3b2602650c835bb7448c81a68a561363"
+          ]
+        },
+        {
+          "index": 1,
+          "leaf": "986aad6d251d450b9e7cd0c811e65bc95f95688060d963a83ab6505da350be56",
+          "proof": [
+            "b696b144b6e6815fb3e83cbd501bca5b3e509fd0d309d582a8329718b9516ccc",
+            "1e4e22ce45fea38703a4c93994677fdb3b2602650c835bb7448c81a68a561363"
+          ]
+        },
+        {
+          "index": 2,
+          "leaf": "27f4c2b7157b2e28b1a08e47fce1c3fa27a0f2c8a6760f5995c8a83c9cd1cacc",
+          "proof": [
+            "2c03e3ac9e4cf8ec8b505361e892e257ca59d91fa6a3b4741de9cd5962b62737",
+            "f44b533747be7db04b33260c722d24b7e8bc9231511cc1dd291bb9134cd9aaee"
+          ]
+        },
+        {
+          "index": 3,
+          "leaf": "49707d9c71d5ebf72aaa3ada7a34e152d41811b345366681fc09849e8c634076",
+          "proof": [
+            "807ffa56924d0647034b00f8ce5517917ab065335048a1ea53f920c2274a2890",
+            "f44b533747be7db04b33260c722d24b7e8bc9231511cc1dd291bb9134cd9aaee"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tree-7",
+      "tree_size": 7,
+      "root": "90306bf5dca8f89e7b253471148f3795e7a6c857f04924c8309d81375e79d987",
+      "leaves": [
+        "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c",
+        "986aad6d251d450b9e7cd0c811e65bc95f95688060d963a83ab6505da350be56",
+        "27f4c2b7157b2e28b1a08e47fce1c3fa27a0f2c8a6760f5995c8a83c9cd1cacc",
+        "49707d9c71d5ebf72aaa3ada7a34e152d41811b345366681fc09849e8c634076",
+        "e1599f1d13ee839f0fe64c2d5697b9d098ea947053f2fd8033e93b5ea1da8970",
+        "7777a46ef6264ec24caf8239bea80bd6b3b1e38e9d3dc4f9daf6ce3722e8ba02",
+        "741c8f1001d6e807fac74c182d15f01fba2ed98375ca7a7cdc6257fdae97b621"
+      ],
+      "inclusions": [
+        {
+          "index": 0,
+          "leaf": "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c",
+          "proof": [
+            "7c55458ad0046eaadabc4a77b312225471068b6e98aae84050312dd49fbd5db5",
+            "1e4e22ce45fea38703a4c93994677fdb3b2602650c835bb7448c81a68a561363",
+            "32f86b4111e8859b214cf501d1091023da954f169d8916dce42aa469c5795d17"
+          ]
+        },
+        {
+          "index": 1,
+          "leaf": "986aad6d251d450b9e7cd0c811e65bc95f95688060d963a83ab6505da350be56",
+          "proof": [
+            "b696b144b6e6815fb3e83cbd501bca5b3e509fd0d309d582a8329718b9516ccc",
+            "1e4e22ce45fea38703a4c93994677fdb3b2602650c835bb7448c81a68a561363",
+            "32f86b4111e8859b214cf501d1091023da954f169d8916dce42aa469c5795d17"
+          ]
+        },
+        {
+          "index": 2,
+          "leaf": "27f4c2b7157b2e28b1a08e47fce1c3fa27a0f2c8a6760f5995c8a83c9cd1cacc",
+          "proof": [
+            "2c03e3ac9e4cf8ec8b505361e892e257ca59d91fa6a3b4741de9cd5962b62737",
+            "f44b533747be7db04b33260c722d24b7e8bc9231511cc1dd291bb9134cd9aaee",
+            "32f86b4111e8859b214cf501d1091023da954f169d8916dce42aa469c5795d17"
+          ]
+        },
+        {
+          "index": 3,
+          "leaf": "49707d9c71d5ebf72aaa3ada7a34e152d41811b345366681fc09849e8c634076",
+          "proof": [
+            "807ffa56924d0647034b00f8ce5517917ab065335048a1ea53f920c2274a2890",
+            "f44b533747be7db04b33260c722d24b7e8bc9231511cc1dd291bb9134cd9aaee",
+            "32f86b4111e8859b214cf501d1091023da954f169d8916dce42aa469c5795d17"
+          ]
+        },
+        {
+          "index": 4,
+          "leaf": "e1599f1d13ee839f0fe64c2d5697b9d098ea947053f2fd8033e93b5ea1da8970",
+          "proof": [
+            "f03cea80d0e99780698a755e4684555e821c2af821f97058926caf8e2d7d2969",
+            "5bd8bd33c7e3c41a98511068b7dfea418b5a6c84ff53767a1c7c0565efb651f4",
+            "93a86cdff4f26f1a7c9793cc7c3ce107102570a81a323902617f7c13670582ee"
+          ]
+        },
+        {
+          "index": 5,
+          "leaf": "7777a46ef6264ec24caf8239bea80bd6b3b1e38e9d3dc4f9daf6ce3722e8ba02",
+          "proof": [
+            "57fe46aac0fcd5d1392884b3523724bd145dcf9f70aa176318808ea56a9f8009",
+            "5bd8bd33c7e3c41a98511068b7dfea418b5a6c84ff53767a1c7c0565efb651f4",
+            "93a86cdff4f26f1a7c9793cc7c3ce107102570a81a323902617f7c13670582ee"
+          ]
+        },
+        {
+          "index": 6,
+          "leaf": "741c8f1001d6e807fac74c182d15f01fba2ed98375ca7a7cdc6257fdae97b621",
+          "proof": [
+            "02c09225565b2fb10fd263edc6951200c743b9121192f68ba7967ffc8a6f1128",
+            "93a86cdff4f26f1a7c9793cc7c3ce107102570a81a323902617f7c13670582ee"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tree-1",
+      "tree_size": 1,
+      "root": "b696b144b6e6815fb3e83cbd501bca5b3e509fd0d309d582a8329718b9516ccc",
+      "leaves": [
+        "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c"
+      ],
+      "inclusions": [
+        {
+          "index": 0,
+          "leaf": "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c",
+          "proof": []
+        }
+      ]
+    }
+  ]
+}

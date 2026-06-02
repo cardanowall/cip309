@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "primitive": "sealed-poe-unwrap-multipriv",
+  "source": "multi-priv trial-decrypt iterator extension",
+  "vector": {
+    "name": "multipriv-archived-match-n3-k4",
+    "recipient_privs_hex": [
+      "1111111111111111111111111111111111111111111111111111111111111111",
+      "2222222222222222222222222222222222222222222222222222222222222222",
+      "3333333333333333333333333333333333333333333333333333333333333333",
+      "4444444444444444444444444444444444444444444444444444444444444444"
+    ],
+    "envelope": {
+      "scheme": 1,
+      "aead": "xchacha20-poly1305",
+      "kem": "x25519",
+      "nonce_hex": "b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1",
+      "slots": [
+        {
+          "epk_hex": "42575d5c8a93833255e09f04054a4f6246d36ed163c1c7f80c1fc9a58a0e912d",
+          "wrap_hex": "8ac8f62f307041e7f73ae409b539f1997a815defe46c3881a4bbdac25fed5cfb6ba5ac6fea77d4da8af9cf8d656f25c6"
+        },
+        {
+          "epk_hex": "b63d05558f21e85cf2e5721509301077a508733b05dff3e6f518ea04aec42c65",
+          "wrap_hex": "0f62a2f056dd4c9dbbed0bde00dc69c1df3d09a15591034a677aa73ec2584b8da17da55f0ddab4919a09535f27166f6a"
+        },
+        {
+          "epk_hex": "bfda3768f927db529fe9f0f6ee4ba469e432c93bb6fbb8ed5d04e87ed0a45d7b",
+          "wrap_hex": "1f242d63b53f0425621bc2c6f357bad74e3aa82ec6dfe02e4624ac1c978bd65c28f22546b4e5b1e4b5aa005111221a11"
+        }
+      ],
+      "slots_mac_hex": "2425151f3831709dccc01e17192b2c2fb585ec815481e24d62f0c96105c2b0be"
+    },
+    "ciphertext_hex": "a9ffdfe7c6c8e5abd807940bbb3ab65b37a898295a876b63b79bcde3571a14203e6317f88aacf5e517b1c765cfecc604",
+    "expected_plaintext_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    "expected_matching_priv_index": 2,
+    "expected_outer_loop_count": 3,
+    "expected_inner_loop_count_per_priv": 3
+  }
+}

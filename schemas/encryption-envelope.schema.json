@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cip309.org/schemas/encryption-envelope.schema.json",
+  "title": "CIP-309 sealed-PoE encryption envelope",
+  "description": "The `enc` block of an item: a CLOSED CBOR map describing a sealed-PoE envelope whose ciphertext lives at the item's content-addressed URI (ar:// / ipfs://). `scheme` MUST be the unsigned integer 1 — modelled here as an unconstrained value (the structural superset), with the literal-1 requirement enforced by the domain pass (UNSUPPORTED_ENVELOPE_SCHEME). `aead` is the content cipher identifier (open). `nonce` is the AEAD nonce (hex byte string; its exact length is the per-AEAD NONCE_LENGTH_MISMATCH domain check — e.g. 24 bytes for xchacha20-poly1305). `kem`, `slots`, `slots_mac`, and `passphrase` are all OPTIONAL at this structural layer. STRUCTURAL only — the following cross-field invariants are NOT expressible here and are domain-pass checks emitting typed codes: slots XOR passphrase (mutually exclusive); slots requires both kem and slots_mac; slots non-empty; the KEM-driven per-slot shape; the argon2id floors; content-hash binding. The map is closed: unknown keys are rejected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["scheme", "aead", "nonce"],
+  "properties": {
+    "scheme": {
+      "$comment": "MUST equal unsigned integer 1; modelled as any value structurally (mirrors the permissive Zod `z.unknown()`), value enforced by the domain pass (UNSUPPORTED_ENVELOPE_SCHEME).",
+      "type": ["integer", "string", "number", "boolean", "array", "object", "null"]
+    },
+    "aead": {
+      "$ref": "defs.schema.json#/$defs/aead-alg"
+    },
+    "nonce": {
+      "$comment": "AEAD nonce, hex byte string; exact length per-AEAD (NONCE_LENGTH_MISMATCH) is a domain-pass check, not asserted structurally.",
+      "type": "string",
+      "pattern": "^([0-9a-f]{2})+$"
+    },
+    "kem": {
+      "$ref": "defs.schema.json#/$defs/kem-alg"
+    },
+    "slots": {
+      "type": "array",
+      "items": {
+        "$ref": "encryption-slot.schema.json"
+      }
+    },
+    "slots_mac": {
+      "$comment": "32-byte MAC over the slot set; wrong length emits ENC_SLOTS_MAC_INVALID_LENGTH.",
+      "$ref": "defs.schema.json#/$defs/bytes32"
+    },
+    "passphrase": {
+      "$ref": "passphrase-block.schema.json"
+    }
+  }
+}

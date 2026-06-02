@@ -1,0 +1,17 @@
+{
+  "wallet": "nufi",
+  "tamper_variant": "missing-address",
+  "captured_from_positive_fixture": "nufi-cose.json",
+  "record_body_cbor_hex": "a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
+  "to_sign_bytes_hex": "63617264616e6f2d706f652d7265636f72642d7369672d7631a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
+  "tamper_signer_pubkey_hex": "fdb45c9ce598a85c1cf9bcebd2028e9ceba2dee0c9d15c2292d4be58b9d24c19",
+  "cose_sign1_bytes_hex": "8443a10127a0f658408aa5b215649ec45bd917e69ef3affc29098ba03cf030bc6501ff0d718789fd865e27dcd6ea5441bb78dd041eab54251509bd731c990e86468e394243b6017906",
+  "cose_key_bytes_hex": "a4010103272006215820fdb45c9ce598a85c1cf9bcebd2028e9ceba2dee0c9d15c2292d4be58b9d24c19",
+  "expected_normalized_verdict": {
+    "index": 0,
+    "signer_pub_hex": "fdb45c9ce598a85c1cf9bcebd2028e9ceba2dee0c9d15c2292d4be58b9d24c19",
+    "signer_type": "wallet-inline-key",
+    "ok": false,
+    "reason": "WALLET_ADDRESS_MISMATCH"
+  }
+}

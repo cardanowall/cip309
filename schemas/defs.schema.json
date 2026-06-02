@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cip309.org/schemas/defs.schema.json",
+  "title": "CIP-309 shared definitions",
+  "description": "Shared $defs reused across the CIP-309 JSON Schema set: fixed-length byte-string types and the open algorithm-identifier string types for each registry. CBOR has a native byte-string type; JSON does not. Every CBOR `bstr` is therefore modelled here as a lowercase-hex JSON string whose character count is twice the documented byte length (e.g. a 32-byte digest is a 64-character hex string). The algorithm-identifier `$defs` are deliberately OPEN strings: structural validation cannot decide registry membership (whether `sha2-256`, `xchacha20-poly1305`, etc. is registered) — that is a typed error-code check performed by the validator's domain pass against the extensible registries, proven by the conformance vectors. These schemas describe only the PERMISSIVE structural superset; cross-field invariants and per-algorithm digest/field lengths are not expressible here.",
+  "$defs": {
+    "bytes32": {
+      "title": "32-byte byte string (hex-encoded)",
+      "description": "A CBOR `bstr` of exactly 32 bytes, modelled as a 64-character lowercase-hex JSON string. Used for content-hash digests, Merkle roots, the supersedes tx hash, and slots_mac.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "bytes48": {
+      "title": "48-byte byte string (hex-encoded)",
+      "description": "A CBOR `bstr` of exactly 48 bytes (32-byte content-encryption key + 16-byte AEAD tag), modelled as a 96-character lowercase-hex JSON string. Used for the per-slot `wrap` field on every KEM.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{96}$"
+    },
+    "content-hash-alg": {
+      "title": "Content-hash algorithm identifier",
+      "description": "Named identifier of a content-hash algorithm from the extensible hash-algorithm registry (e.g. sha2-256, blake2b-256). OPEN string here: registry membership (UNSUPPORTED_HASH_ALG) and the per-algorithm digest length (HASH_DIGEST_LENGTH_MISMATCH) are not structural and are checked by the validator's domain pass.",
+      "type": "string",
+      "minLength": 1
+    },
+    "merkle-commit-alg": {
+      "title": "Merkle list-commitment algorithm identifier",
+      "description": "Named identifier of a Merkle list-commitment algorithm from the extensible registry (e.g. rfc9162-sha256). OPEN string here: registry membership (UNSUPPORTED_MERKLE_COMMIT_ALG) is a domain-pass check.",
+      "type": "string",
+      "minLength": 1
+    },
+    "aead-alg": {
+      "title": "Content AEAD algorithm identifier",
+      "description": "Named identifier of an authenticated-encryption cipher from the extensible AEAD registry (e.g. xchacha20-poly1305). OPEN string here: registry membership (UNSUPPORTED_AEAD_ALG), the unauthenticated-cipher denylist (UNAUTHENTICATED_CIPHER_FORBIDDEN), and the per-AEAD nonce length (NONCE_LENGTH_MISMATCH) are domain-pass checks.",
+      "type": "string",
+      "minLength": 1
+    },
+    "kem-alg": {
+      "title": "KEM algorithm identifier",
+      "description": "Named identifier of a key-encapsulation mechanism from the extensible KEM registry (e.g. x25519, mlkem768x25519). OPEN string here: registry membership and the KEM-driven slot shape (ENC_SLOT_INVALID_SHAPE, KEM_*_LENGTH_MISMATCH) are domain-pass checks — a slot cannot see the envelope-level kem in isolation.",
+      "type": "string",
+      "minLength": 1
+    },
+    "kdf-alg": {
+      "title": "Passphrase KDF algorithm identifier",
+      "description": "Named identifier of a password-based key-derivation function from the extensible KDF registry (e.g. argon2id). OPEN string here: registry membership (ENC_PASSPHRASE_ALG_UNSUPPORTED) and the per-KDF params shape/floor (ENC_PASSPHRASE_ARGON2_PARAMS_TOO_LOW) are domain-pass checks.",
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

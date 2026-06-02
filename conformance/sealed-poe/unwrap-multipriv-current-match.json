@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "primitive": "sealed-poe-unwrap-multipriv",
+  "source": "multi-priv trial-decrypt iterator extension",
+  "vector": {
+    "name": "multipriv-current-match-n1-k4",
+    "recipient_privs_hex": [
+      "1111111111111111111111111111111111111111111111111111111111111111",
+      "2222222222222222222222222222222222222222222222222222222222222222",
+      "3333333333333333333333333333333333333333333333333333333333333333",
+      "4444444444444444444444444444444444444444444444444444444444444444"
+    ],
+    "envelope": {
+      "scheme": 1,
+      "aead": "xchacha20-poly1305",
+      "kem": "x25519",
+      "nonce_hex": "b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0",
+      "slots": [
+        {
+          "epk_hex": "1c78fc71ef01855f670c555c82226397f0e73b0aaf443a491d4110dc22f28236",
+          "wrap_hex": "fa93c39fb422450bdbf8e9373e39aef4eecc2a71449179cbc429058b7d3544f1fed99b8af500c2c780376b5e9db9230f"
+        }
+      ],
+      "slots_mac_hex": "4be8da69845f7bb4f990e269c7fa584be56b8a5267d5a20f4cb7cc4490908f27"
+    },
+    "ciphertext_hex": "19943e86a5f2f5d04bfc1427246a6f16be3778cdd2c55cb9f1903846da5405b27d28deff87a3c2663f04c78ec3401957",
+    "expected_plaintext_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+    "expected_matching_priv_index": 0,
+    "expected_outer_loop_count": 1,
+    "expected_inner_loop_count_per_priv": 1
+  }
+}

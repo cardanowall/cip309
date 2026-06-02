@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cip309.org/schemas/poe-record.schema.json",
+  "title": "CIP-309 v1 PoE record",
+  "description": "The top-level CIP-309 Proof-of-Existence record, as decoded from canonical CBOR carried under transaction metadata label 309. A CBOR map whose only required key is `v` (the version, the literal unsigned integer 1; a future major version is rejected as SCHEMA_INVALID_LITERAL). All payload keys are optional at this structural layer: `items[]` (inline content claims), `merkle[]` (Merkle list commitments), `supersedes` (prior-record tx hash), `sigs[]` (optional authorship signatures), `crit[]` (criticality markers). Beyond these base keys the record has an OPEN extension namespace: keys matching `^x-.+` (vendor) or `^[a-z]+-.+` (companion) are admitted; any other unknown key is rejected (SCHEMA_UNKNOWN_FIELD). STRUCTURAL only — the following are NOT expressible here and are domain-pass checks: at least one of items/merkle must be non-empty; crit[] entry shape; registry membership of all algorithm identifiers; and every cross-field invariant of the sub-structures. The extension-key patterns tolerate exactly one trailing newline, mirroring the reference validators.",
+  "type": "object",
+  "required": ["v"],
+  "properties": {
+    "v": {
+      "title": "Record version",
+      "description": "The CIP-309 record version. MUST be the literal unsigned integer 1; any other value is rejected as SCHEMA_INVALID_LITERAL.",
+      "const": 1
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "item-entry.schema.json"
+      }
+    },
+    "merkle": {
+      "type": "array",
+      "items": {
+        "$ref": "merkle-commit.schema.json"
+      }
+    },
+    "supersedes": {
+      "$ref": "supersedes.schema.json"
+    },
+    "sigs": {
+      "type": "array",
+      "items": {
+        "$ref": "sig-entry.schema.json"
+      }
+    },
+    "crit": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "patternProperties": {
+    "^x-.+\n?$": true,
+    "^[a-z]+-.+\n?$": true
+  },
+  "additionalProperties": false
+}

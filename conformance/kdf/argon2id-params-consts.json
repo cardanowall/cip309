@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "primitive": "argon2id-params",
+  "discovery": {
+    "mem_size_kb": 65536,
+    "iterations": 3,
+    "parallelism": 1,
+    "out_bytes": 32
+  }
+}

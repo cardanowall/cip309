@@ -1,0 +1,19 @@
+{
+  "registry": "kdf-algorithms",
+  "description": "Passphrase-KDF registry: the key-derivation functions selectable on the wire via an encryption envelope's `passphrase.alg` field, used to stretch a human passphrase into a content-encryption key for the passphrase key-path (the alternative to recipient KEM slots). The pinned `params` carry the closed parameter set and security floors the structural validator enforces; values below the floor are ENC_PASSPHRASE_ARGON2_PARAMS_TOO_LOW, an out-of-range salt is ENC_PASSPHRASE_SALT_TOO_SHORT or ENC_PASSPHRASE_SALT_TOO_LONG, an unknown params field is SCHEMA_UNKNOWN_FIELD, and an unregistered identifier is ENC_PASSPHRASE_ALG_UNSUPPORTED. Note: HKDF-SHA-256 and HMAC-SHA-256 are FIXED constructions used internally (slot key derivation, MACs) and carry no wire identifier — they are not selectable and are not entries here. PBKDF2-SHA-256 is intentionally excluded: it belongs to the out-of-scope identity key-envelope, not to this wire standard. Additions are additive-only and must ship with conformance vectors.",
+  "entries": [
+    {
+      "identifier": "argon2id",
+      "description": "Argon2id memory-hard password-hashing function. The sole wire-selectable passphrase KDF for the passphrase key-path. The validator enforces a closed parameter set {m, t, p} with minimum floors and a bounded salt length.",
+      "output_length_bytes": 32,
+      "params": {
+        "m_min_kib": 65536,
+        "t_min": 3,
+        "p_min": 1,
+        "salt_length_bytes_min": 16,
+        "salt_length_bytes_max": 64
+      },
+      "reference": "RFC 9106 (Argon2 Memory-Hard Function for Password Hashing and Proof-of-Work)"
+    }
+  ]
+}

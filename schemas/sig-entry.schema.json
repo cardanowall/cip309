@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cip309.org/schemas/sig-entry.schema.json",
+  "title": "CIP-309 signature entry",
+  "description": "A single optional record-level authorship signature: a CLOSED CBOR map `{cose_sign1, ? cose_key}`. `cose_sign1` (REQUIRED) is a COSE_Sign1 structure carried as a chunked byte-string array (oversized byte strings split into 1..64-byte chunks). `cose_key` (optional) is the signer's public COSE_Key, likewise chunked. STRUCTURAL only: COSE_Sign1 structural decode, the path-1/path-2 mutual exclusion, the SIG_PRIVATE_KEY_LEAKED guard, and signature cryptographic verification are domain-pass / verifier concerns. The map is closed: unknown keys are rejected. (Canonical CBOR map-key ordering places `cose_key` before `cose_sign1`; JSON property order is irrelevant.)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["cose_sign1"],
+  "properties": {
+    "cose_sign1": {
+      "$ref": "chunked-bytes-array.schema.json"
+    },
+    "cose_key": {
+      "$ref": "chunked-bytes-array.schema.json"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "registry": "kem-algorithms",
+  "description": "Key-encapsulation-mechanism registry. Each identifier names the KEM used to wrap a content-encryption key to a recipient and pins the exact recipient-slot shape. A slot is a closed 2-key map: the KEM's ciphertext-bearing field plus a 48-byte `wrap` (32-byte CEK + 16-byte AEAD tag). The validator branches on the descriptor for the declared `kem` to know which ciphertext field MUST be present (and at what reassembled length) and which MUST be absent; a slot carrying the other KEM's field, a stray key, or a wrong-length field is an ENC_SLOT_INVALID_SHAPE, a wrong-length ciphertext field is KEM_EPK_LENGTH_MISMATCH or KEM_CT_LENGTH_MISMATCH, a wrong-length wrap is WRAP_LENGTH_MISMATCH, and an unregistered identifier is an UNSUPPORTED_KEM_ALG. The `hrp` is the Bech32 human-readable prefix of the recipient public-key encoding for that KEM. Additions are additive-only and must ship with conformance vectors.",
+  "entries": [
+    {
+      "identifier": "x25519",
+      "description": "Classical ephemeral-static X25519 key agreement. Each slot carries the 32-byte ephemeral public key `epk`; there is no separate KEM ciphertext field.",
+      "post_quantum": false,
+      "default": false,
+      "slot": {
+        "epk_length_bytes": 32,
+        "wrap_length_bytes": 48
+      },
+      "hrp": "age1",
+      "reference": "RFC 7748 (Elliptic Curves for Security, Curve25519)"
+    },
+    {
+      "identifier": "mlkem768x25519",
+      "description": "X-Wing hybrid KEM combining ML-KEM-768 (post-quantum) with X25519 (classical), with a SHA3-256 combiner binding both shared secrets. The hybrid post-quantum default: it remains secure if either component holds. Each slot carries the X-Wing KEM ciphertext `kem_ct` as a chunked byte-string array (each chunk 1..64 bytes) that MUST reassemble to exactly 1120 bytes; there is no per-slot `epk` on the hybrid path. The recipient public key is 1216 bytes. The human-readable prefix is age1pqc — NOT age1pq (which collides with an upstream native ML-KEM-768+X25519 encoding).",
+      "post_quantum": true,
+      "default": true,
+      "slot": {
+        "kem_ct_length_bytes": 1120,
+        "kem_ct_chunk_length_bytes": "1..64",
+        "wrap_length_bytes": 48
+      },
+      "pubkey_length_bytes": 1216,
+      "kem_ct_length_bytes": 1120,
+      "combiner": "SHA3-256",
+      "hrp": "age1pqc",
+      "reference": "draft-connolly-cfrg-xwing-kem-06 (X-Wing hybrid KEM), FIPS 203 (ML-KEM), RFC 7748 (X25519), and FIPS 202 (SHA3-256 combiner)"
+    }
+  ]
+}

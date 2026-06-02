@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "primitive": "mlkem768x25519",
+  "source": "https://github.com/RustCrypto/KEMs/blob/2425fe5a3380fcc125f01ae7662e467c8857148d/x-wing/src/test-vectors.json (draft-connolly-cfrg-xwing-kem-06)",
+  "vectors": [
+    {
+      "name": "rustcrypto-xwing-v06-vec0",
+      "seed_hex": "7f9c2ba4e88f827d616045507605853ed73b8093f6efbc88eb1a6eacfa66ef26",
+      "expected_expanded_hex": "c44829d2b269887f6150dfaee5a25a704cbc607e57d18a2ffc8734633333cff0f0fc6fa4e4827531168087ef223e9b070c5a78a789fd46d4c604d69b1139d4dacd3f2cce66ed130e5e73a0ebd454e15488885a2a1544252a20e0f58b6e8fc27b",
+      "split_note": "shake_256(seed,96): bytes[0:32]=ML-KEM keygen coin d, bytes[32:64]=ML-KEM keygen coin z (d||z is ML-KEM-768 _keygen_internal input / key_derive seed), bytes[64:96]=X25519 secret scalar (X25519 clamps internally at use; store raw)"
+    },
+    {
+      "name": "rustcrypto-xwing-v06-vec1",
+      "seed_hex": "badfd6dfaac359a5efbb7bcc4b59d538df9a04302e10c8bc1cbf1a0b3a5120ea",
+      "expected_expanded_hex": "0740ffcd2c4eae453ceaaf8721f57509bb8b4341fa78c317309315e3cf65668ddd85ff777fd177212a0a509cba26924d8ac573a7a22f4e4bd00c4668f751696affca9e2e2ac24a625842c6687fb7b62e5c933c08f93ca9b0099dff1d54a57885",
+      "split_note": "shake_256(seed,96): bytes[0:32]=ML-KEM keygen coin d, bytes[32:64]=ML-KEM keygen coin z (d||z is ML-KEM-768 _keygen_internal input / key_derive seed), bytes[64:96]=X25519 secret scalar (X25519 clamps internally at use; store raw)"
+    },
+    {
+      "name": "rustcrypto-xwing-v06-vec2",
+      "seed_hex": "ef58538b8d23f87732ea63b02b4fa0f4873360e2841928cd60dd4cee8cc0d4c9",
+      "expected_expanded_hex": "f745a4e723f559fd40ec7cbd4dba3d7bf35cfccab2fe9573264948e1fc5cc50d3ff5c5ec5d4fa295b9215cf109c1b4c1c705cc8c4257d3c3d66a63c691bd6282d1c38db0b7bd7cf2ebfa89d4869344e809871a2b774e8482c48dcef15fa39538",
+      "split_note": "shake_256(seed,96): bytes[0:32]=ML-KEM keygen coin d, bytes[32:64]=ML-KEM keygen coin z (d||z is ML-KEM-768 _keygen_internal input / key_derive seed), bytes[64:96]=X25519 secret scalar (X25519 clamps internally at use; store raw)"
+    }
+  ]
+}

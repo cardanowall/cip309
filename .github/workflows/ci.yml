@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-data:
+    name: Validate JSON data
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Validate every JSON file under schemas/, registries/, conformance/
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find schemas registries conformance -type f -name '*.json' 2>/dev/null | sort)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No JSON files found yet — nothing to validate."
+            exit 0
+          fi
+          status=0
+          for f in "${files[@]}"; do
+            if python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f"; then
+              echo "ok: $f"
+            else
+              echo "INVALID JSON: $f"
+              status=1
+            fi
+          done
+          exit "$status"
+
+  examples-typescript:
+    name: TypeScript examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check for a TypeScript example package
+        id: detect
+        run: |
+          if [ -f examples/typescript/package.json ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "No examples/typescript/package.json — skipping."
+          fi
+
+      - uses: actions/setup-node@v6
+        if: steps.detect.outputs.present == 'true'
+        with:
+          node-version: 20
+
+      - name: Install, typecheck, and lint
+        if: steps.detect.outputs.present == 'true'
+        working-directory: examples/typescript
+        run: |
+          set -euo pipefail
+          npm ci || npm install
+          npm run typecheck --if-present
+          npm run lint --if-present
+
+  examples-python:
+    name: Python examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Check for a Python example project
+        id: detect
+        run: |
+          if [ -f examples/python/pyproject.toml ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "No examples/python/pyproject.toml — skipping."
+          fi
+
+      - uses: actions/setup-python@v6
+        if: steps.detect.outputs.present == 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Install, lint, and type-check
+        if: steps.detect.outputs.present == 'true'
+        working-directory: examples/python
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install ruff mypy
+          pip install -e . || pip install .
+          ruff check .
+          mypy .

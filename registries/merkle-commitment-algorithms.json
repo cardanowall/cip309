@@ -1,0 +1,15 @@
+{
+  "registry": "merkle-commitment-algorithms",
+  "description": "Merkle list-commitment algorithm registry. Each identifier names the tree construction used to compute the `root` of a `merkle[]` commitment, which lets one record commit to many content digests under a single on-chain root. The pinned `root_length_bytes` is the exact byte length the structural validator requires for the root under that identifier; any other length is a HASH_DIGEST_LENGTH_MISMATCH, and any unregistered identifier is an UNSUPPORTED_MERKLE_COMMIT_ALG. Additions are additive-only and must ship with conformance vectors.",
+  "entries": [
+    {
+      "identifier": "rfc9162-sha256",
+      "description": "Binary Merkle tree per the RFC 9162 Merkle Tree Hash, using SHA-256. Domain-separation prefixes are applied before hashing: a 0x00 byte prefixes each leaf input and a 0x01 byte prefixes each internal-node input, which prevents second-preimage attacks that swap a leaf for an internal node. The root is the SHA-256 output of the tree.",
+      "root_length_bytes": 32,
+      "leaf_domain_prefix": "0x00",
+      "internal_domain_prefix": "0x01",
+      "hash": "sha2-256",
+      "reference": "RFC 9162 §2.1.1 (Certificate Transparency v2.0, Merkle Tree definition)"
+    }
+  ]
+}

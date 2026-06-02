@@ -1,0 +1,404 @@
+{
+  "registry": "error-codes",
+  "description": "The complete CIP-309 v1 error-code catalogue. Codes are SCREAMING_SNAKE_CASE and stable; implementations MUST emit them byte-exact and MUST NOT introduce lowercase synonyms. Part A codes are emitted by the structural validator (a pure function over CBOR bytes — no I/O, no signature verification, no decryption). Part B codes are emitted by the public verifier and recipient verifier (which fetch metadata, verify signatures, resolve URIs, and decrypt). Severities are taken from the frozen severity map: `error` fails the record, `warning` is a non-fatal runtime anomaly, and `info` is a deliberate non-check that does not fail the record. Two codes carry dual severity (`dual_severity: true`): their default reading is `info`, and a strict / merkle-only verifier promotes them to `error`. Additions are additive-only and must ship with conformance vectors.",
+  "entries": [
+    {
+      "code": "MALFORMED_CBOR",
+      "part": "A",
+      "severity": "error",
+      "description": "Canonical-CBOR decode failed. A single code covers every decode failure: malformed or truncated bytes, indefinite-length (streaming) encodings, non-canonical (unsorted) map-key ordering, duplicate map keys, non-minimal integers, and invalid UTF-8."
+    },
+    {
+      "code": "SCHEMA_TYPE_MISMATCH",
+      "part": "A",
+      "severity": "error",
+      "description": "A field is present but has the wrong CBOR type or shape (e.g. a non-map `hashes`, a non-integer Argon2id parameter, or an empty `crit[]`)."
+    },
+    {
+      "code": "SCHEMA_MISSING_REQUIRED",
+      "part": "A",
+      "severity": "error",
+      "description": "A required field is absent (e.g. the record version `v` or another mandatory key)."
+    },
+    {
+      "code": "SCHEMA_UNKNOWN_FIELD",
+      "part": "A",
+      "severity": "error",
+      "description": "An unrecognized field appears where the map is closed — an unknown top-level key outside the base set and the extension-key namespaces, or an unknown Argon2id params field."
+    },
+    {
+      "code": "SCHEMA_INVALID_LITERAL",
+      "part": "A",
+      "severity": "error",
+      "description": "A field that must equal a fixed literal carries a present-but-wrong value (e.g. the record version `v` set to a value other than the required literal)."
+    },
+    {
+      "code": "SCHEMA_EMPTY_RECORD",
+      "part": "A",
+      "severity": "error",
+      "description": "The record carries no content commitment: both `items[]` and `merkle[]` are empty or absent. A record MUST carry at least one of them non-empty."
+    },
+    {
+      "code": "HASH_DIGEST_LENGTH_MISMATCH",
+      "part": "A",
+      "severity": "error",
+      "description": "A digest's byte length does not match the length pinned for its algorithm — either a content-hash digest in an item's `hashes` map or a `merkle[]` commitment root."
+    },
+    {
+      "code": "UNSUPPORTED_HASH_ALG",
+      "part": "A",
+      "severity": "error",
+      "description": "An item's `hashes` map names a content-hash algorithm that is not in the hash-algorithm registry."
+    },
+    {
+      "code": "UNSUPPORTED_MERKLE_COMMIT_ALG",
+      "part": "A",
+      "severity": "error",
+      "description": "A `merkle[]` commitment names an algorithm that is not in the Merkle-commitment-algorithm registry."
+    },
+    {
+      "code": "INVALID_URI",
+      "part": "A",
+      "severity": "error",
+      "description": "A reconstructed URI is not a valid absolute URI under the profile — it carries a fragment, lacks a scheme, uses a scheme outside {ar://, ipfs://}, or fails the per-scheme shape check (Arweave 43-char base64url txid, or the IPFS CID profile)."
+    },
+    {
+      "code": "CHUNK_TOO_LARGE",
+      "part": "A",
+      "severity": "error",
+      "description": "A chunk in a chunked byte-string or text array exceeds the maximum per-chunk byte length."
+    },
+    {
+      "code": "UNAUTHENTICATED_CIPHER_FORBIDDEN",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope's `aead` names an unauthenticated cipher — a block-cipher mode with no integrity (CBC, CTR, ECB, CFB, OFB) in any key-size spelling, or a legacy stream/block cipher (RC4, DES, 3DES). Reported instead of the generic UNSUPPORTED_AEAD_ALG so the failure names the integrity hazard precisely."
+    },
+    {
+      "code": "UNSUPPORTED_AEAD_ALG",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope's `aead` names a cipher that is not in the content-AEAD registry (and is not in the forbidden unauthenticated-cipher family)."
+    },
+    {
+      "code": "NONCE_LENGTH_MISMATCH",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope's `nonce` byte length does not match the length pinned for its `aead` algorithm."
+    },
+    {
+      "code": "UNSUPPORTED_ENVELOPE_SCHEME",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope's `scheme` is not the supported unsigned integer scheme identifier."
+    },
+    {
+      "code": "ENC_SLOTS_EMPTY",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope declares `slots` but the array is empty; at least one recipient slot is required."
+    },
+    {
+      "code": "ENC_SLOT_INVALID_SHAPE",
+      "part": "A",
+      "severity": "error",
+      "description": "A recipient slot is not the closed 2-key map the declared KEM requires — it is the wrong type, carries the other KEM's ciphertext field, carries an unexpected key, or is missing a required field."
+    },
+    {
+      "code": "UNSUPPORTED_KEM_ALG",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope's `kem` names a key-encapsulation mechanism that is not in the KEM registry."
+    },
+    {
+      "code": "ENC_KEM_REQUIRED",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope declares `slots` but is missing the `kem` that determines the recipient-slot shape."
+    },
+    {
+      "code": "KEM_EPK_LENGTH_MISMATCH",
+      "part": "A",
+      "severity": "error",
+      "description": "A classical-KEM slot's ephemeral public key `epk` has the wrong byte length for its KEM."
+    },
+    {
+      "code": "KEM_CT_LENGTH_MISMATCH",
+      "part": "A",
+      "severity": "error",
+      "description": "A hybrid-KEM slot's KEM ciphertext `kem_ct` does not reassemble to the byte length pinned for its KEM."
+    },
+    {
+      "code": "WRAP_LENGTH_MISMATCH",
+      "part": "A",
+      "severity": "error",
+      "description": "A recipient slot's `wrap` is not 48 bytes (32-byte wrapped content-encryption key + 16-byte AEAD tag)."
+    },
+    {
+      "code": "ENC_SLOTS_MAC_INVALID_LENGTH",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope's `slots_mac` (the MAC binding the recipient-slot set) has the wrong byte length."
+    },
+    {
+      "code": "ENC_SLOTS_MAC_REQUIRED",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope declares `slots` but is missing the required `slots_mac` binding them."
+    },
+    {
+      "code": "ENC_SLOTS_REQUIRED",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope declares `slots_mac` but carries no `slots` for it to bind."
+    },
+    {
+      "code": "ENC_EXCLUSIVITY_VIOLATION",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope combines the recipient-slot key-path (`slots`) with the passphrase key-path (`passphrase`); exactly one key-path is allowed."
+    },
+    {
+      "code": "ENC_NO_KEY_PATH",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope declares neither `slots` nor `passphrase`, leaving no on-chain key-path to recover the content-encryption key."
+    },
+    {
+      "code": "ENC_REQUIRES_CONTENT_HASH",
+      "part": "A",
+      "severity": "error",
+      "description": "An item carries an `enc` envelope but its `hashes` map declares no content-hash (sha2-256 / blake2b-256), so the ciphertext is not bound to any plaintext digest."
+    },
+    {
+      "code": "ENC_PASSPHRASE_ALG_UNSUPPORTED",
+      "part": "A",
+      "severity": "error",
+      "description": "A passphrase envelope's `alg` names a KDF that is not in the passphrase-KDF registry."
+    },
+    {
+      "code": "ENC_PASSPHRASE_SALT_TOO_SHORT",
+      "part": "A",
+      "severity": "error",
+      "description": "A passphrase envelope's salt is shorter than the minimum salt length."
+    },
+    {
+      "code": "ENC_PASSPHRASE_SALT_TOO_LONG",
+      "part": "A",
+      "severity": "error",
+      "description": "A passphrase envelope's salt is longer than the maximum salt length."
+    },
+    {
+      "code": "ENC_PASSPHRASE_ARGON2_PARAMS_TOO_LOW",
+      "part": "A",
+      "severity": "error",
+      "description": "A passphrase envelope's Argon2id parameters fall below a security floor (memory m < 65536 KiB, time t < 3, or parallelism p < 1)."
+    },
+    {
+      "code": "ENC_PASSPHRASE_PARAMS_EXCEED_POLICY",
+      "part": "A",
+      "severity": "error",
+      "description": "A passphrase envelope's KDF parameters exceed the upper policy bound (a denial-of-service backstop against unbounded work factors)."
+    },
+    {
+      "code": "MALFORMED_SIG_COSE_SIGN1",
+      "part": "A",
+      "severity": "error",
+      "description": "A signature entry's COSE_Sign1 (or its inline COSE_Key sidecar) is structurally invalid — fails to decode, carries an attached (non-detached) payload, or its COSE_Key has the wrong key type, curve, or public-key shape."
+    },
+    {
+      "code": "SIGNATURE_UNSUPPORTED",
+      "part": "A",
+      "severity": "info",
+      "description": "A signature entry's COSE_Sign1 protected `alg` is not a registered signature algorithm label. Info severity: an unrecognized signature algorithm does not fail the record (signatures are always optional)."
+    },
+    {
+      "code": "SIG_ENTRY_INVALID_SHAPE",
+      "part": "A",
+      "severity": "error",
+      "description": "A signature entry is not the closed map the schema requires — wrong type, missing required field, or an unexpected key."
+    },
+    {
+      "code": "SIG_ENTRY_KID_COSE_KEY_CONFLICT",
+      "part": "A",
+      "severity": "error",
+      "description": "A signature entry carries both a 32-byte protected-header `kid` (key-by-reference path) and an inline `cose_key` sidecar (key-by-value path); the two key-resolution paths are mutually exclusive."
+    },
+    {
+      "code": "SIG_PRIVATE_KEY_LEAKED",
+      "part": "A",
+      "severity": "error",
+      "description": "A signature entry's inline COSE_Key carries the private scalar `d` (COSE_Key label -4). Publishing private-key material on the permanent ledger is forbidden; this is a producer-side preflight guard."
+    },
+    {
+      "code": "SUPERSEDES_TX_INVALID_LENGTH",
+      "part": "A",
+      "severity": "error",
+      "description": "A `supersedes` transaction reference does not have the required byte length."
+    },
+    {
+      "code": "EXTENSION_UNSUPPORTED_CRITICAL",
+      "part": "A",
+      "severity": "error",
+      "description": "The record's `crit[]` names a critical extension that this validator does not implement, so the record cannot be safely processed."
+    },
+    {
+      "code": "CRIT_SHAPE_INVALID",
+      "part": "A",
+      "severity": "error",
+      "description": "A `crit[]` entry violates the list-shape rules — it names a base key, does not match the extension-key form, is named but absent from the record map, or is duplicated."
+    },
+    {
+      "code": "METADATA_NOT_FOUND",
+      "part": "B",
+      "severity": "error",
+      "description": "No CIP-309 metadata (label 309) was found at the referenced transaction."
+    },
+    {
+      "code": "INSUFFICIENT_CONFIRMATIONS",
+      "part": "B",
+      "severity": "info",
+      "description": "The transaction has fewer confirmations than the verifier's threshold. Info severity: the record may still be structurally valid; the depth is reported for the caller to weigh."
+    },
+    {
+      "code": "SIGNATURE_INVALID",
+      "part": "B",
+      "severity": "error",
+      "description": "A record-level signature failed cryptographic verification against its claimed public key."
+    },
+    {
+      "code": "SIGNER_KEY_UNRESOLVED",
+      "part": "B",
+      "severity": "error",
+      "description": "A signature's signing key could not be resolved (no inline COSE_Key and no resolvable key-by-reference)."
+    },
+    {
+      "code": "WALLET_ADDRESS_MISMATCH",
+      "part": "B",
+      "severity": "error",
+      "description": "A claimed publishing wallet does not match the address that submitted the transaction."
+    },
+    {
+      "code": "URI_TARGET_FORBIDDEN",
+      "part": "B",
+      "severity": "error",
+      "description": "A URI resolves to a forbidden network target (e.g. a host on the deny-list), blocked to prevent server-side request forgery."
+    },
+    {
+      "code": "URI_INTEGRITY_MISMATCH",
+      "part": "B",
+      "severity": "error",
+      "description": "Content fetched from a content-addressed URI does not match the digest the URI commits to."
+    },
+    {
+      "code": "URI_FETCH_FAILED",
+      "part": "B",
+      "severity": "warning",
+      "description": "A URI fetch failed transiently. Warning severity: a non-fatal runtime anomaly (e.g. a gateway error) that does not by itself invalidate the record."
+    },
+    {
+      "code": "CONTENT_UNAVAILABLE",
+      "part": "B",
+      "severity": "error",
+      "description": "The referenced plaintext content could not be retrieved from any provided URI, so the content hash could not be recomputed."
+    },
+    {
+      "code": "CIPHERTEXT_UNAVAILABLE",
+      "part": "B",
+      "severity": "error",
+      "description": "The sealed-PoE ciphertext could not be retrieved from any provided URI, so decryption could not proceed."
+    },
+    {
+      "code": "PROVIDER_UNAVAILABLE",
+      "part": "B",
+      "severity": "error",
+      "description": "A required external provider (chain explorer or storage gateway) was unavailable for the verification."
+    },
+    {
+      "code": "SERVICE_INDEPENDENCE_VIOLATION",
+      "part": "B",
+      "severity": "error",
+      "description": "Verification could not be completed without trusting a single issuer-controlled service, violating the standalone-verifiability requirement."
+    },
+    {
+      "code": "WRONG_DECRYPTION_INPUT_SHAPE",
+      "part": "B",
+      "severity": "error",
+      "description": "The inputs supplied to recipient decryption have the wrong shape (e.g. the wrong slot or envelope structure)."
+    },
+    {
+      "code": "WRONG_RECIPIENT_KEY",
+      "part": "B",
+      "severity": "error",
+      "description": "The recipient private key does not unwrap any slot in the envelope; this key is not a recipient of the sealed PoE."
+    },
+    {
+      "code": "TAMPERED_HEADER",
+      "part": "B",
+      "severity": "error",
+      "description": "The authenticated encryption-envelope header failed its integrity check (the slot MAC or associated data did not verify)."
+    },
+    {
+      "code": "TAMPERED_CIPHERTEXT",
+      "part": "B",
+      "severity": "error",
+      "description": "The content ciphertext failed its AEAD authentication tag check during decryption."
+    },
+    {
+      "code": "KDF_DERIVATION_FAILED",
+      "part": "B",
+      "severity": "error",
+      "description": "Key derivation from the passphrase (or from the KEM shared secret) failed."
+    },
+    {
+      "code": "SCHEMA_MERKLE_LEAF_COUNT_MISMATCH",
+      "part": "B",
+      "severity": "error",
+      "description": "The number of supplied Merkle leaves does not match the leaf count the commitment declares."
+    },
+    {
+      "code": "SCHEMA_MERKLE_LEAVES_FORMAT_UNSUPPORTED",
+      "part": "B",
+      "severity": "error",
+      "description": "The supplied Merkle-leaves payload uses a format the verifier does not support."
+    },
+    {
+      "code": "SCHEMA_MERKLE_LEAVES_MALFORMED",
+      "part": "B",
+      "severity": "error",
+      "description": "The supplied Merkle-leaves payload is structurally malformed."
+    },
+    {
+      "code": "MERKLE_ROOT_MISMATCH",
+      "part": "B",
+      "severity": "error",
+      "description": "The Merkle root recomputed from the supplied leaves does not match the committed root."
+    },
+    {
+      "code": "MERKLE_LEAVES_UNAVAILABLE",
+      "part": "B",
+      "severity": "warning",
+      "description": "The Merkle leaves could not be retrieved, so the root could not be recomputed. Warning severity: a non-fatal availability anomaly."
+    },
+    {
+      "code": "MERKLE_LEAVES_INFORMATIVE_FORM",
+      "part": "B",
+      "severity": "info",
+      "description": "The Merkle leaves were provided only in an informative (non-verifiable) form. Info severity: reported, but not a verification failure."
+    },
+    {
+      "code": "MERKLE_UNSUPPORTED",
+      "part": "B",
+      "severity": "info",
+      "dual_severity": true,
+      "description": "A Merkle commitment uses an algorithm the verifier does not support. Dual severity: the default reading is info when another commitment in the same record was validated; promoted to error for a merkle-only record (no content claim was validated alongside it)."
+    },
+    {
+      "code": "OUT_OF_PROFILE_SKIPPED",
+      "part": "B",
+      "severity": "info",
+      "dual_severity": true,
+      "description": "A check was skipped because its target is out of the verifier's profile. Dual severity: the default reading is info (render mode); a strict end-to-end verifier promotes it to error."
+    }
+  ]
+}

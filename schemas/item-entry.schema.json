@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cip309.org/schemas/item-entry.schema.json",
+  "title": "CIP-309 item entry",
+  "description": "A single content item in a PoE record: a CLOSED CBOR map `{hashes, ? uris, ? enc}`. `hashes` (REQUIRED) is the non-empty content-hash map — the primary, content-first claim. `uris` (optional) is a non-empty array of chunked URI arrays locating the content (or, for sealed PoE, the ciphertext). `enc` (optional) is the sealed-PoE encryption envelope. STRUCTURAL only: `enc` is admitted here as an unconstrained value (mirroring the permissive source schema) so the validator can run the ENC_REQUIRES_CONTENT_HASH pre-check before any inner-shape error and surface the most informative code first; its intended shape is encryption-envelope.schema.json. The map is closed: unknown keys are rejected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["hashes"],
+  "properties": {
+    "hashes": {
+      "$ref": "hash-map.schema.json"
+    },
+    "uris": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "uri-chunk-array.schema.json"
+      }
+    },
+    "enc": {
+      "$comment": "Unconstrained structurally (mirrors permissive `z.unknown()`); intended shape is encryption-envelope.schema.json, validated by the domain pass after the ENC_REQUIRES_CONTENT_HASH pre-check.",
+      "type": ["object", "array", "string", "integer", "number", "boolean", "null"]
+    }
+  }
+}

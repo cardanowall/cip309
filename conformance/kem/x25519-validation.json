@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "primitive": "x25519-ecdh-validation",
+  "source": "RFC 7748 §6.1 contributory check (small-order points)",
+  "vectors": [
+    {
+      "name": "rfc7748-6.1-small-order-zero-point",
+      "secret_key_hex": "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+      "peer_public_key_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected_rejection": true,
+      "rejection_category": "small_order_zero",
+      "notes": "All-zero u-coordinate is the order-1 point on Curve25519. ECDH with this peer pubkey produces all-zero shared secret. Both @noble/curves and PyCA cryptography MUST raise per RFC 7748 §6.1 contributory check."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "wallet": "yoroi",
+  "captured_at": "1970-01-01T00:00:00Z",
+  "wallet_version": "synthetic-placeholder",
+  "wallet_api_version": "synthetic-placeholder",
+  "browser_user_agent": "synthetic-placeholder",
+  "cardano_network": "mainnet",
+  "record_body_cbor_hex": "a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
+  "to_sign_bytes_hex": "63617264616e6f2d706f652d7265636f72642d7369672d7631a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
+  "stake_addr_hex": "e1bababd8ecf577521a2b8bdc901d7549befe3ff01c71958da19dbc93b",
+  "stake_addr_bech32": "stake1uxat40vweath2gdzhz7ujqwh2jd7lcllq8r3jkx6r8dujwcqkw9ny",
+  "cose_sign1_bytes_hex": "84582aa201276761646472657373581de1bababd8ecf577521a2b8bdc901d7549befe3ff01c71958da19dbc93ba0f6584033d5f4a147fae2b45a18156496b4d334cce926e71c289e43732510a79e8bc94f80f44ed2b700d29fa29a4fa88da670fe7da22ce53725452f244f55f52144e30d",
+  "cose_key_bytes_hex": "a4010103272006215820bf51682a714a2f86137db015939ef4485ed9c268e184ef133a7a53f4d634c8ea",
+  "expected_signer_pubkey_hex": "bf51682a714a2f86137db015939ef4485ed9c268e184ef133a7a53f4d634c8ea",
+  "expected_normalized_verdict": {
+    "index": 0,
+    "signer_pub_hex": "bf51682a714a2f86137db015939ef4485ed9c268e184ef133a7a53f4d634c8ea",
+    "signer_type": "wallet-inline-key",
+    "ok": true,
+    "reason": null
+  }
+}

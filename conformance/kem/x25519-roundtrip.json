@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "primitive": "x25519-roundtrip",
+  "source": "Project-internal synthetic (deterministic seeds + SHA-256-derived synthetic secrets); cross-verified via PyCA cryptography before commit",
+  "vectors": [
+    {
+      "name": "project-zero-secret-vs-zero-secret",
+      "alice_secret_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected_alice_public_hex": "2fe57da347cd62431528daac5fbb290730fff684afc4cfc2ed90995f58cb3b74",
+      "bob_secret_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+      "expected_bob_public_hex": "2fe57da347cd62431528daac5fbb290730fff684afc4cfc2ed90995f58cb3b74",
+      "expected_shared_secret_hex": "93fea2a7c1aeb62cfd6452ff5badae8bdffcbd7196dc910c89944006d85dbb68"
+    },
+    {
+      "name": "project-allff-secret-vs-allff-secret",
+      "alice_secret_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "expected_alice_public_hex": "847c0d2c375234f365e660955187a3735a0f7613d1609d3a6a4d8c53aeaa5a22",
+      "bob_secret_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "expected_bob_public_hex": "847c0d2c375234f365e660955187a3735a0f7613d1609d3a6a4d8c53aeaa5a22",
+      "expected_shared_secret_hex": "3e5f127fe732458e922c814ca70f36ef847bd8706ad13331692b12e00dafde48"
+    },
+    {
+      "name": "project-pattern-secret-1-vs-2",
+      "alice_secret_hex": "90288c481ae3cafe22881c8a54ca5a874b3184231c79098128f0413d7306e0a8",
+      "expected_alice_public_hex": "8005c32128c06912ee2db07b9b07927d6cdb9e0d1f72af3ea3a6c21ac6960514",
+      "bob_secret_hex": "59d3f367999d4265e758f1ac56a53456b7cd1aeffc61ca15e617820aa720e9f8",
+      "expected_bob_public_hex": "cfac40879be7b12e0123941774b5b0f96dbf7f2343263302e5b8b1b68fd23c7e",
+      "expected_shared_secret_hex": "38f35276d165bfe8cfaab0cd484523b211132abf0099d13b5c225d6347a09c0d"
+    },
+    {
+      "name": "project-pattern-secret-3-vs-4",
+      "alice_secret_hex": "584341aa84b8d7a13403026e25cd3e9002d6fd3bed944ed5449a18f57216a958",
+      "expected_alice_public_hex": "5f41511085c238b33f9d79344c225addbb8819a1b5d83a4f7954c0fa3c591d65",
+      "bob_secret_hex": "c7a55b6dc43ac987e060b6e3a96205f9ae7ca44d12e383c51c921a973a867968",
+      "expected_bob_public_hex": "98f86b207125b9f4ba051433aa92d27d79d16b259a8647e9b3797d6e05b5f674",
+      "expected_shared_secret_hex": "4b04b6fc6b38c39f28ac4400f1ab3302227ca873b52f1b56874985a316de5a0a"
+    }
+  ]
+}

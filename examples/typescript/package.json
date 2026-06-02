@@ -1,0 +1,36 @@
+{
+  "name": "cip309-examples",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Self-contained TypeScript reference implementations of the CIP-309 wire primitives, built only from public cryptographic libraries (no SDK dependency).",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "demo": "node src/end-to-end.ts",
+    "verify": "node src/standalone-verify-example.ts",
+    "smoke:parity": "node src/smoke-parity.ts",
+    "smoke:validator": "node src/smoke-validator.ts",
+    "smoke:tx-extract": "node src/smoke-tx-extract.ts",
+    "selftest:merkle": "node src/merkle-sha2-256.ts",
+    "selftest:cid": "node src/cid-validator.ts",
+    "smoke": "node src/end-to-end.ts && node src/smoke-parity.ts && node src/smoke-validator.ts && node src/smoke-tx-extract.ts && node src/standalone-verify-example.ts && node src/merkle-sha2-256.ts && node src/cid-validator.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@noble/ciphers": "^2.2.0",
+    "@noble/curves": "^2.2.0",
+    "@noble/ed25519": "^3.1.0",
+    "@noble/hashes": "^2.2.0",
+    "@noble/post-quantum": "^0.6.1",
+    "cbor2": "^2.3.0",
+    "hash-wasm": "^4.12.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.9.3"
+  }
+}

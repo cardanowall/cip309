@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "primitive": "sealed-poe-wrap-negative",
+  "source": "project-authored — seven negative cases covering every EciesSealedPoeError input-validation code; the obsolete N>32 upper-bound case (n33) was removed when the spec lifted the recipient cap.",
+  "vectors": [
+    {
+      "name": "n0",
+      "recipient_publics_hex": [],
+      "plaintext_hex": "",
+      "expected_error_code": "ENC_SLOTS_EMPTY"
+    },
+    {
+      "name": "pubkey-31b",
+      "recipient_publics_hex": [
+        "700f9fc738e0dba1e20a0ef63fb6b09782a26e1a0e1fdf51376a56b17bc391"
+      ],
+      "plaintext_hex": "",
+      "expected_error_code": "KEM_EPK_LENGTH_MISMATCH"
+    },
+    {
+      "name": "pubkey-33b",
+      "recipient_publics_hex": [
+        "6e165275150d6df744126eb96ee6464bf990c25f754bd98f473bd0de68b1fc0808"
+      ],
+      "plaintext_hex": "",
+      "expected_error_code": "KEM_EPK_LENGTH_MISMATCH"
+    },
+    {
+      "name": "cek-31b",
+      "recipient_publics_hex": [
+        "b7294194b47f6e5495c2bf9eb442e583bf1bcd10d01d655092cec71dfef8142b"
+      ],
+      "cek_hex": "d53ec213908164beeabef155e2ccc9ef33ec7afa56dda2bbf92415cabfc58c",
+      "plaintext_hex": "",
+      "expected_error_code": "INVALID_CEK_LENGTH"
+    },
+    {
+      "name": "iv-12b",
+      "recipient_publics_hex": [
+        "b7294194b47f6e5495c2bf9eb442e583bf1bcd10d01d655092cec71dfef8142b"
+      ],
+      "nonce_hex": "e79dfae39b707ca45f2103f6",
+      "plaintext_hex": "",
+      "expected_error_code": "NONCE_LENGTH_MISMATCH"
+    },
+    {
+      "name": "eph-count-mismatch",
+      "recipient_publics_hex": [
+        "b7294194b47f6e5495c2bf9eb442e583bf1bcd10d01d655092cec71dfef8142b",
+        "fc106efa70771587b41fcb2ef95ba20c765106f20d80485e362eb4ed618d00be",
+        "a15b17d8aea9d002054168a365d1aa573a837dd4cc5277a33a57fd7ab46ca5ce"
+      ],
+      "ephemeral_secrets_hex": [
+        "9524de698ddd5b15d5fd47c43380a2879103d2d06ae61f62e9838184f76e836a",
+        "2bf698795c39a45a94fc0e521f4fd2777eaeaa78ae6d955d789c83fa19ca137f"
+      ],
+      "plaintext_hex": "",
+      "expected_error_code": "EPHEMERAL_SECRETS_COUNT_MISMATCH"
+    },
+    {
+      "name": "eph-31b",
+      "recipient_publics_hex": [
+        "b7294194b47f6e5495c2bf9eb442e583bf1bcd10d01d655092cec71dfef8142b"
+      ],
+      "ephemeral_secrets_hex": [
+        "a45693c51f978da5738bac673a2aa3403117bcbd3228d34504b2731b8982ba"
+      ],
+      "plaintext_hex": "",
+      "expected_error_code": "INVALID_EPHEMERAL_SECRET_LENGTH"
+    }
+  ]
+}

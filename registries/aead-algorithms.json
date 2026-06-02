@@ -1,0 +1,12 @@
+{
+  "registry": "aead-algorithms",
+  "description": "Content-AEAD registry: the authenticated-encryption ciphers selectable on the wire via an encryption envelope's `aead` field to encrypt sealed-PoE content. Exactly one identifier is registered. The pinned `nonce_length_bytes` is the exact nonce length the structural validator requires for that identifier; any other length is a NONCE_LENGTH_MISMATCH, an unregistered identifier is an UNSUPPORTED_AEAD_ALG, and naming an unauthenticated cipher (CBC/CTR/ECB/CFB/OFB block modes in any key-size spelling, or legacy RC4/DES/3DES) is the more specific UNAUTHENTICATED_CIPHER_FORBIDDEN. Note: chacha20-poly1305 is NOT a wire-selectable content AEAD and is deliberately not an entry here — it is the fixed per-slot key-wrap construction (used to wrap the content-encryption key to a recipient slot with a fixed zero nonce, producing a 48-byte `wrap` = 32-byte key + 16-byte tag), not a selectable content cipher. aes-256-gcm is likewise not a wire-selectable content AEAD and is intentionally not an entry. Additions are additive-only and must ship with conformance vectors.",
+  "entries": [
+    {
+      "identifier": "xchacha20-poly1305",
+      "description": "XChaCha20-Poly1305 AEAD with an extended 24-byte nonce. The extended nonce permits random nonce generation per ciphertext without birthday-bound collision concerns. This is the sole wire-selectable content AEAD for sealed-PoE ciphertext.",
+      "nonce_length_bytes": 24,
+      "reference": "RFC 8439 (ChaCha20 and Poly1305) and draft-irtf-cfrg-xchacha (XChaCha20 extended-nonce construction)"
+    }
+  ]
+}
