@@ -49,9 +49,7 @@ const KNOWN_HASH_ALGS = new Set<string>(Object.keys(HASH_ALGS));
 const MERKLE_COMMIT_ALGS: Record<string, number> = {
   'rfc9162-sha256': 32,
 };
-const KNOWN_MERKLE_COMMIT_ALGS = new Set<string>(
-  Object.keys(MERKLE_COMMIT_ALGS),
-);
+const KNOWN_MERKLE_COMMIT_ALGS = new Set<string>(Object.keys(MERKLE_COMMIT_ALGS));
 
 // Forward-compat extension-key tolerance (CIP-309 §4.1.4). Keys matching either
 // regex are extension keys (vendor / experimental for `^x-.+`; companion-CIP
@@ -67,14 +65,7 @@ function isExtensionKey(k: string): boolean {
 // Top-level base keys defined in CIP-309 §4.1. Any unknown key that is NOT an
 // extension key is a `SCHEMA_UNKNOWN_FIELD` (e.g. typos like `supersedess`
 // or `Sigs`).
-const TOP_LEVEL_BASE_KEYS = new Set<string>([
-  'v',
-  'items',
-  'merkle',
-  'supersedes',
-  'sigs',
-  'crit',
-]);
+const TOP_LEVEL_BASE_KEYS = new Set<string>(['v', 'items', 'merkle', 'supersedes', 'sigs', 'crit']);
 
 // === Schemas ===
 
@@ -83,11 +74,9 @@ const TOP_LEVEL_BASE_KEYS = new Set<string>([
 // rejected with the same code as oversized ones.
 const ChunkedBytesArraySchema = z
   .array(
-    z
-      .instanceof(Uint8Array)
-      .refine((b) => b.length >= 1 && b.length <= 64, {
-        params: { code: 'CHUNK_TOO_LARGE' },
-      }),
+    z.instanceof(Uint8Array).refine((b) => b.length >= 1 && b.length <= 64, {
+      params: { code: 'CHUNK_TOO_LARGE' },
+    }),
   )
   .min(1);
 
@@ -336,11 +325,7 @@ const EncryptionEnvelopeSchema = z
     // `enc.scheme` MUST be the unsigned integer 1 (CIP-309 §4.4). Reject CBOR
     // floats or any other type that happens to compare `=== 1` in JS (see
     // VersionLiteralSchema rationale).
-    if (
-      typeof enc.scheme !== 'number' ||
-      !Number.isInteger(enc.scheme) ||
-      enc.scheme !== 1
-    ) {
+    if (typeof enc.scheme !== 'number' || !Number.isInteger(enc.scheme) || enc.scheme !== 1) {
       ctx.addIssue({
         code: 'custom',
         path: ['scheme'],
@@ -479,9 +464,7 @@ const ItemEntrySchema = z
       item.hashes !== null &&
       Object.keys(item.hashes).length > 0
     ) {
-      const hasContentHash = Object.keys(item.hashes).some((alg) =>
-        CONTENT_HASH_ALGS.has(alg),
-      );
+      const hasContentHash = Object.keys(item.hashes).some((alg) => CONTENT_HASH_ALGS.has(alg));
       if (!hasContentHash) {
         ctx.addIssue({
           code: 'custom',
@@ -544,8 +527,7 @@ const ItemEntrySchema = z
           ctx.addIssue({
             code: 'custom',
             path: ['uris', ui],
-            message:
-              'unsupported URI scheme; v1 fetch set is {ar://, ipfs://}',
+            message: 'unsupported URI scheme; v1 fetch set is {ar://, ipfs://}',
             params: { code: 'INVALID_URI' },
           });
         } else {
@@ -555,7 +537,8 @@ const ItemEntrySchema = z
               ctx.addIssue({
                 code: 'custom',
                 path: ['uris', ui],
-                message: 'ar:// URI does not match `^ar://[A-Za-z0-9_-]{43}$` (43-char base64url txid)',
+                message:
+                  'ar:// URI does not match `^ar://[A-Za-z0-9_-]{43}$` (43-char base64url txid)',
                 params: { code: 'INVALID_URI' },
               });
             }
@@ -640,12 +623,10 @@ const MerkleCommitSchema = z
 // `f9 3c 00`) decodes to a JS number that satisfies `=== 1`. This refinement
 // adds the integer check explicitly so a non-integer `v` is rejected as
 // SCHEMA_INVALID_LITERAL rather than silently accepted.
-const VersionLiteralSchema = z
-  .number()
-  .refine((n) => Number.isInteger(n) && n === 1, {
-    params: { code: 'SCHEMA_INVALID_LITERAL' },
-    message: 'v must be the unsigned integer 1',
-  });
+const VersionLiteralSchema = z.number().refine((n) => Number.isInteger(n) && n === 1, {
+  params: { code: 'SCHEMA_INVALID_LITERAL' },
+  message: 'v must be the unsigned integer 1',
+});
 
 // Metadata label 309 is the on-chain record dispatcher; the record itself
 // carries no in-band type discriminator. A well-formed record MUST carry at
@@ -683,8 +664,7 @@ export const PoeRecordSchema = z
       ctx.addIssue({
         code: 'custom',
         path: [],
-        message:
-          'record must carry at least one of items[] or merkle[] non-empty',
+        message: 'record must carry at least one of items[] or merkle[] non-empty',
         params: { code: 'SCHEMA_EMPTY_RECORD' },
       });
     }
@@ -725,8 +705,7 @@ function mapZodIssue(i: z.core.$ZodIssue): ValidationIssue {
   // covers (a) sigs[i] not a map, (b) missing required `cose` key,
   // (c) closed-schema violations (extra keys beyond `cose`/`cose_key`), and
   // (d) `cose`/`cose_key` value-shape errors below the entry.
-  const inSigsEntry =
-    path.length >= 2 && path[0] === 'sigs' && typeof path[1] === 'number';
+  const inSigsEntry = path.length >= 2 && path[0] === 'sigs' && typeof path[1] === 'number';
 
   // Refinements that already carry a canonical code in `params.code`
   const explicit = (i as { params?: { code?: string } }).params?.code;
@@ -957,7 +936,10 @@ export function validatePoeRecord(bytes: Uint8Array): ValidationResult {
   }
 
   if (issues.length > 0) {
-    return { valid: false, issues: issues.sort((a, b) => a.path.join('.').localeCompare(b.path.join('.'))) };
+    return {
+      valid: false,
+      issues: issues.sort((a, b) => a.path.join('.').localeCompare(b.path.join('.'))),
+    };
   }
 
   if (warnings.length > 0) {
@@ -1003,10 +985,7 @@ function concatChunks(chunks: Uint8Array[]): Uint8Array {
 //      the verifier cannot proceed with a structurally invalid public-key
 //      blob. An undecodable `cose_key` blob also surfaces as
 //      `MALFORMED_SIG_COSE_SIGN1`.
-function inspectCoseKey(
-  keyChunks: Uint8Array[],
-  i: number,
-): ValidationIssue | null {
+function inspectCoseKey(keyChunks: Uint8Array[], i: number): ValidationIssue | null {
   let decoded: unknown;
   try {
     decoded = decodeCbor(concatChunks(keyChunks));
@@ -1075,8 +1054,7 @@ function inspectCoseKey(
   }
   const x = getLabel(-2);
   if (!(x instanceof Uint8Array) || x.length !== 32) {
-    const got =
-      x instanceof Uint8Array ? `${x.length}-byte bstr` : typeof x;
+    const got = x instanceof Uint8Array ? `${x.length}-byte bstr` : typeof x;
     return {
       path: ['sigs', i, 'cose_key'],
       code: 'MALFORMED_SIG_COSE_SIGN1',

@@ -5,7 +5,7 @@ description = "Self-contained Python reference implementations of the CIP-309 wi
 readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.11"
-authors = [{ name = "Cardanowall", email = "hello@cardanowall.com" }]
+authors = [{ name = "CardanoWall", email = "hello@cardanowall.com" }]
 keywords = ["cip-309", "cardano", "proof-of-existence", "cbor", "cose", "reference-implementation"]
 
 dependencies = [

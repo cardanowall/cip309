@@ -96,8 +96,7 @@ export function readHead(bytes: Uint8Array, pos: number): CborHead {
       throw new RangeError('MALFORMED_CBOR: truncated 4-byte argument');
     }
     valueU64 =
-      bytes[p]! * 0x1000000 +
-      ((bytes[p + 1]! << 16) | (bytes[p + 2]! << 8) | bytes[p + 3]!);
+      bytes[p]! * 0x1000000 + ((bytes[p + 1]! << 16) | (bytes[p + 2]! << 8) | bytes[p + 3]!);
     p += 4;
   } else if (ai === 27) {
     if (p + 8 > bytes.length) {
@@ -106,9 +105,7 @@ export function readHead(bytes: Uint8Array, pos: number): CborHead {
     let n = 0;
     for (let k = 0; k < 8; k++) n = n * 256 + bytes[p + k]!;
     if (n > Number.MAX_SAFE_INTEGER) {
-      throw new RangeError(
-        'MALFORMED_CBOR: 8-byte argument exceeds JavaScript safe integer range',
-      );
+      throw new RangeError('MALFORMED_CBOR: 8-byte argument exceeds JavaScript safe integer range');
     }
     valueU64 = n;
     p += 8;
@@ -219,9 +216,7 @@ export function sliceLabel309Value(txCbor: Uint8Array): Uint8Array | null {
   // Outer shape: array of >= 4 items.
   const txHead = readHead(txCbor, 0);
   if (txHead.mt !== 4) {
-    throw new RangeError(
-      `MALFORMED_CBOR: tx CBOR is not a CBOR array (major type ${txHead.mt})`,
-    );
+    throw new RangeError(`MALFORMED_CBOR: tx CBOR is not a CBOR array (major type ${txHead.mt})`);
   }
   if (txHead.valueU64 < 4) {
     throw new RangeError(
@@ -302,9 +297,7 @@ export function sliceLabel309Value(txCbor: Uint8Array): Uint8Array | null {
   // Walk the metadata map to find integer key 309.
   const metaHead = readHead(txCbor, metadataMapPos);
   if (metaHead.mt !== 5) {
-    throw new RangeError(
-      `MALFORMED_CBOR: metadata is not a CBOR map (major type ${metaHead.mt})`,
-    );
+    throw new RangeError(`MALFORMED_CBOR: metadata is not a CBOR map (major type ${metaHead.mt})`);
   }
   let pairPos = metaHead.payloadStart;
   for (let i = 0; i < metaHead.valueU64; i++) {

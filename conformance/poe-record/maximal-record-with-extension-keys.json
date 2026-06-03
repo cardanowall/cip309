@@ -11,14 +11,8 @@
           "blake2b-256": "2222222222222222222222222222222222222222222222222222222222222222"
         },
         "uris": [
-          [
-            "ar://",
-            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-          ],
-          [
-            "ipfs://",
-            "QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH"
-          ]
+          ["ar://", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"],
+          ["ipfs://", "QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH"]
         ],
         "enc": {
           "scheme": 1,
@@ -51,9 +45,7 @@
         ]
       }
     ],
-    "crit": [
-      "x-note"
-    ],
+    "crit": ["x-note"],
     "x-note": "frozen cross-impl record vector",
     "x-meta": {
       "a": 1,

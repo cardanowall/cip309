@@ -85,7 +85,12 @@
     {
       "vector_class": "COSE_Sign1 — Sig_structure / protected header / build / strict-Ed25519 verify",
       "area": "cose",
-      "files": ["sig-structure.json", "sign1-build.json", "sign1-verify.json", "sign1-strict-ed25519.json"],
+      "files": [
+        "sig-structure.json",
+        "sign1-build.json",
+        "sign1-verify.json",
+        "sign1-strict-ed25519.json"
+      ],
       "kind": "kat",
       "notes": "RFC 9052 encoder mechanics plus the production-form record-level COSE_Sign1 (detached payload, domain-separated to_sign prefix)."
     },
@@ -93,8 +98,12 @@
       "vector_class": "Wallet COSE_Sign1 (CIP-30) — valid per-wallet signed records",
       "area": "wallet-cose",
       "files": [
-        "eternl-cose.json", "lace-cose.json", "nami-cose.json",
-        "nufi-cose.json", "typhon-cose.json", "yoroi-cose.json"
+        "eternl-cose.json",
+        "lace-cose.json",
+        "nami-cose.json",
+        "nufi-cose.json",
+        "typhon-cose.json",
+        "yoroi-cose.json"
       ],
       "kind": "kat",
       "notes": "Per-wallet CIP-30 signData COSE_Key + COSE_Sign1 wire form; verifiers MUST accept the inline cose_key path byte-exact."
@@ -131,13 +140,19 @@
       "vector_class": "Multi-recipient sealed-PoE unwrap — round-trip + multi-private-key matching + rechunking",
       "area": "sealed-poe",
       "files": [
-        "unwrap-n1-empty.json", "unwrap-n3.json", "unwrap-n32.json",
+        "unwrap-n1-empty.json",
+        "unwrap-n3.json",
+        "unwrap-n32.json",
         "unwrap-hybrid-rechunked.json",
-        "unwrap-multipriv-current-match.json", "unwrap-multipriv-archived-match.json",
+        "unwrap-multipriv-current-match.json",
+        "unwrap-multipriv-archived-match.json",
         "unwrap-multipriv-no-match.json",
-        "unwrap-multipriv-ac9-priv0-slot0.json", "unwrap-multipriv-ac9-priv0-slot31.json",
-        "unwrap-multipriv-ac9-priv4-slot0.json", "unwrap-multipriv-ac9-priv4-slot31.json",
-        "unwrap-multipriv-ac9-no-match.json", "unwrap-multipriv-n32-k10-worst-case.json"
+        "unwrap-multipriv-ac9-priv0-slot0.json",
+        "unwrap-multipriv-ac9-priv0-slot31.json",
+        "unwrap-multipriv-ac9-priv4-slot0.json",
+        "unwrap-multipriv-ac9-priv4-slot31.json",
+        "unwrap-multipriv-ac9-no-match.json",
+        "unwrap-multipriv-n32-k10-worst-case.json"
       ],
       "kind": "kat",
       "notes": "Recovered plaintext = original; slot/private-key matching is deterministic given pinned inputs. Hybrid path adds the KEM_CT_LENGTH_MISMATCH pre-decapsulation guard."
@@ -208,12 +223,24 @@
       "vector_class": "Wallet COSE_Sign1 (CIP-30) — rejection fixtures (tampered / missing / wrong-network)",
       "area": "wallet-cose",
       "files": [
-        "eternl-cose-tampered-address.json", "eternl-cose-missing-address.json", "eternl-cose-wrong-network-header.json",
-        "lace-cose-tampered-address.json", "lace-cose-missing-address.json", "lace-cose-wrong-network-header.json",
-        "nami-cose-tampered-address.json", "nami-cose-missing-address.json", "nami-cose-wrong-network-header.json",
-        "nufi-cose-tampered-address.json", "nufi-cose-missing-address.json", "nufi-cose-wrong-network-header.json",
-        "typhon-cose-tampered-address.json", "typhon-cose-missing-address.json", "typhon-cose-wrong-network-header.json",
-        "yoroi-cose-tampered-address.json", "yoroi-cose-missing-address.json", "yoroi-cose-wrong-network-header.json"
+        "eternl-cose-tampered-address.json",
+        "eternl-cose-missing-address.json",
+        "eternl-cose-wrong-network-header.json",
+        "lace-cose-tampered-address.json",
+        "lace-cose-missing-address.json",
+        "lace-cose-wrong-network-header.json",
+        "nami-cose-tampered-address.json",
+        "nami-cose-missing-address.json",
+        "nami-cose-wrong-network-header.json",
+        "nufi-cose-tampered-address.json",
+        "nufi-cose-missing-address.json",
+        "nufi-cose-wrong-network-header.json",
+        "typhon-cose-tampered-address.json",
+        "typhon-cose-missing-address.json",
+        "typhon-cose-wrong-network-header.json",
+        "yoroi-cose-tampered-address.json",
+        "yoroi-cose-missing-address.json",
+        "yoroi-cose-wrong-network-header.json"
       ],
       "kind": "negative",
       "notes": "Every verifier MUST reject these with the same verdict (tamper / missing address binding / wrong-network header). The rejection outcome is pinned; the underlying bytes vary per wallet."

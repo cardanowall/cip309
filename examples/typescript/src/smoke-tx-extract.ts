@@ -158,9 +158,7 @@ function checkA(): void {
   record(
     '(a) extracted bytes pass structural validation',
     v.valid,
-    v.valid
-      ? 'valid=true'
-      : `valid=false issues=${v.issues.map((i) => i.code).join(',')}`,
+    v.valid ? 'valid=true' : `valid=false issues=${v.issues.map((i) => i.code).join(',')}`,
   );
 }
 
@@ -207,8 +205,7 @@ function checkB(): void {
   // out-of-order map keys). If the laundering bug were present, this would
   // succeed silently — exactly the failure mode the byte-slice fix prevents.
   const v = validatePoeRecord(extracted);
-  const flaggedMalformed =
-    !v.valid && v.issues.some((i) => i.code === 'MALFORMED_CBOR');
+  const flaggedMalformed = !v.valid && v.issues.some((i) => i.code === 'MALFORMED_CBOR');
   record(
     '(b) validator on non-canonical bytes → MALFORMED_CBOR',
     flaggedMalformed,
@@ -238,9 +235,7 @@ function checkC(): void {
     record(
       '(c.1) tag-259 wrapper extracts correctly',
       ok,
-      ok
-        ? `${extracted!.length}B identical`
-        : `extracted=${extracted ? hex(extracted) : 'null'}`,
+      ok ? `${extracted!.length}B identical` : `extracted=${extracted ? hex(extracted) : 'null'}`,
     );
   }
 
@@ -256,9 +251,7 @@ function checkC(): void {
     record(
       '(c.2) bare-map auxiliary_data extracts correctly',
       ok,
-      ok
-        ? `${extracted!.length}B identical`
-        : `extracted=${extracted ? hex(extracted) : 'null'}`,
+      ok ? `${extracted!.length}B identical` : `extracted=${extracted ? hex(extracted) : 'null'}`,
     );
   }
 }
@@ -277,9 +270,7 @@ function checkD(): void {
   record(
     '(d) metadata without label 309 → null',
     extracted === null,
-    extracted === null
-      ? 'returned null'
-      : `BUG: returned ${extracted.length}B = ${hex(extracted)}`,
+    extracted === null ? 'returned null' : `BUG: returned ${extracted.length}B = ${hex(extracted)}`,
   );
 
   // Bonus sanity: tx with no auxiliary_data at all (CBOR null) → also null.
@@ -288,9 +279,7 @@ function checkD(): void {
   record(
     '(d) tx with auxiliary_data=null → null',
     extractedNoAux === null,
-    extractedNoAux === null
-      ? 'returned null'
-      : `BUG: returned ${extractedNoAux.length}B`,
+    extractedNoAux === null ? 'returned null' : `BUG: returned ${extractedNoAux.length}B`,
   );
 }
 

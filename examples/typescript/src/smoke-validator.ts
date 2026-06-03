@@ -70,7 +70,7 @@ function codes(r: ValidationResult): string[] {
 {
   const cbor = encodeCanonicalCbor({
     v: 1,
-    items: [{ hashes: { 'md5': new Uint8Array(16) } }],
+    items: [{ hashes: { md5: new Uint8Array(16) } }],
   });
   const r = validatePoeRecord(cbor);
   const has = !r.valid && r.issues.some((i) => i.code === 'UNSUPPORTED_HASH_ALG');
@@ -85,7 +85,11 @@ function codes(r: ValidationResult): string[] {
   });
   const r = validatePoeRecord(cbor);
   const has = !r.valid && r.issues.some((i) => i.code === 'HASH_DIGEST_LENGTH_MISMATCH');
-  record('(d) wrong digest length → HASH_DIGEST_LENGTH_MISMATCH', has, `codes=${codes(r).join(',')}`);
+  record(
+    '(d) wrong digest length → HASH_DIGEST_LENGTH_MISMATCH',
+    has,
+    `codes=${codes(r).join(',')}`,
+  );
 }
 
 // (e) Sealed envelope with enc.slots → valid
@@ -157,7 +161,11 @@ function codes(r: ValidationResult): string[] {
     ],
   });
   const rGoodV0 = validatePoeRecord(goodV0);
-  record('(g.ii) real CIDv0 passes', rGoodV0.valid, `valid=${rGoodV0.valid}, codes=${codes(rGoodV0).join(',') || '(none)'}`);
+  record(
+    '(g.ii) real CIDv0 passes',
+    rGoodV0.valid,
+    `valid=${rGoodV0.valid}, codes=${codes(rGoodV0).join(',') || '(none)'}`,
+  );
 
   // (g.iii) Real CIDv1 — chunked because the URI exceeds 64 bytes
   // (`ipfs://` + 59-char CID = 66B; the CDDL chunk limit is 64B per piece).
@@ -172,7 +180,11 @@ function codes(r: ValidationResult): string[] {
     ],
   });
   const rGoodV1 = validatePoeRecord(goodV1);
-  record('(g.iii) real CIDv1 passes', rGoodV1.valid, `valid=${rGoodV1.valid}, codes=${codes(rGoodV1).join(',') || '(none)'}`);
+  record(
+    '(g.iii) real CIDv1 passes',
+    rGoodV1.valid,
+    `valid=${rGoodV1.valid}, codes=${codes(rGoodV1).join(',') || '(none)'}`,
+  );
 }
 
 // (h) Wrap output exposes the slot-set MAC under the wire field name `slots_mac`
@@ -472,11 +484,7 @@ function codes(r: ValidationResult): string[] {
   });
   const r = validatePoeRecord(cbor);
   const has = !r.valid && r.issues.some((i) => i.code === 'CRIT_SHAPE_INVALID');
-  record(
-    '(u) crit references base key → CRIT_SHAPE_INVALID',
-    has,
-    `codes=${codes(r).join(',')}`,
-  );
+  record('(u) crit references base key → CRIT_SHAPE_INVALID', has, `codes=${codes(r).join(',')}`);
 }
 
 // (v) `crit[]` entry that names a field absent from the record map →
@@ -509,11 +517,7 @@ function codes(r: ValidationResult): string[] {
   });
   const r = validatePoeRecord(cbor);
   const has = !r.valid && r.issues.some((i) => i.code === 'CRIT_SHAPE_INVALID');
-  record(
-    '(w) crit duplicate entries → CRIT_SHAPE_INVALID',
-    has,
-    `codes=${codes(r).join(',')}`,
-  );
+  record('(w) crit duplicate entries → CRIT_SHAPE_INVALID', has, `codes=${codes(r).join(',')}`);
 }
 
 const failed = results.filter((r) => !r.pass);

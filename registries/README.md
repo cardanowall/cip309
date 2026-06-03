@@ -11,15 +11,15 @@ additively, without breaking existing records.
 
 Each registry is a single JSON file:
 
-| File | What it registers |
-| --- | --- |
-| [`hash-algorithms.json`](hash-algorithms.json) | Content-hash algorithms (item `hashes` digests and Merkle leaf digests). |
-| [`merkle-commitment-algorithms.json`](merkle-commitment-algorithms.json) | Merkle list-commitment tree constructions for `merkle[]` roots. |
-| [`aead-algorithms.json`](aead-algorithms.json) | Wire-selectable authenticated-encryption ciphers for sealed-PoE content. |
-| [`kem-algorithms.json`](kem-algorithms.json) | Key-encapsulation mechanisms that wrap a content-encryption key to a recipient slot. |
-| [`kdf-algorithms.json`](kdf-algorithms.json) | Wire-selectable passphrase key-derivation functions for the passphrase key-path. |
-| [`signature-algorithms.json`](signature-algorithms.json) | Optional record-signature algorithms, keyed by COSE algorithm label. |
-| [`error-codes.json`](error-codes.json) | The complete stable catalogue of validator and verifier error codes. |
+| File                                                                     | What it registers                                                                    |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| [`hash-algorithms.json`](hash-algorithms.json)                           | Content-hash algorithms (item `hashes` digests and Merkle leaf digests).             |
+| [`merkle-commitment-algorithms.json`](merkle-commitment-algorithms.json) | Merkle list-commitment tree constructions for `merkle[]` roots.                      |
+| [`aead-algorithms.json`](aead-algorithms.json)                           | Wire-selectable authenticated-encryption ciphers for sealed-PoE content.             |
+| [`kem-algorithms.json`](kem-algorithms.json)                             | Key-encapsulation mechanisms that wrap a content-encryption key to a recipient slot. |
+| [`kdf-algorithms.json`](kdf-algorithms.json)                             | Wire-selectable passphrase key-derivation functions for the passphrase key-path.     |
+| [`signature-algorithms.json`](signature-algorithms.json)                 | Optional record-signature algorithms, keyed by COSE algorithm label.                 |
+| [`error-codes.json`](error-codes.json)                                   | The complete stable catalogue of validator and verifier error codes.                 |
 
 ## Entry shape
 

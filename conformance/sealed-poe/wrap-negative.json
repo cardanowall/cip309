@@ -11,9 +11,7 @@
     },
     {
       "name": "pubkey-31b",
-      "recipient_publics_hex": [
-        "700f9fc738e0dba1e20a0ef63fb6b09782a26e1a0e1fdf51376a56b17bc391"
-      ],
+      "recipient_publics_hex": ["700f9fc738e0dba1e20a0ef63fb6b09782a26e1a0e1fdf51376a56b17bc391"],
       "plaintext_hex": "",
       "expected_error_code": "KEM_EPK_LENGTH_MISMATCH"
     },
@@ -27,18 +25,14 @@
     },
     {
       "name": "cek-31b",
-      "recipient_publics_hex": [
-        "b7294194b47f6e5495c2bf9eb442e583bf1bcd10d01d655092cec71dfef8142b"
-      ],
+      "recipient_publics_hex": ["b7294194b47f6e5495c2bf9eb442e583bf1bcd10d01d655092cec71dfef8142b"],
       "cek_hex": "d53ec213908164beeabef155e2ccc9ef33ec7afa56dda2bbf92415cabfc58c",
       "plaintext_hex": "",
       "expected_error_code": "INVALID_CEK_LENGTH"
     },
     {
       "name": "iv-12b",
-      "recipient_publics_hex": [
-        "b7294194b47f6e5495c2bf9eb442e583bf1bcd10d01d655092cec71dfef8142b"
-      ],
+      "recipient_publics_hex": ["b7294194b47f6e5495c2bf9eb442e583bf1bcd10d01d655092cec71dfef8142b"],
       "nonce_hex": "e79dfae39b707ca45f2103f6",
       "plaintext_hex": "",
       "expected_error_code": "NONCE_LENGTH_MISMATCH"
@@ -59,12 +53,8 @@
     },
     {
       "name": "eph-31b",
-      "recipient_publics_hex": [
-        "b7294194b47f6e5495c2bf9eb442e583bf1bcd10d01d655092cec71dfef8142b"
-      ],
-      "ephemeral_secrets_hex": [
-        "a45693c51f978da5738bac673a2aa3403117bcbd3228d34504b2731b8982ba"
-      ],
+      "recipient_publics_hex": ["b7294194b47f6e5495c2bf9eb442e583bf1bcd10d01d655092cec71dfef8142b"],
+      "ephemeral_secrets_hex": ["a45693c51f978da5738bac673a2aa3403117bcbd3228d34504b2731b8982ba"],
       "plaintext_hex": "",
       "expected_error_code": "INVALID_EPHEMERAL_SECRET_LENGTH"
     }

@@ -59,9 +59,7 @@ export function inclusionProof(leaves: Uint8Array[], i: number): InclusionProof 
     throw new Error('inclusionProof: empty leaf list (n == 0 is forbidden per CIP-309 §6.1)');
   }
   if (!Number.isInteger(i) || i < 0 || i >= leaves.length) {
-    throw new Error(
-      `inclusionProof: index ${i} out of range [0, ${leaves.length})`,
-    );
+    throw new Error(`inclusionProof: index ${i} out of range [0, ${leaves.length})`);
   }
   for (let j = 0; j < leaves.length; j++) {
     const leaf = leaves[j]!;
@@ -257,9 +255,7 @@ function selfTest(): void {
   for (let i = 0; i < leaves.length; i++) {
     const p = inclusionProof(leaves, i);
     const ok = verifyInclusion(p, root);
-    console.log(
-      `  proof[${i}] length=${p.proof.length} verify=${ok ? 'PASS' : 'FAIL'}`,
-    );
+    console.log(`  proof[${i}] length=${p.proof.length} verify=${ok ? 'PASS' : 'FAIL'}`);
     if (!ok) allPass = false;
   }
 

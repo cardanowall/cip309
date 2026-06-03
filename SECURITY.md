@@ -43,7 +43,7 @@ guarantees:
 **Please report privately. Do not open a public issue for a security report.**
 
 Preferred channel: GitHub's **private vulnerability reporting** for this
-repository (the *Security* tab → *Report a vulnerability*).
+repository (the _Security_ tab → _Report a vulnerability_).
 
 Alternative contact: `hello@cardanowall.com`.
 

@@ -84,7 +84,7 @@ jobs:
       - uses: actions/setup-python@v6
         if: steps.detect.outputs.present == 'true'
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
       - name: Install, lint, and type-check
         if: steps.detect.outputs.present == 'true'

@@ -125,16 +125,10 @@ function checkA1(): void {
 // === Signed record ===
 
 const SIG_DOMAIN_RECORD_V1 = enc.encode('cardano-poe-record-sig-v1');
-const SIGNER_SK_RFC = fromHex(
-  '4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb',
-);
+const SIGNER_SK_RFC = fromHex('4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb');
 
-const A2_SHA = fromHex(
-  '97a7881ce48f5bf457261797e06e3387a904f0ee70488d3c03090635800320ee',
-);
-const A2_BLAKE = fromHex(
-  '2d3b9520f17f6be4e26361b18afc8d7bbdbc2cd4209319a77f014f2fd0d409a4',
-);
+const A2_SHA = fromHex('97a7881ce48f5bf457261797e06e3387a904f0ee70488d3c03090635800320ee');
+const A2_BLAKE = fromHex('2d3b9520f17f6be4e26361b18afc8d7bbdbc2cd4209319a77f014f2fd0d409a4');
 
 async function ed25519PublicKey(secretKey: Uint8Array): Promise<Uint8Array> {
   return await ed.getPublicKeyAsync(secretKey);

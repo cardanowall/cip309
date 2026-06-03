@@ -57,7 +57,7 @@ import {
 
 // ----- Constants -----
 const enc = new TextEncoder();
-const INFO_KEK_V1: Uint8Array = enc.encode('cardano-poe-kek-v1');             // 18 ASCII bytes
+const INFO_KEK_V1: Uint8Array = enc.encode('cardano-poe-kek-v1'); // 18 ASCII bytes
 // Hybrid (X-Wing) per-slot KEK label. Distinct from the classical label so a
 // KEK derived under one KEM can never collide with the other. Reused verbatim
 // as the per-slot wrap AEAD AAD, exactly as the classical path reuses its own.
@@ -376,7 +376,14 @@ export function eciesSealedPoeWrap(args: WrapArgs): SealedPoeOutput {
     // CSPRNG-shuffle to prevent ordering leak (security-critical).
     if (!args.skipShuffle) csprngShuffle(slots);
     const slotsMac = computeSlotsMac(cek, slots, 'x25519');
-    envelope = { scheme: 1, aead: 'xchacha20-poly1305', kem: 'x25519', nonce, slots, slots_mac: slotsMac };
+    envelope = {
+      scheme: 1,
+      aead: 'xchacha20-poly1305',
+      kem: 'x25519',
+      nonce,
+      slots,
+      slots_mac: slotsMac,
+    };
   } else {
     const slots: Mlkem768X25519Slot[] = [];
     for (let i = 0; i < n; i++) {
@@ -468,7 +475,10 @@ function tryOpenX25519Slot(
  * a wrong seed simply produces a KEK whose AEAD tag fails — returned as a
  * non-match (null). The slot's `kem_ct` MUST already have been length-checked.
  */
-function tryOpenMlkem768X25519Slot(slot: Mlkem768X25519Slot, secretSeed: Uint8Array): Uint8Array | null {
+function tryOpenMlkem768X25519Slot(
+  slot: Mlkem768X25519Slot,
+  secretSeed: Uint8Array,
+): Uint8Array | null {
   if (slot.wrap.length !== 48) return null;
   const ss = mlkem768x25519Decapsulate({ secretSeed, enc: joinKemCt(slot.kem_ct) });
   // Empty salt: the X-Wing combiner already binds the transcript.
@@ -564,7 +574,10 @@ export function eciesSealedPoeUnwrap(args: UnwrapArgs): Uint8Array {
 
   if (cek === null) {
     if (!openedAny) {
-      throw new SealedPoeDecryptError('WRONG_RECIPIENT_KEY', 'no slot opened under recipient secret');
+      throw new SealedPoeDecryptError(
+        'WRONG_RECIPIENT_KEY',
+        'no slot opened under recipient secret',
+      );
     }
     throw new SealedPoeDecryptError('TAMPERED_HEADER', 'opened slot(s) did not satisfy slots_mac');
   }

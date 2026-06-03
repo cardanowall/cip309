@@ -3,8 +3,8 @@
 CIP-309 is an open standard for **Proof of Existence (PoE)** anchored on the
 Cardano blockchain. A publisher hashes content and records the digest — together
 with optional metadata — on-chain under transaction **metadata label 309**.
-Anyone holding the resulting transaction reference can later prove that *this
-content existed on or before the block time* — without trusting the publisher,
+Anyone holding the resulting transaction reference can later prove that _this
+content existed on or before the block time_ — without trusting the publisher,
 their domain, or any server.
 
 This repository is the reference home of the standard: the normative
@@ -49,14 +49,14 @@ superset of the previous:
 
 ## Repository layout
 
-| Directory      | Purpose                                                                                  |
-| -------------- | ---------------------------------------------------------------------------------------- |
-| `spec/`        | The normative standard prose — the authoritative definition of CIP-309.                  |
-| `cddl/`        | The canonical CDDL grammar for the on-chain record (`cip-309.cddl`).                      |
-| `schemas/`     | JSON Schemas for the record and its sub-structures.                                       |
-| `registries/` | The extensible named-identifier registries: error codes and hash / KDF / signature / KEM / AEAD algorithms. |
-| `conformance/` | Canonical cross-implementation test vectors — the byte-parity source of truth.           |
-| `examples/`    | Runnable reference implementations (`examples/typescript/`, `examples/python/`).          |
+| Directory      | Purpose                                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------------------- |
+| `spec/`        | The normative standard prose — the authoritative definition of CIP-309.                                     |
+| `cddl/`        | The canonical CDDL grammar for the on-chain record (`cip-309.cddl`).                                        |
+| `schemas/`     | JSON Schemas for the record and its sub-structures.                                                         |
+| `registries/`  | The extensible named-identifier registries: error codes and hash / KDF / signature / KEM / AEAD algorithms. |
+| `conformance/` | Canonical cross-implementation test vectors — the byte-parity source of truth.                              |
+| `examples/`    | Runnable reference implementations (`examples/typescript/`, `examples/python/`).                            |
 
 Wire-format specifics — exact byte layouts, CBOR tags, field encodings — live in
 `spec/`, `cddl/`, and `schemas/`, not in this README.
@@ -69,12 +69,12 @@ conformance vectors in this repository, and produce **byte-identical** output fo
 the same inputs. That cross-implementation byte-parity is a core guarantee of the
 standard.
 
-| Repository    | Distribution                                                                                                                                                  | Summary                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| [`cip309-ts`](https://github.com/cardanowall/cip309-ts)   | npm: `@cardanowall/crypto-core` (primitives), `@cardanowall/poe-standard` (wire format), `@cardanowall/sdk-ts` (SDK + standalone verifier)                     | The TypeScript reference implementation for browser and Node.                  |
-| [`cip309-py`](https://github.com/cardanowall/cip309-py)   | PyPI: `cardanowall-sdk` (import name `cardanowall`)                                                                                                            | The Python SDK — a byte-identical parity twin of the TypeScript SDK.           |
-| [`cip309-rs`](https://github.com/cardanowall/cip309-rs)   | crates.io: `cardanowall`                                                                                                                                       | The Rust SDK — the byte-parity twin in Rust.                                   |
-| [`cip309-cli`](https://github.com/cardanowall/cip309-cli)  | crates.io: `cardanowall-cli` (binary `cardanowall`)                                                                                                            | A command-line standalone verifier and toolkit built on the Rust SDK.         |
+| Repository                                                | Distribution                                                                                                                               | Summary                                                               |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| [`cip309-ts`](https://github.com/cardanowall/cip309-ts)   | npm: `@cardanowall/crypto-core` (primitives), `@cardanowall/poe-standard` (wire format), `@cardanowall/sdk-ts` (SDK + standalone verifier) | The TypeScript reference implementation for browser and Node.         |
+| [`cip309-py`](https://github.com/cardanowall/cip309-py)   | PyPI: `cardanowall-sdk` (import name `cardanowall`)                                                                                        | The Python SDK — a byte-identical parity twin of the TypeScript SDK.  |
+| [`cip309-rs`](https://github.com/cardanowall/cip309-rs)   | crates.io: `cardanowall`                                                                                                                   | The Rust SDK — the byte-parity twin in Rust.                          |
+| [`cip309-cli`](https://github.com/cardanowall/cip309-cli) | crates.io: `cardanowall-cli` (binary `cardanowall`)                                                                                        | A command-line standalone verifier and toolkit built on the Rust SDK. |
 
 ## License
 

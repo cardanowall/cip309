@@ -8,24 +8,23 @@ import { encodeCanonicalCbor } from './cbor-canonical.ts';
 export type CoseHeader = Map<number | string, unknown>;
 
 export interface CoseSign1Decoded {
-  protectedHeader: CoseHeader;       // decoded from protected_bytes (or empty if 0-length)
-  protectedBytes: Uint8Array;        // original encoding (preserved for signature verification)
+  protectedHeader: CoseHeader; // decoded from protected_bytes (or empty if 0-length)
+  protectedBytes: Uint8Array; // original encoding (preserved for signature verification)
   unprotectedHeader: CoseHeader;
-  payload: Uint8Array | null;        // null = detached
+  payload: Uint8Array | null; // null = detached
   signature: Uint8Array;
 }
 
 export function encodeCoseSign1(args: {
   protectedHeader: CoseHeader;
   unprotectedHeader: CoseHeader;
-  payload: Uint8Array | null;        // null for detached
+  payload: Uint8Array | null; // null for detached
   signature: Uint8Array;
 }): Uint8Array {
   // protected is encoded as bstr; if header is empty, protected_bytes MUST be h'' (zero-length bstr)
   // RFC 9052 §3
-  const protectedBytes = args.protectedHeader.size === 0
-    ? new Uint8Array(0)
-    : encodeCanonicalCbor(args.protectedHeader);
+  const protectedBytes =
+    args.protectedHeader.size === 0 ? new Uint8Array(0) : encodeCanonicalCbor(args.protectedHeader);
   const cborArray = [protectedBytes, args.unprotectedHeader, args.payload, args.signature];
   return encodeCanonicalCbor(cborArray);
 }
@@ -50,9 +49,8 @@ export function decodeCoseSign1(bytes: Uint8Array): CoseSign1Decoded {
     throw new Error('CoseMalformedError: expected 4-element array');
   }
   const [protectedBytes, unprotectedHeaderRaw, payload, signature] = arr;
-  const protectedHeader: CoseHeader = protectedBytes.length === 0
-    ? new Map()
-    : toCoseHeader(decode(protectedBytes));
+  const protectedHeader: CoseHeader =
+    protectedBytes.length === 0 ? new Map() : toCoseHeader(decode(protectedBytes));
   const unprotectedHeader = toCoseHeader(unprotectedHeaderRaw);
   return { protectedHeader, protectedBytes, unprotectedHeader, payload, signature };
 }
@@ -62,8 +60,8 @@ export function decodeCoseSign1(bytes: Uint8Array): CoseSign1Decoded {
 //   payload field is the actual payload even if "detached" (null) in the COSE_Sign1 array.
 export function buildSigStructure(args: {
   context: 'Signature1';
-  bodyProtectedBytes: Uint8Array;     // the encoded protected header bytes (h'' if empty header)
-  externalAad?: Uint8Array;            // empty by default
+  bodyProtectedBytes: Uint8Array; // the encoded protected header bytes (h'' if empty header)
+  externalAad?: Uint8Array; // empty by default
   payload: Uint8Array;
 }): Uint8Array {
   const externalAad = args.externalAad ?? new Uint8Array(0);

@@ -4,9 +4,7 @@
   "source": "reuses wrap-n1-empty envelope/ciphertext (N=1 recipient, empty plaintext)",
   "vector": {
     "name": "n1-empty",
-    "recipient_secrets_hex": [
-      "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161"
-    ],
+    "recipient_secrets_hex": ["a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161"],
     "envelope": {
       "scheme": 1,
       "aead": "xchacha20-poly1305",

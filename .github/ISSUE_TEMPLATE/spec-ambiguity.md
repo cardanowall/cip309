@@ -1,8 +1,8 @@
 ---
 name: Specification ambiguity or error
 about: Report wording in the normative specification that is ambiguous, contradictory, or incorrect
-title: "spec: <short description of the ambiguity>"
-labels: ["spec", "needs-triage"]
+title: 'spec: <short description of the ambiguity>'
+labels: ['spec', 'needs-triage']
 ---
 
 <!--

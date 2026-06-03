@@ -13,20 +13,20 @@ record that satisfies one is expected to satisfy the others.
 The set is twelve files. The root references every sub-structure; shared
 primitives live in `defs.schema.json` and are `$ref`'d by filename.
 
-| File | Covers |
-| --- | --- |
-| `poe-record.schema.json` | Root v1 record: `{ v: 1, ? items[], ? merkle[], ? supersedes, ? sigs[], ? crit[] }` plus the open extension-key namespace (`^x-.+` / `^[a-z]+-.+`). `$ref`s every sub-structure. |
-| `item-entry.schema.json` | A content item: `{ hashes (required), ? uris[][], ? enc }`. |
-| `hash-map.schema.json` | Non-empty map of content-hash-alg → 32-byte digest. |
-| `merkle-commit.schema.json` | A Merkle list commitment: `{ alg, root (32B), leaf_count (uint >= 1), ? uris[][] }`. |
-| `encryption-envelope.schema.json` | Sealed-PoE `enc`: `{ scheme: 1, aead, nonce, ? kem, ? slots[], ? slots_mac (32B), ? passphrase }`. |
-| `encryption-slot.schema.json` | A KEM-driven recipient slot: classical `{ epk (32B), wrap (48B) }` (kem = `x25519`) vs hybrid `{ kem_ct ([bstr 1..64]), wrap (48B) }` (kem = `mlkem768x25519`). |
-| `passphrase-block.schema.json` | Passphrase derivation: `{ alg (kdf), salt (16..64B), params }`; the closed argon2id `{ m, t, p }` shape is documented as a `$def`. |
-| `sig-entry.schema.json` | An authorship signature: `{ cose_sign1 (chunked-bytes-array, required), ? cose_key (chunked-bytes-array) }`. |
-| `chunked-bytes-array.schema.json` | `[1* bstr .size (1..64)]` — non-empty array of 1..64-byte chunks. |
-| `uri-chunk-array.schema.json` | `[1* tstr .size (1..64)]` — non-empty array of 1..64-byte text chunks. |
-| `supersedes.schema.json` | A 32-byte prior-record transaction hash. |
-| `defs.schema.json` | Shared `$defs`: `bytes32`, `bytes48`, and the open algorithm-identifier string types (`content-hash-alg`, `merkle-commit-alg`, `aead-alg`, `kem-alg`, `kdf-alg`). |
+| File                              | Covers                                                                                                                                                                           |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `poe-record.schema.json`          | Root v1 record: `{ v: 1, ? items[], ? merkle[], ? supersedes, ? sigs[], ? crit[] }` plus the open extension-key namespace (`^x-.+` / `^[a-z]+-.+`). `$ref`s every sub-structure. |
+| `item-entry.schema.json`          | A content item: `{ hashes (required), ? uris[][], ? enc }`.                                                                                                                      |
+| `hash-map.schema.json`            | Non-empty map of content-hash-alg → 32-byte digest.                                                                                                                              |
+| `merkle-commit.schema.json`       | A Merkle list commitment: `{ alg, root (32B), leaf_count (uint >= 1), ? uris[][] }`.                                                                                             |
+| `encryption-envelope.schema.json` | Sealed-PoE `enc`: `{ scheme: 1, aead, nonce, ? kem, ? slots[], ? slots_mac (32B), ? passphrase }`.                                                                               |
+| `encryption-slot.schema.json`     | A KEM-driven recipient slot: classical `{ epk (32B), wrap (48B) }` (kem = `x25519`) vs hybrid `{ kem_ct ([bstr 1..64]), wrap (48B) }` (kem = `mlkem768x25519`).                  |
+| `passphrase-block.schema.json`    | Passphrase derivation: `{ alg (kdf), salt (16..64B), params }`; the closed argon2id `{ m, t, p }` shape is documented as a `$def`.                                               |
+| `sig-entry.schema.json`           | An authorship signature: `{ cose_sign1 (chunked-bytes-array, required), ? cose_key (chunked-bytes-array) }`.                                                                     |
+| `chunked-bytes-array.schema.json` | `[1* bstr .size (1..64)]` — non-empty array of 1..64-byte chunks.                                                                                                                |
+| `uri-chunk-array.schema.json`     | `[1* tstr .size (1..64)]` — non-empty array of 1..64-byte text chunks.                                                                                                           |
+| `supersedes.schema.json`          | A 32-byte prior-record transaction hash.                                                                                                                                         |
+| `defs.schema.json`                | Shared `$defs`: `bytes32`, `bytes48`, and the open algorithm-identifier string types (`content-hash-alg`, `merkle-commit-alg`, `aead-alg`, `kem-alg`, `kdf-alg`).                |
 
 ## Root and `$ref` structure
 

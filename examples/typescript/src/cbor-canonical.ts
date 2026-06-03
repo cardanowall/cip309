@@ -15,12 +15,7 @@
 //   typed checks in the validator. cbor2 silently normalises such floats to
 //   JS integers; this byte-level pre-walk catches them before that happens.
 
-import {
-  cdeDecodeOptions,
-  cdeEncodeOptions,
-  decode,
-  encode,
-} from 'cbor2';
+import { cdeDecodeOptions, cdeEncodeOptions, decode, encode } from 'cbor2';
 
 export function encodeCanonicalCbor(value: unknown): Uint8Array {
   return encode(value, {
@@ -72,7 +67,9 @@ function rejectFloats(bytes: Uint8Array, pos: number): number {
     pos += 2;
   } else if (ai === 26) {
     if (pos + 4 > bytes.length) throw new RangeError('MALFORMED_CBOR: truncated 4-byte length');
-    size = bytes[pos]! * 0x1000000 + ((bytes[pos + 1]! << 16) | (bytes[pos + 2]! << 8) | bytes[pos + 3]!);
+    size =
+      bytes[pos]! * 0x1000000 +
+      ((bytes[pos + 1]! << 16) | (bytes[pos + 2]! << 8) | bytes[pos + 3]!);
     pos += 4;
   } else if (ai === 27) {
     if (pos + 8 > bytes.length) throw new RangeError('MALFORMED_CBOR: truncated 8-byte length');
@@ -81,7 +78,9 @@ function rejectFloats(bytes: Uint8Array, pos: number): number {
     size = n;
     pos += 8;
   } else if (ai === 31) {
-    throw new RangeError('MALFORMED_CBOR: indefinite-length encoding not allowed under canonical CBOR');
+    throw new RangeError(
+      'MALFORMED_CBOR: indefinite-length encoding not allowed under canonical CBOR',
+    );
   } else {
     throw new RangeError(`MALFORMED_CBOR: reserved additional info ${ai}`);
   }

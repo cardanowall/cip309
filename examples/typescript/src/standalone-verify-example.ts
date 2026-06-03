@@ -24,11 +24,7 @@ import { buildRecordSignaturePayload } from './cip-309-encoder.ts';
 import { encodeCoseSign1, buildSigStructure } from './cose-sign1.ts';
 import { generateEd25519KeyPair, signEd25519 } from './ed25519.ts';
 import type { PoeRecord } from './cip-309-validator.ts';
-import {
-  verifyTx,
-  type FetchOutbound,
-  type VerifyReport,
-} from './standalone-verifier.ts';
+import { verifyTx, type FetchOutbound, type VerifyReport } from './standalone-verifier.ts';
 
 const enc = new TextEncoder();
 
@@ -187,7 +183,9 @@ async function main(): Promise<void> {
   console.log(`verdict           : ${report.verdict}`);
   console.log(`exitCode          : ${report.exitCode}`);
   console.log(`metadataPresent   : ${report.metadataPresent}`);
-  console.log(`numConfirmations  : ${report.numConfirmations} (threshold ${report.confirmationDepthThreshold})`);
+  console.log(
+    `numConfirmations  : ${report.numConfirmations} (threshold ${report.confirmationDepthThreshold})`,
+  );
   console.log(`validation.valid  : ${report.validation.valid}`);
   console.log(
     `recordSignatures  : ${(report.recordSignatures ?? [])
@@ -205,7 +203,9 @@ async function main(): Promise<void> {
     report.validation.valid === true &&
     (report.recordSignatures ?? []).every((s) => s.valid);
 
-  console.log(`\n${ok ? 'PASS' : 'FAIL'}  standalone verification produced a clean 'valid' verdict`);
+  console.log(
+    `\n${ok ? 'PASS' : 'FAIL'}  standalone verification produced a clean 'valid' verdict`,
+  );
   if (!ok) process.exit(1);
 }
 

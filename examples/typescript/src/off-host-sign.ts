@@ -61,7 +61,6 @@ export class MockHsmSigner implements OffHostSigner {
     this.seed = seed;
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   async sign(message: Uint8Array): Promise<Uint8Array> {
     return signEd25519(message, this.seed);
   }

@@ -229,9 +229,7 @@ export async function verifyTx(input: VerifyTxInput): Promise<VerifyReport> {
       numConfirmations: resolved.numConfirmations,
       validation: {
         valid: false,
-        issues: [
-          { path: [], code: 'MALFORMED_CBOR', message: (e as Error).message },
-        ],
+        issues: [{ path: [], code: 'MALFORMED_CBOR', message: (e as Error).message }],
       },
     });
   }
@@ -333,11 +331,7 @@ export async function verifyTx(input: VerifyTxInput): Promise<VerifyReport> {
 
   // 7. Decryption (optional)
   if (input.decryption && input.decryption.length > 0) {
-    const { out: decOut, warnings: decWarnings } = await tryDecryptions(
-      record,
-      input,
-      fetchFn,
-    );
+    const { out: decOut, warnings: decWarnings } = await tryDecryptions(record, input, fetchFn);
     report.itemDecryptions = decOut;
     if (decWarnings.length > 0) {
       const existing = report.validation.warnings ?? [];
@@ -375,11 +369,7 @@ export async function verifyTx(input: VerifyTxInput): Promise<VerifyReport> {
         warnings: [...existing, ...merkleWarnings],
       };
     }
-    if (
-      report.merkleChecks.some(
-        (m) => m.rootOk === false || m.reason !== undefined,
-      )
-    ) {
+    if (report.merkleChecks.some((m) => m.rootOk === false || m.reason !== undefined)) {
       report.verdict = 'failed';
       report.exitCode = 1;
     }
@@ -560,7 +550,7 @@ function extractLabel309Metadata(txCbor: Uint8Array): Uint8Array | null {
 
 async function verifyRecordSignatures(
   record: PoeRecord,
-  input: VerifyTxInput,
+  _input: VerifyTxInput,
 ): Promise<NonNullable<VerifyReport['recordSignatures']>> {
   const out: NonNullable<VerifyReport['recordSignatures']> = [];
   // Strip `sigs` from the signed payload (CIP-309 §4.6.1). The optional
@@ -620,7 +610,7 @@ async function verifySignature(args: VerifySignatureArgs): Promise<SignatureVeri
   let cose;
   try {
     cose = decodeCoseSign1(concatChunks(args.sigChunks));
-  } catch (e) {
+  } catch {
     return { valid: false, reason: 'MALFORMED_SIG_COSE_SIGN1' };
   }
   // RFC 9052 §4.1: detached form MUST encode payload as nil; a zero-length
@@ -844,8 +834,11 @@ async function tryDecryptions(
       // unwrap and bit-flip tampering — the AEAD tag check fails in both
       // cases and a public verifier cannot disambiguate.
       const reason =
-        e && typeof e === 'object' && 'code' in e && typeof (e as { code: unknown }).code === 'string'
-          ? ((e as { code: string }).code)
+        e &&
+        typeof e === 'object' &&
+        'code' in e &&
+        typeof (e as { code: unknown }).code === 'string'
+          ? (e as { code: string }).code
           : 'TAMPERED_CIPHERTEXT';
       out.push({
         itemIndex: dec.itemIndex,
@@ -976,7 +969,7 @@ async function checkMerkleCommitments(
     // JSON falls back as an informative projection and triggers
     // `MERKLE_LEAVES_INFORMATIVE_FORM` (info severity).
     let leaves: Uint8Array[];
-    let onChainLeafCount: number = commit.leaf_count;
+    const onChainLeafCount: number = commit.leaf_count;
     let fileLeafCount: number;
     let algId: string;
     try {
@@ -1016,8 +1009,7 @@ async function checkMerkleCommitments(
           if (typeof h !== 'string') throw new Error('leaf not string');
           return hexToBytes(h);
         });
-        fileLeafCount =
-          typeof parsed.leaf_count === 'number' ? parsed.leaf_count : leaves.length;
+        fileLeafCount = typeof parsed.leaf_count === 'number' ? parsed.leaf_count : leaves.length;
         algId = typeof parsed.tree_alg === 'string' ? parsed.tree_alg : commit.alg;
         warnings.push({
           path: ['merkle', i],

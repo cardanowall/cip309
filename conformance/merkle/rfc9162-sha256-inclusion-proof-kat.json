@@ -131,9 +131,7 @@
       "name": "tree-1",
       "tree_size": 1,
       "root": "b696b144b6e6815fb3e83cbd501bca5b3e509fd0d309d582a8329718b9516ccc",
-      "leaves": [
-        "b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c"
-      ],
+      "leaves": ["b5e62a21038c1c2fdf28ad4d39ba6502e0568591c8647cac6998bfff67a25b3c"],
       "inclusions": [
         {
           "index": 0,

@@ -29,7 +29,7 @@ const RECOGNISED_CIDV1_CODECS: ReadonlySet<number> = new Set([0x55, 0x70, 0x71])
 // Multihash codes are themselves varint-encoded inside the CID payload, so a
 // blake2b-256 entry on the wire reads as varint(0xb220) → bytes 0xa0 0xe4 0x02.
 const RECOGNISED_MULTIHASH: ReadonlyMap<number, number> = new Map([
-  [0x12, 32],   // sha2-256
+  [0x12, 32], // sha2-256
   [0xb220, 32], // blake2b-256
 ]);
 
@@ -75,10 +75,7 @@ function b58Decode(s: string): Uint8Array | null {
   return out;
 }
 
-function b32DecodeNoPad(
-  s: string,
-  alphaIndex: ReadonlyMap<string, number>,
-): Uint8Array | null {
+function b32DecodeNoPad(s: string, alphaIndex: ReadonlyMap<string, number>): Uint8Array | null {
   if (s.length === 0) return new Uint8Array(0);
   let bits = 0;
   let buffer = 0;
@@ -228,10 +225,7 @@ export function runSelfTest(): void {
   assert(!isValidCid('Qm'), 'too-short Qm prefix');
   assert(!isValidCid('Qm' + '1'.repeat(44)), 'wrong length Qm-prefix');
   // Wrong base58 alphabet ('0' not in alphabet).
-  assert(
-    !isValidCid('Qm0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'),
-    'invalid b58 char',
-  );
+  assert(!isValidCid('Qm0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'), 'invalid b58 char');
   // Garbage CIDv1.
   assert(!isValidCid('babcdefg'), 'invalid CIDv1 base32 payload');
   // CIDv1 with unknown multibase prefix (base64url-upper M is allowed by some

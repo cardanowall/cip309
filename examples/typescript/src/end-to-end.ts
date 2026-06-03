@@ -26,21 +26,10 @@ import {
   SIG_DOMAIN_RECORD_V1,
 } from './cip-309-encoder.ts';
 import { validatePoeRecord, type PoeRecord } from './cip-309-validator.ts';
-import {
-  encodeCoseSign1,
-  decodeCoseSign1,
-  buildSigStructure,
-} from './cose-sign1.ts';
-import {
-  generateEd25519KeyPair,
-  signEd25519,
-  verifyEd25519,
-} from './ed25519.ts';
+import { encodeCoseSign1, decodeCoseSign1, buildSigStructure } from './cose-sign1.ts';
+import { generateEd25519KeyPair, signEd25519, verifyEd25519 } from './ed25519.ts';
 import { generateX25519KeyPair } from './x25519.ts';
-import {
-  eciesSealedPoeWrap,
-  eciesSealedPoeUnwrap,
-} from './ecies-sealed-poe.ts';
+import { eciesSealedPoeWrap, eciesSealedPoeUnwrap } from './ecies-sealed-poe.ts';
 
 // ----- Tiny assertion harness -----
 
@@ -141,7 +130,10 @@ function signedRecordFlow(): void {
   // (e) A verifier decodes + structurally validates the record bytes. This is a
   // pure function — no network, no crypto signature check yet.
   const decoded = decodeCanonicalCbor(recordBytes);
-  check('record round-trips through canonical CBOR decode', decoded !== null && typeof decoded === 'object');
+  check(
+    'record round-trips through canonical CBOR decode',
+    decoded !== null && typeof decoded === 'object',
+  );
 
   const validation = validatePoeRecord(recordBytes);
   check(
@@ -214,7 +206,11 @@ function sealedPoeFlow(): void {
     recipientPublicKeys: recipientPubs,
   });
   check('envelope KEM is x25519', envelope.kem === 'x25519');
-  check('one slot per recipient', envelope.slots.length === recipients.length, `${envelope.slots.length} slots`);
+  check(
+    'one slot per recipient',
+    envelope.slots.length === recipients.length,
+    `${envelope.slots.length} slots`,
+  );
   check('slots_mac is 32 bytes', envelope.slots_mac.length === 32);
 
   // (c) The producer publishes the digests of the PLAINTEXT on-chain (the

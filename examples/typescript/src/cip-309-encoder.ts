@@ -35,9 +35,7 @@ import type { PoeRecord } from './cip-309-validator.ts';
 // (`to_sign`) rather than placed in Sig_structure[2] (`external_aad`).
 // The empty `external_aad` keeps v1 byte-compatible with CIP-30 `signData`,
 // which explicitly forbids `external_aad`.
-export const SIG_DOMAIN_RECORD_V1 = new TextEncoder().encode(
-  'cardano-poe-record-sig-v1',
-);
+export const SIG_DOMAIN_RECORD_V1 = new TextEncoder().encode('cardano-poe-record-sig-v1');
 
 export function encodePoeRecord(record: PoeRecord): Uint8Array {
   // Records produced for Cardano label 309 metadata MUST use canonical CBOR (RFC 8949 §4.2.1)

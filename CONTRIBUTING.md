@@ -21,14 +21,14 @@ This is the **home of the standard itself** and its normative,
 machine-readable artifacts. Contributions here concern the wire format and the
 materials that define and test it:
 
-| Path            | Contents                                                              |
-| --------------- | -------------------------------------------------------------------- |
-| `spec/`         | The normative standard prose.                                        |
-| `cddl/`         | The canonical CDDL grammar for the on-chain record.                  |
-| `schemas/`      | JSON Schemas for the record and its sub-structures.                  |
-| `registries/`   | The extensible named-identifier registries (error codes; hash, KDF, signature, KEM, and AEAD algorithms). |
-| `conformance/`  | Canonical cross-implementation test vectors — the parity source of truth. |
-| `examples/`     | Small, runnable reference implementations in TypeScript and Python.  |
+| Path           | Contents                                                                                                  |
+| -------------- | --------------------------------------------------------------------------------------------------------- |
+| `spec/`        | The normative standard prose.                                                                             |
+| `cddl/`        | The canonical CDDL grammar for the on-chain record.                                                       |
+| `schemas/`     | JSON Schemas for the record and its sub-structures.                                                       |
+| `registries/`  | The extensible named-identifier registries (error codes; hash, KDF, signature, KEM, and AEAD algorithms). |
+| `conformance/` | Canonical cross-implementation test vectors — the parity source of truth.                                 |
+| `examples/`    | Small, runnable reference implementations in TypeScript and Python.                                       |
 
 If your change touches the meaning of the wire format, the grammar, a schema, a
 registry, or the conformance corpus, you are in the right place.

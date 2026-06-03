@@ -8,10 +8,7 @@
 import * as ed from '@noble/ed25519';
 import { sha512 } from '@noble/hashes/sha2.js';
 import { hkdfSha256 } from './hkdf.ts';
-import {
-  mlkem768x25519Keygen,
-  type Mlkem768X25519KeyPair,
-} from './mlkem768x25519.ts';
+import { mlkem768x25519Keygen, type Mlkem768X25519KeyPair } from './mlkem768x25519.ts';
 import { x25519PublicKey } from './x25519.ts';
 
 // Mirror the injection from ed25519.ts — this module calls ed.getPublicKey

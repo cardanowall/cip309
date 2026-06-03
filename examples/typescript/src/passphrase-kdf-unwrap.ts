@@ -116,11 +116,7 @@ async function deriveCek(
   const normalised = normalizePassphrase(passphrase);
   const passphraseBytes = new TextEncoder().encode(normalised);
   if (envelope.passphrase.alg === 'argon2id') {
-    return deriveCekArgon2id(
-      passphraseBytes,
-      envelope.passphrase.salt,
-      envelope.passphrase.params,
-    );
+    return deriveCekArgon2id(passphraseBytes, envelope.passphrase.salt, envelope.passphrase.params);
   }
   throw new PassphraseUnwrapError(
     'ENC_PASSPHRASE_ALG_UNSUPPORTED',
@@ -147,10 +143,7 @@ export async function eciesKdfUnwrap(args: PassphraseUnwrapArgs): Promise<Uint8A
   const { envelope, ciphertext, passphrase } = args;
 
   if (envelope.scheme !== 1) {
-    throw new PassphraseUnwrapError(
-      'UNSUPPORTED_ENVELOPE_SCHEME',
-      `enc.scheme=${envelope.scheme}`,
-    );
+    throw new PassphraseUnwrapError('UNSUPPORTED_ENVELOPE_SCHEME', `enc.scheme=${envelope.scheme}`);
   }
   if (envelope.aead !== 'xchacha20-poly1305') {
     throw new PassphraseUnwrapError('UNSUPPORTED_AEAD_ALG', envelope.aead);
@@ -159,10 +152,7 @@ export async function eciesKdfUnwrap(args: PassphraseUnwrapArgs): Promise<Uint8A
     throw new PassphraseUnwrapError('INVALID_ENVELOPE_SHAPE', 'nonce length');
   }
   if (envelope.passphrase === undefined || envelope.passphrase === null) {
-    throw new PassphraseUnwrapError(
-      'INVALID_ENVELOPE_SHAPE',
-      'envelope has no passphrase block',
-    );
+    throw new PassphraseUnwrapError('INVALID_ENVELOPE_SHAPE', 'envelope has no passphrase block');
   }
 
   const cek = await deriveCek(envelope, passphrase);

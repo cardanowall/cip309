@@ -1,8 +1,8 @@
 ---
 name: Registry addition
 about: Propose a new entry in an extensible registry (algorithm or error code)
-title: "registry: add <named-identifier>"
-labels: ["registry", "needs-triage"]
+title: 'registry: add <named-identifier>'
+labels: ['registry', 'needs-triage']
 ---
 
 <!--

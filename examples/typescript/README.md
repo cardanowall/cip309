@@ -26,36 +26,36 @@ deliberately reduced to the wire standard so they can be audited line by line.
 
 Primitive modules (`src/`):
 
-| File | Demonstrates |
-| --- | --- |
-| `hash-dual.ts` | SHA-256 + BLAKE2b-256 dual content hashing. |
-| `cbor-canonical.ts` | Deterministic (canonical) CBOR encode/decode, with float rejection. |
-| `cbor-walker.ts` | Byte-slicing the label-309 value out of a serialised Cardano tx (no re-encode). |
-| `cose-sign1.ts` | `COSE_Sign1` encode/decode + `Sig_structure` builder. |
-| `ed25519.ts` | Ed25519 keygen / sign / strict verify. |
-| `x25519.ts` | X25519 keygen / ECDH. |
-| `mlkem768x25519.ts` | X-Wing hybrid KEM (ML-KEM-768 + X25519) wrapper. |
-| `hkdf.ts` | HKDF-SHA-256. |
-| `seed-derive.ts` | Deriving Ed25519 / X25519 / X-Wing keypairs from a 32-byte seed. |
-| `merkle-sha2-256.ts` | RFC 6962 / RFC 9162 Merkle tree, roots + inclusion proofs (self-test). |
-| `merkle-leaves-list.ts` | Canonical-CBOR codec for the off-chain Merkle leaves-list. |
-| `cid-validator.ts` | Full IPFS CID (v0/v1) structural parsing (self-test). |
-| `cip-309-encoder.ts` | Encoding a PoE record to canonical CBOR + the record-signature payload. |
-| `cip-309-validator.ts` | Pure-function structural validator over record bytes. |
-| `ecies-sealed-poe.ts` | Multi-recipient sealed-PoE wrap/unwrap (X25519 and X-Wing KEMs). |
-| `passphrase-kdf-unwrap.ts` | Sealed-PoE passphrase path (Argon2id → XChaCha20-Poly1305). |
-| `off-host-sign.ts` | Off-host (HSM/KMS/air-gap) signing helper + CIP-8 hashed mode. |
-| `standalone-verifier.ts` | The full service-independent verifier (`verifyTx`). |
+| File                       | Demonstrates                                                                    |
+| -------------------------- | ------------------------------------------------------------------------------- |
+| `hash-dual.ts`             | SHA-256 + BLAKE2b-256 dual content hashing.                                     |
+| `cbor-canonical.ts`        | Deterministic (canonical) CBOR encode/decode, with float rejection.             |
+| `cbor-walker.ts`           | Byte-slicing the label-309 value out of a serialised Cardano tx (no re-encode). |
+| `cose-sign1.ts`            | `COSE_Sign1` encode/decode + `Sig_structure` builder.                           |
+| `ed25519.ts`               | Ed25519 keygen / sign / strict verify.                                          |
+| `x25519.ts`                | X25519 keygen / ECDH.                                                           |
+| `mlkem768x25519.ts`        | X-Wing hybrid KEM (ML-KEM-768 + X25519) wrapper.                                |
+| `hkdf.ts`                  | HKDF-SHA-256.                                                                   |
+| `seed-derive.ts`           | Deriving Ed25519 / X25519 / X-Wing keypairs from a 32-byte seed.                |
+| `merkle-sha2-256.ts`       | RFC 6962 / RFC 9162 Merkle tree, roots + inclusion proofs (self-test).          |
+| `merkle-leaves-list.ts`    | Canonical-CBOR codec for the off-chain Merkle leaves-list.                      |
+| `cid-validator.ts`         | Full IPFS CID (v0/v1) structural parsing (self-test).                           |
+| `cip-309-encoder.ts`       | Encoding a PoE record to canonical CBOR + the record-signature payload.         |
+| `cip-309-validator.ts`     | Pure-function structural validator over record bytes.                           |
+| `ecies-sealed-poe.ts`      | Multi-recipient sealed-PoE wrap/unwrap (X25519 and X-Wing KEMs).                |
+| `passphrase-kdf-unwrap.ts` | Sealed-PoE passphrase path (Argon2id → XChaCha20-Poly1305).                     |
+| `off-host-sign.ts`         | Off-host (HSM/KMS/air-gap) signing helper + CIP-8 hashed mode.                  |
+| `standalone-verifier.ts`   | The full service-independent verifier (`verifyTx`).                             |
 
 Runnable demos and tests (`src/`):
 
-| File | Shows |
-| --- | --- |
-| `end-to-end.ts` | Publish + verify a signed hash-only PoE, then a sealed-PoE wrap → unwrap roundtrip. |
-| `standalone-verify-example.ts` | Driving `verifyTx` against a synthetic tx via an injected (offline) gateway. |
-| `smoke-parity.ts` | Canonical-CBOR byte-parity against the pinned conformance vectors. |
-| `smoke-validator.ts` | Structural-validator accept/reject behaviour across many record shapes. |
-| `smoke-tx-extract.ts` | Positional byte-slice extraction of the label-309 value (and non-laundering proof). |
+| File                           | Shows                                                                               |
+| ------------------------------ | ----------------------------------------------------------------------------------- |
+| `end-to-end.ts`                | Publish + verify a signed hash-only PoE, then a sealed-PoE wrap → unwrap roundtrip. |
+| `standalone-verify-example.ts` | Driving `verifyTx` against a synthetic tx via an injected (offline) gateway.        |
+| `smoke-parity.ts`              | Canonical-CBOR byte-parity against the pinned conformance vectors.                  |
+| `smoke-validator.ts`           | Structural-validator accept/reject behaviour across many record shapes.             |
+| `smoke-tx-extract.ts`          | Positional byte-slice extraction of the label-309 value (and non-laundering proof). |
 
 ## How to run
 

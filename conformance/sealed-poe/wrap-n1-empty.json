@@ -4,12 +4,8 @@
   "source": "N=1 recipient, empty plaintext",
   "vector": {
     "name": "n1-empty",
-    "recipient_publics_hex": [
-      "c306fb0ef2bf8b7f93bad98155fa37daec74db0c4cbeda6c6f1dba9d36558252"
-    ],
-    "ephemeral_secrets_hex": [
-      "e0e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e161"
-    ],
+    "recipient_publics_hex": ["c306fb0ef2bf8b7f93bad98155fa37daec74db0c4cbeda6c6f1dba9d36558252"],
+    "ephemeral_secrets_hex": ["e0e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e161"],
     "cek_hex": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
     "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
     "plaintext_hex": "",

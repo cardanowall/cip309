@@ -14,7 +14,7 @@ canonical conformance vectors that pin this parity live in
 
 ## Self-contained
 
-Nothing here imports a published Cardanowall SDK. The implementations build only
+Nothing here imports a published CardanoWall SDK. The implementations build only
 on widely-used, audited public libraries:
 
 - [`cryptography`](https://pypi.org/project/cryptography/) — X25519, Ed25519
@@ -33,26 +33,26 @@ on widely-used, audited public libraries:
 
 Modules live under [`cip309_examples/`](./cip309_examples):
 
-| Module | Primitive |
-| --- | --- |
-| `hash_dual.py` | SHA-256 + BLAKE2b-256 content hashing. |
-| `cbor_canonical.py` | Canonical CBOR encode/decode; float rejection. |
-| `cose_sign1.py` | COSE_Sign1 encode/decode + RFC 9052 Sig_structure. |
-| `ed25519.py` | Strict (RFC 8032 §5.1.7) Ed25519 sign / verify / keygen. |
-| `x25519.py` | X25519 keygen + ECDH. |
-| `mlkem768x25519.py` | X-Wing hybrid KEM (ML-KEM-768 + X25519). |
-| `hkdf.py` | HKDF-SHA-256. |
-| `seed_derive.py` | Seed → Ed25519 / X25519 / X-Wing keypairs (stops at the seed). |
-| `merkle_sha2_256.py` | RFC 6962 Merkle tree, roots + inclusion proofs. |
-| `merkle_leaves_list.py` | Canonical-CBOR Merkle leaves-list codec. |
-| `cid_validator.py` | IPFS CID (v0/v1) structural validator. |
-| `off_host_sign.py` | Off-host (KMS / HSM / air-gapped) record signing helper. |
-| `cip_309_validator.py` | Pure-function structural validator over record CBOR bytes. |
-| `ecies_sealed_poe.py` | Multi-recipient sealed-PoE wrap / unwrap (x25519 + X-Wing). |
-| `passphrase_kdf_unwrap.py` | Passphrase (Argon2id) sealed-PoE wrap / unwrap. |
-| `passphrase.py` | Passphrase normalization (NFKC + whitespace) for the KDF. |
-| `cbor_walker.py` | Position-aware walker: extract label-309 bytes from a tx. |
-| `standalone_verifier.py` | Service-independent verifier: fetch tx → validate → verify. |
+| Module                     | Primitive                                                      |
+| -------------------------- | -------------------------------------------------------------- |
+| `hash_dual.py`             | SHA-256 + BLAKE2b-256 content hashing.                         |
+| `cbor_canonical.py`        | Canonical CBOR encode/decode; float rejection.                 |
+| `cose_sign1.py`            | COSE_Sign1 encode/decode + RFC 9052 Sig_structure.             |
+| `ed25519.py`               | Strict (RFC 8032 §5.1.7) Ed25519 sign / verify / keygen.       |
+| `x25519.py`                | X25519 keygen + ECDH.                                          |
+| `mlkem768x25519.py`        | X-Wing hybrid KEM (ML-KEM-768 + X25519).                       |
+| `hkdf.py`                  | HKDF-SHA-256.                                                  |
+| `seed_derive.py`           | Seed → Ed25519 / X25519 / X-Wing keypairs (stops at the seed). |
+| `merkle_sha2_256.py`       | RFC 6962 Merkle tree, roots + inclusion proofs.                |
+| `merkle_leaves_list.py`    | Canonical-CBOR Merkle leaves-list codec.                       |
+| `cid_validator.py`         | IPFS CID (v0/v1) structural validator.                         |
+| `off_host_sign.py`         | Off-host (KMS / HSM / air-gapped) record signing helper.       |
+| `cip_309_validator.py`     | Pure-function structural validator over record CBOR bytes.     |
+| `ecies_sealed_poe.py`      | Multi-recipient sealed-PoE wrap / unwrap (x25519 + X-Wing).    |
+| `passphrase_kdf_unwrap.py` | Passphrase (Argon2id) sealed-PoE wrap / unwrap.                |
+| `passphrase.py`            | Passphrase normalization (NFKC + whitespace) for the KDF.      |
+| `cbor_walker.py`           | Position-aware walker: extract label-309 bytes from a tx.      |
+| `standalone_verifier.py`   | Service-independent verifier: fetch tx → validate → verify.    |
 
 Two runnable entry points:
 

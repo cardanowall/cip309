@@ -23,10 +23,7 @@ export function x25519PublicKey(secretKey: Uint8Array): Uint8Array {
   return x25519.getPublicKey(secretKey);
 }
 
-export function x25519SharedSecret(
-  secretKey: Uint8Array,
-  theirPublicKey: Uint8Array,
-): Uint8Array {
+export function x25519SharedSecret(secretKey: Uint8Array, theirPublicKey: Uint8Array): Uint8Array {
   if (secretKey.length !== 32) {
     throw new Error('x25519SharedSecret: secretKey must be 32 bytes');
   }

@@ -80,22 +80,22 @@ derivation, and structural-validator code emission.
 
 ## Layout
 
-| Area | Contents |
-|---|---|
-| `cbor/` | Canonical CBOR encode/decode (RFC 8949) + decode-rejection |
-| `hash/` | SHA-256, BLAKE2b-256, dual-hash equivalence |
-| `kdf/` | HKDF-SHA-256, Argon2id v1.3, Argon2id parameter constants |
-| `aead/` | ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305 |
-| `kem/` | X25519 (RFC 7748), ML-KEM-768 + X25519 (X-Wing) |
-| `sig/` | Ed25519 (KAT, round-trip, strict/torsion) |
-| `cose/` | `COSE_Sign1`, `Sig_structure`, build/verify, strict-Ed25519 |
-| `wallet-cose/` | CIP-30 per-wallet signed records (valid + rejection) |
-| `merkle/` | `rfc9162-sha256` leaves-list validation |
-| `seed-derive/` | seed → Ed25519 / X25519 / X-Wing keys + recipient encodings |
-| `sealed-poe/` | multi-recipient wrap/unwrap (classical + hybrid) + negatives |
-| `poe-record/` | maximal positive record (full wire surface) |
-| `validator/` | structural-validator negative corpus (per error code) |
-| `cross-service/` | cross-implementation interop sealed records |
+| Area             | Contents                                                     |
+| ---------------- | ------------------------------------------------------------ |
+| `cbor/`          | Canonical CBOR encode/decode (RFC 8949) + decode-rejection   |
+| `hash/`          | SHA-256, BLAKE2b-256, dual-hash equivalence                  |
+| `kdf/`           | HKDF-SHA-256, Argon2id v1.3, Argon2id parameter constants    |
+| `aead/`          | ChaCha20-Poly1305 (RFC 8439), XChaCha20-Poly1305             |
+| `kem/`           | X25519 (RFC 7748), ML-KEM-768 + X25519 (X-Wing)              |
+| `sig/`           | Ed25519 (KAT, round-trip, strict/torsion)                    |
+| `cose/`          | `COSE_Sign1`, `Sig_structure`, build/verify, strict-Ed25519  |
+| `wallet-cose/`   | CIP-30 per-wallet signed records (valid + rejection)         |
+| `merkle/`        | `rfc9162-sha256` leaves-list validation                      |
+| `seed-derive/`   | seed → Ed25519 / X25519 / X-Wing keys + recipient encodings  |
+| `sealed-poe/`    | multi-recipient wrap/unwrap (classical + hybrid) + negatives |
+| `poe-record/`    | maximal positive record (full wire surface)                  |
+| `validator/`     | structural-validator negative corpus (per error code)        |
+| `cross-service/` | cross-implementation interop sealed records                  |
 
 ## License
 

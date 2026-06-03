@@ -80,10 +80,7 @@ export function encodeLeavesList(args: EncodeLeavesListArgs): Uint8Array {
     );
   }
   if (args.leaves.length < 1) {
-    throw new LeavesListError(
-      'SCHEMA_MERKLE_LEAVES_MALFORMED',
-      'leaves array MUST be non-empty',
-    );
+    throw new LeavesListError('SCHEMA_MERKLE_LEAVES_MALFORMED', 'leaves array MUST be non-empty');
   }
   for (let i = 0; i < args.leaves.length; i++) {
     const leaf = args.leaves[i]!;
@@ -132,10 +129,7 @@ export function decodeLeavesList(bytes: Uint8Array): DecodedLeavesList {
   const m = decoded as Record<string, unknown>;
   const format = m['format'];
   if (typeof format !== 'string') {
-    throw new LeavesListError(
-      'SCHEMA_MERKLE_LEAVES_MALFORMED',
-      'format MUST be a tstr',
-    );
+    throw new LeavesListError('SCHEMA_MERKLE_LEAVES_MALFORMED', 'format MUST be a tstr');
   }
   if (!REGISTERED_FORMATS.has(format)) {
     throw new LeavesListError(
@@ -152,17 +146,11 @@ export function decodeLeavesList(bytes: Uint8Array): DecodedLeavesList {
   }
   const root = m['root'];
   if (!(root instanceof Uint8Array) || root.length !== DIGEST_LENGTH) {
-    throw new LeavesListError(
-      'SCHEMA_MERKLE_LEAVES_MALFORMED',
-      'root MUST be a 32-byte bstr',
-    );
+    throw new LeavesListError('SCHEMA_MERKLE_LEAVES_MALFORMED', 'root MUST be a 32-byte bstr');
   }
   const leavesRaw = m['leaves'];
   if (!Array.isArray(leavesRaw) || leavesRaw.length < 1) {
-    throw new LeavesListError(
-      'SCHEMA_MERKLE_LEAVES_MALFORMED',
-      'leaves MUST be a non-empty array',
-    );
+    throw new LeavesListError('SCHEMA_MERKLE_LEAVES_MALFORMED', 'leaves MUST be a non-empty array');
   }
   const leaves: Uint8Array[] = leavesRaw.map((leaf, i) => {
     if (!(leaf instanceof Uint8Array) || leaf.length !== DIGEST_LENGTH) {
@@ -224,7 +212,6 @@ export function toJsonProjection(decoded: DecodedLeavesList): string {
  * `MERKLE_LEAVES_INFORMATIVE_FORM` (info-severity) per CIP-309.
  */
 export function fromJsonProjection(json: string): DecodedLeavesList {
-  // eslint-disable-next-line no-console
   if (typeof process !== 'undefined' && process.env?.['CIP309_VERIFICATION_CTX']) {
     console.warn(
       'merkle-leaves-list: fromJsonProjection used in a verification context; ' +
@@ -248,10 +235,7 @@ export function fromJsonProjection(json: string): DecodedLeavesList {
   }
   const rootHex = parsed['root'];
   if (typeof rootHex !== 'string') {
-    throw new LeavesListError(
-      'SCHEMA_MERKLE_LEAVES_MALFORMED',
-      'root MUST be a hex string',
-    );
+    throw new LeavesListError('SCHEMA_MERKLE_LEAVES_MALFORMED', 'root MUST be a hex string');
   }
   const root = hexToBytes(rootHex);
   const leavesRaw = parsed['leaves'];
@@ -283,9 +267,7 @@ export function fromJsonProjection(json: string): DecodedLeavesList {
     root,
     leaves,
     leafCount,
-    ...(typeof parsed['leaf_alg'] === 'string'
-      ? { leafAlg: parsed['leaf_alg'] as string }
-      : {}),
+    ...(typeof parsed['leaf_alg'] === 'string' ? { leafAlg: parsed['leaf_alg'] as string } : {}),
   };
   return out;
 }
@@ -301,10 +283,7 @@ function bytesToHex(b: Uint8Array): string {
 function hexToBytes(hex: string): Uint8Array {
   const clean = hex.startsWith('0x') ? hex.slice(2) : hex;
   if (clean.length % 2 !== 0) {
-    throw new LeavesListError(
-      'SCHEMA_MERKLE_LEAVES_MALFORMED',
-      'hex string has odd length',
-    );
+    throw new LeavesListError('SCHEMA_MERKLE_LEAVES_MALFORMED', 'hex string has odd length');
   }
   const out = new Uint8Array(clean.length / 2);
   for (let i = 0; i < out.length; i++) {
