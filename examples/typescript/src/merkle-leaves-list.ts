@@ -1,6 +1,6 @@
-// Merkle leaves-list CBOR codec for CIP-309.
-// Spec: CIP-309 §6.5 (canonical CBOR wire form),
-//       CIP-309 §4.5 (on-chain commitment).
+// Merkle leaves-list CBOR codec for Label 309.
+// Spec: Label 309 §6.5 (canonical CBOR wire form),
+//       Label 309 §4.5 (on-chain commitment).
 //
 // CBOR is the normative wire form of the leaves-list file published to the
 // content-addressed substrate referenced by `merkle[i].uris[]`. The JSON
@@ -8,7 +8,7 @@
 // human-readable companion view (CLI dumps, doc examples) and MUST NOT be
 // used as the byte-normative form when both forms are present.
 //
-// Final CDDL (CIP-309 §6.5):
+// Final CDDL (Label 309 §6.5):
 //
 //   leaves-list = {
 //     "format":     "cardano-poe-merkle-leaves-v1",
@@ -20,7 +20,7 @@
 //   }
 //
 // Unknown / mismatched `format` values throw `SCHEMA_MERKLE_LEAVES_FORMAT_UNSUPPORTED`
-// (CIP-309).
+// (Label 309).
 
 import { decodeCanonicalCbor, encodeCanonicalCbor } from './cbor-canonical.ts';
 
@@ -114,9 +114,9 @@ export function encodeLeavesList(args: EncodeLeavesListArgs): Uint8Array {
 
 /**
  * Parse canonical CBOR bytes as a leaves-list and validate the schema. The
- * `format` field is the version hook (CIP-309 §6.5); a value not in the
+ * `format` field is the version hook (Label 309 §6.5); a value not in the
  * registered set raises `SCHEMA_MERKLE_LEAVES_FORMAT_UNSUPPORTED`
- * (CIP-309).
+ * (Label 309).
  */
 export function decodeLeavesList(bytes: Uint8Array): DecodedLeavesList {
   const decoded = decodeCanonicalCbor(bytes);
@@ -186,7 +186,7 @@ export function decodeLeavesList(bytes: Uint8Array): DecodedLeavesList {
  * inspection (CLI dumps, doc examples, debugging). The output is human-
  * readable and stable for byte-level diffing but is NOT the wire form.
  * A verifier MUST NOT use the JSON projection as the byte-normative
- * leaves-list (CIP-309 §6.5).
+ * leaves-list (Label 309 §6.5).
  */
 export function toJsonProjection(decoded: DecodedLeavesList): string {
   const obj: Record<string, unknown> = {
@@ -209,13 +209,13 @@ export function toJsonProjection(decoded: DecodedLeavesList): string {
  * Inverse of `toJsonProjection`. Provided for completeness; NOT for
  * verification: callers using this function in a verification context
  * MUST treat the result as informative and emit
- * `MERKLE_LEAVES_INFORMATIVE_FORM` (info-severity) per CIP-309.
+ * `MERKLE_LEAVES_INFORMATIVE_FORM` (info-severity) per Label 309.
  */
 export function fromJsonProjection(json: string): DecodedLeavesList {
-  if (typeof process !== 'undefined' && process.env?.['CIP309_VERIFICATION_CTX']) {
+  if (typeof process !== 'undefined' && process.env?.['LABEL309_VERIFICATION_CTX']) {
     console.warn(
       'merkle-leaves-list: fromJsonProjection used in a verification context; ' +
-        'CBOR is the normative wire form per CIP-309 §6.5. Emit MERKLE_LEAVES_INFORMATIVE_FORM.',
+        'CBOR is the normative wire form per Label 309 §6.5. Emit MERKLE_LEAVES_INFORMATIVE_FORM.',
     );
   }
   const parsed = JSON.parse(json) as Record<string, unknown>;

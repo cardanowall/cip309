@@ -1,4 +1,4 @@
-// CIP-309 v1 reference implementation — X25519 keygen + ECDH
+// Label 309 v1 reference implementation — X25519 keygen + ECDH
 // Spec: RFC 7748. @noble/curves rejects all-zero shared secret per §6.1 (contributory check).
 
 import { x25519 } from '@noble/curves/ed25519.js';

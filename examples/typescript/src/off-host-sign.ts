@@ -1,8 +1,8 @@
-// CIP-309 v1 reference implementation — off-host signing helper
-// Spec: CIP-309 §4.6.1 (Sig_structure + 25-byte domain prefix),
-//       CIP-309 §4.6.2 (COSE_Sign1 layout + CIP-8 hashed = true mode),
-//       CIP-309 §4.6.3 (path-1 kid-as-public-key convention),
-//       CIP-309 §4.8 (chunked-bytes-array).
+// Label 309 v1 reference implementation — off-host signing helper
+// Spec: Label 309 §4.6.1 (Sig_structure + 25-byte domain prefix),
+//       Label 309 §4.6.2 (COSE_Sign1 layout + CIP-8 hashed = true mode),
+//       Label 309 §4.6.3 (path-1 kid-as-public-key convention),
+//       Label 309 §4.8 (chunked-bytes-array).
 //
 // Demonstrates the off-host signing helper and its CIP-8 hashed-mode companion:
 // the record body to be signed is prepared here, the signature is produced by a
@@ -19,7 +19,7 @@
 //      Ed25519 signature back.
 //
 // For production use, apply the same Sig_structure and COSE_Sign1 rules from
-// CIP-309 §4.6. This file is a self-contained reference implementation.
+// Label 309 §4.6. This file is a self-contained reference implementation.
 //
 // Privacy contract: this module never sees, stores, logs, or transmits any
 // byte string that contains the integrator's Ed25519 private signing key.

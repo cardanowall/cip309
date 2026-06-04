@@ -1,4 +1,4 @@
-# License — CIP-309 Specification Text
+# License — Label 309 Specification Text
 
 The **specification prose** in this repository (the documents under `spec/` and
 the explanatory text throughout the repository) is licensed under the
@@ -9,7 +9,7 @@ separately under the **Apache License 2.0** — see `LICENSE`.
 
 Required attribution:
 
-> "CIP-309 specification, © the CIP-309 contributors, licensed under CC BY 4.0."
+> "Label 309 specification, © the Label 309 contributors, licensed under CC BY 4.0."
 
 - Human-readable summary: https://creativecommons.org/licenses/by/4.0/
 - Full legal code: https://creativecommons.org/licenses/by/4.0/legalcode

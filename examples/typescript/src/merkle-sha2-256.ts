@@ -1,11 +1,11 @@
-// CIP-309 v1 reference implementation — RFC 6962 §2.1 Merkle tree, SHA-256
-// Spec: CIP-309 §6 (byte-exact construction);
-//       schema-level rules in CIP-309 §4.5.
+// Label 309 v1 reference implementation — RFC 6962 §2.1 Merkle tree, SHA-256
+// Spec: Label 309 §6 (byte-exact construction);
+//       schema-level rules in Label 309 §4.5.
 // Identifier on-wire: `rfc9162-sha256` (IANA COSE Verifiable Data Structure
 // Algorithms registry codepoint 1, draft-ietf-cose-merkle-tree-proofs-18;
-// CIP-309 §4.10.3 / §4.5, OPT-INFO).
+// Label 309 §4.10.3 / §4.5, OPT-INFO).
 //
-// Construction notes (per CIP-309 §6.1):
+// Construction notes (per Label 309 §6.1):
 //   - Single leaf:   MTH(L) = SHA-256(0x00 || d_0)
 //   - Internal node: MTH(L) = SHA-256(0x01 || MTH(L[0:k]) || MTH(L[k:n]))
 //     where k = largest power of 2 strictly less than n.
@@ -23,7 +23,7 @@ const LEAF_PREFIX = 0x00;
 const NODE_PREFIX = 0x01;
 const DIGEST_LENGTH = 32;
 
-/** Inclusion-proof envelope per CIP-309 §6.4 "Producer-side proof format". */
+/** Inclusion-proof envelope per Label 309 §6.4 "Producer-side proof format". */
 export interface InclusionProof {
   /** The 32-byte leaf datum d_i committed under `rfc9162-sha256`. */
   leaf: Uint8Array;
@@ -35,10 +35,10 @@ export interface InclusionProof {
   proof: Uint8Array[];
 }
 
-/** Merkle root per CIP-309 §6.1 (RFC 6962 §2.1 with SHA-256). */
+/** Merkle root per Label 309 §6.1 (RFC 6962 §2.1 with SHA-256). */
 export function merkleRoot(leaves: Uint8Array[]): Uint8Array {
   if (leaves.length === 0) {
-    throw new Error('merkleRoot: empty leaf list (n == 0 is forbidden per CIP-309 §6.1)');
+    throw new Error('merkleRoot: empty leaf list (n == 0 is forbidden per Label 309 §6.1)');
   }
   for (let i = 0; i < leaves.length; i++) {
     const leaf = leaves[i]!;
@@ -53,10 +53,10 @@ export function merkleRoot(leaves: Uint8Array[]): Uint8Array {
   return mthRecursive(leaves);
 }
 
-/** Inclusion proof per CIP-309 §6.3 (RFC 6962 §2.1.1). */
+/** Inclusion proof per Label 309 §6.3 (RFC 6962 §2.1.1). */
 export function inclusionProof(leaves: Uint8Array[], i: number): InclusionProof {
   if (leaves.length === 0) {
-    throw new Error('inclusionProof: empty leaf list (n == 0 is forbidden per CIP-309 §6.1)');
+    throw new Error('inclusionProof: empty leaf list (n == 0 is forbidden per Label 309 §6.1)');
   }
   if (!Number.isInteger(i) || i < 0 || i >= leaves.length) {
     throw new Error(`inclusionProof: index ${i} out of range [0, ${leaves.length})`);
@@ -80,7 +80,7 @@ export function inclusionProof(leaves: Uint8Array[], i: number): InclusionProof 
 }
 
 /**
- * Verify an inclusion proof against an expected root per CIP-309 §6.3
+ * Verify an inclusion proof against an expected root per Label 309 §6.3
  * (RFC 6962 §2.1.1 audit-path verification).
  *
  * The proof is ordered **leaf-to-root**: `proof[0]` is the sibling at the leaf
@@ -153,7 +153,7 @@ export function largestPow2Lt(n: number): number {
   if (!Number.isInteger(n) || n < 2) {
     throw new Error(`largestPow2Lt: n must be an integer >= 2; got ${n}`);
   }
-  // `k = 2^floor(log_2(n - 1))` per CIP-309 §6.1. Implemented as a bit-walk
+  // `k = 2^floor(log_2(n - 1))` per Label 309 §6.1. Implemented as a bit-walk
   // so we never depend on Math.log2 floating-point rounding at large n.
   let k = 1;
   while (k * 2 < n) {
@@ -181,7 +181,7 @@ export function hashNode(left: Uint8Array, right: Uint8Array): Uint8Array {
 
 // === Internals =============================================================
 
-/** Recursive MTH(L) per CIP-309 §6.1. Caller already validated leaf shape. */
+/** Recursive MTH(L) per Label 309 §6.1. Caller already validated leaf shape. */
 function mthRecursive(leaves: Uint8Array[]): Uint8Array {
   const n = leaves.length;
   if (n === 1) {

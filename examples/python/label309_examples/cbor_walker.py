@@ -1,4 +1,4 @@
-# CIP-309 v1 reference implementation — position-aware CBOR walker.
+# Label 309 v1 reference implementation — position-aware CBOR walker.
 # Extracts and reassembles the label-309 record body from a serialised Cardano
 # transaction without ever decode-then-re-encoding.
 #
@@ -19,7 +19,7 @@
 #   bytes. Both functions below return raw byte slices / concatenations — never
 #   a decode-then-re-encode — so that guarantee holds end to end.
 #
-# The walker rejects indefinite-length encodings (CIP-309 mandates
+# The walker rejects indefinite-length encodings (Label 309 mandates
 # definite-length); the structural validator's canonical-CBOR decode performs
 # the rest of the deterministic-encoding checks (preferred integer encoding,
 # sorted map keys, no duplicate keys).
@@ -259,7 +259,7 @@ def slice_label309_value(tx_cbor: bytes) -> bytes | None:
 
 
 def reassemble_record_body(value: bytes) -> bytes:
-    """Reassemble the CIP-309 record body from the verbatim label-309 value bytes
+    """Reassemble the Label 309 record body from the verbatim label-309 value bytes
     returned by `slice_label309_value`.
 
     The Cardano ledger caps every metadata byte string at 64 bytes, so the

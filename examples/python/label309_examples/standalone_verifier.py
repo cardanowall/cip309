@@ -1,4 +1,4 @@
-"""CIP-309 v1 reference implementation — standalone CIP-309 verifier.
+"""Label 309 v1 reference implementation — standalone Label 309 verifier.
 
 Service-independent: depends only on caller-supplied Cardano + Arweave
 gateways (public block explorers and content gateways). No issuer server is
@@ -656,7 +656,7 @@ def _check_merkle_commitments(
 
 
 def verify_tx(input_: VerifyTxInput) -> VerifyReport:
-    from .cip_309_validator import validate_poe_record
+    from .label309_validator import validate_poe_record
 
     threshold = input_.confirmation_depth_threshold
     http_calls: list[HttpCall] = []

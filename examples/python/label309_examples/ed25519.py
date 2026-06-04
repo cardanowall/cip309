@@ -1,10 +1,10 @@
-# CIP-309 v1 reference implementation — Ed25519 sign / verify / keygen.
+# Label 309 v1 reference implementation — Ed25519 sign / verify / keygen.
 # Strict RFC 8032 verification (§5.1.7).
 #
 # Why PyNaCl (libsodium), not pyca/cryptography:
 #   - pyca/cryptography's Ed25519PublicKey.verify uses the cofactored
 #     verification equation, which accepts small-subgroup public keys — this is
-#     NON-conformant with the strict RFC 8032 §5.1.7 verification rule CIP-309
+#     NON-conformant with the strict RFC 8032 §5.1.7 verification rule Label 309
 #     mandates.
 #   - libsodium (and therefore PyNaCl) implements strict verification by
 #     default: canonical R/S encoding, S < L, low-order public-key rejection.

@@ -1,7 +1,7 @@
 # Specification
 
-This directory holds the single normative document of the **CIP-309** standard:
-[`cip-0309.md`](./cip-0309.md). It is an open standard for **Proof of Existence
+This directory holds the single normative document of the **Label 309** standard:
+[`label-309.md`](./label-309.md). It is an open standard for **Proof of Existence
 (PoE)** anchored on the Cardano blockchain. A publisher hashes content and
 records the digest — together with optional metadata — on-chain under Cardano
 transaction **metadata label 309**. Anyone holding the transaction reference can
@@ -10,7 +10,7 @@ trusting the publisher, their domain, or any server.
 
 ## The document
 
-[`cip-0309.md`](./cip-0309.md) is structured against the
+[`label-309.md`](./label-309.md) is structured against the
 [CIP-0001 template](https://github.com/cardano-foundation/CIPs/blob/master/CIP-0001/README.md)
 (preamble header block, Abstract, Motivation, Specification, Rationale, Path to
 Active, Copyright) so it can be submitted to `cardano-foundation/CIPs` with
@@ -26,7 +26,7 @@ while the text is finalized for submission.
 
 ## Machine-readable companions
 
-The prose in `cip-0309.md` references machine-readable artifacts that are
+The prose in `label-309.md` references machine-readable artifacts that are
 **normative companions** to the specification — an implementation that disagrees
 with them does not conform:
 

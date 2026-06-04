@@ -1,7 +1,7 @@
 # CDDL Grammar
 
 This directory holds the canonical **CDDL** (Concise Data Definition Language,
-[RFC 8610](https://www.rfc-editor.org/rfc/rfc8610)) grammar for the CIP-309 PoE
+[RFC 8610](https://www.rfc-editor.org/rfc/rfc8610)) grammar for the Label 309 PoE
 record.
 
 The grammar is the machine-checkable companion to the normative prose in
@@ -12,14 +12,14 @@ grammar that tooling can enforce.
 
 ## Files
 
-- [`cip-309.cddl`](./cip-309.cddl) — the canonical grammar for the PoE record
+- [`label-309.cddl`](./label-309.cddl) — the canonical grammar for the PoE record
   and its sub-structures (`poe-record`, `poe-common`, `item-entry`, `hash-map`,
   `merkle-commit`, `enc`, `slot`, `sig-entry`, the chunk-array transport types,
   and the algorithm-identifier rules).
 
 ## What it covers
 
-`cip-309.cddl` models the **reassembled record body** — the canonical-CBOR
+`label-309.cddl` models the **reassembled record body** — the canonical-CBOR
 bytes obtained after byte-concatenating the array of ≤ 64-byte chunks stored on
 chain under Cardano transaction-metadata label `309`. It is a deliberately
 **permissive structural superset**: it captures the closed map shapes and core

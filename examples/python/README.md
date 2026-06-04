@@ -1,6 +1,6 @@
-# CIP-309 Python reference examples
+# Label 309 Python reference examples
 
-Self-contained Python reference implementations of the CIP-309 **wire**
+Self-contained Python reference implementations of the Label 309 **wire**
 primitives. Each module is the smallest faithful illustration of one operation a
 producer or verifier performs when building and checking a Proof-of-Existence
 record.
@@ -31,7 +31,7 @@ on widely-used, audited public libraries:
 
 ## What each file shows
 
-Modules live under [`cip309_examples/`](./cip309_examples):
+Modules live under [`label309_examples/`](./label309_examples):
 
 | Module                     | Primitive                                                      |
 | -------------------------- | -------------------------------------------------------------- |
@@ -47,7 +47,7 @@ Modules live under [`cip309_examples/`](./cip309_examples):
 | `merkle_leaves_list.py`    | Canonical-CBOR Merkle leaves-list codec.                       |
 | `cid_validator.py`         | IPFS CID (v0/v1) structural validator.                         |
 | `off_host_sign.py`         | Off-host (KMS / HSM / air-gapped) record signing helper.       |
-| `cip_309_validator.py`     | Pure-function structural validator over record CBOR bytes.     |
+| `label309_validator.py`    | Pure-function structural validator over record CBOR bytes.     |
 | `ecies_sealed_poe.py`      | Multi-recipient sealed-PoE wrap / unwrap (x25519 + X-Wing).    |
 | `passphrase_kdf_unwrap.py` | Passphrase (Argon2id) sealed-PoE wrap / unwrap.                |
 | `passphrase.py`            | Passphrase normalization (NFKC + whitespace) for the KDF.      |
@@ -60,7 +60,7 @@ Two runnable entry points:
   a record → canonical-CBOR encode → attach a COSE_Sign1 → decode → validate →
   verify the signature → recompute content hashes → sealed-PoE wrap then unwrap.
   It asserts byte-parity against a pinned vector along the way.
-- `cip309_examples/standalone_verifier.py` exposes `verify_tx(...)`, which
+- `label309_examples/standalone_verifier.py` exposes `verify_tx(...)`, which
   resolves a Cardano transaction through a caller-supplied gateway (Koios /
   Blockfrost), extracts the label-309 record, runs the structural validator,
   checks confirmation depth, and verifies record-level signatures, sealed-PoE
@@ -78,8 +78,8 @@ uv run python end_to_end.py  # run the end-to-end demo
 Or, with any environment where the package is installed / on the path:
 
 ```bash
-python -m cip309_examples.merkle_sha2_256   # module self-test
-python -m cip309_examples.cid_validator     # module self-test
+python -m label309_examples.merkle_sha2_256   # module self-test
+python -m label309_examples.cid_validator     # module self-test
 ```
 
 Quality gates (linter + type checker):
@@ -87,7 +87,7 @@ Quality gates (linter + type checker):
 ```bash
 uv run ruff check .
 uv run ruff format --check .
-uv run mypy cip309_examples end_to_end.py
+uv run mypy label309_examples end_to_end.py
 ```
 
 ## Out of scope

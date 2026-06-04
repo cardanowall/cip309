@@ -1,5 +1,5 @@
-// CIP-309 v1 reference implementation — Standalone CIP-309 verifier
-// Spec: CIP-309 (standalone verification; §7)
+// Label 309 v1 reference implementation — Standalone Label 309 verifier
+// Spec: Label 309 (standalone verification; §7)
 // Service-independent: depends only on user-supplied Cardano + Arweave gateways.
 //
 // Key invariants this verifier MUST uphold:
@@ -9,7 +9,7 @@
 //  - Enforce confirmation depth ≥ threshold (default 15 blocks). Below threshold
 //    surfaces as `INSUFFICIENT_CONFIRMATIONS` with `verdict: 'pending'`.
 //  - Build `to_sign = SIG_DOMAIN_RECORD_V1 || canonical_cbor(record_body)` and
-//    pass `external_aad = h''` to the COSE Sig_structure (CIP-309 §4.6.1).
+//    pass `external_aad = h''` to the COSE Sig_structure (Label 309 §4.6.1).
 //    Signatures attach at the record level only — only `record.sigs[]` is verified.
 //  - Use the COSE_Sign1's preserved protectedBytes verbatim,
 //    NOT a re-encoded form.
@@ -21,7 +21,7 @@ import { sha256 } from '@noble/hashes/sha2.js';
 import { blake2b } from '@noble/hashes/blake2.js';
 import { encodeCanonicalCbor } from './cbor-canonical.ts';
 import { sliceLabel309Value } from './cbor-walker.ts';
-import { validatePoeRecord, type PoeRecord, type ValidationIssue } from './cip-309-validator.ts';
+import { validatePoeRecord, type PoeRecord, type ValidationIssue } from './label-309-validator.ts';
 import { decodeCoseSign1, buildSigStructure } from './cose-sign1.ts';
 import { verifyEd25519 } from './ed25519.ts';
 import { eciesSealedPoeUnwrap } from './ecies-sealed-poe.ts';
@@ -33,7 +33,7 @@ import { decodeLeavesList } from './merkle-leaves-list.ts';
 // Constants
 // -----------------------------------------------------------------------------
 
-// Per CIP-309 §4.6.1: the 25-byte UTF-8 prefix prepended to canonical-CBOR(record_body)
+// Per Label 309 §4.6.1: the 25-byte UTF-8 prefix prepended to canonical-CBOR(record_body)
 // to form Sig_structure[3] (`to_sign`). Sig_structure[2] (`external_aad`) is the
 // empty bstr in v1 — this is the entire CIP-30-compatibility path.
 const SIG_DOMAIN_RECORD_V1 = new TextEncoder().encode('cardano-poe-record-sig-v1');
@@ -78,28 +78,28 @@ export interface VerifyTxInput {
   blockfrostProjectId?: string;
   arweaveGatewayChain?: string[];
   /** Below-threshold confirmations surface as `verdict: 'pending'` with code
-   *  `INSUFFICIENT_CONFIRMATIONS`. Defaults to 15 (CIP-309). */
+   *  `INSUFFICIENT_CONFIRMATIONS`. Defaults to 15 (Label 309). */
   confirmationDepthThreshold?: number;
   denyHosts?: string[];
-  /** Sealed-PoE decryption attempts. Discriminated union per CIP-309:
+  /** Sealed-PoE decryption attempts. Discriminated union per Label 309:
    *    - `recipientSecretKey` (32 B) for items whose `enc` carries `slots[]`.
    *    - `passphrase` (string) for items whose `enc` carries `passphrase`.
-   *  Mismatch surfaces as `WRONG_DECRYPTION_INPUT_SHAPE` (CIP-309). */
+   *  Mismatch surfaces as `WRONG_DECRYPTION_INPUT_SHAPE` (Label 309). */
   decryption?: Array<
     | { itemIndex: number; recipientSecretKey: Uint8Array }
     | { itemIndex: number; passphrase: string }
   >;
   /** Out-of-band ciphertext bytes, keyed by `items[i]` index. Used when a
    *  producer chose to deliver ciphertext via a private channel rather than
-   *  publish a retrieval URI. Per CIP-309 §4.2 and CIP-309, `uris` is OPTIONAL
+   *  publish a retrieval URI. Per Label 309 §4.2 and Label 309, `uris` is OPTIONAL
    *  on `enc`-bearing items; the verifier MUST prefer `ciphertextBytes[i]`
    *  when supplied, fall back to `item.uris[]`, and otherwise emit
-   *  `CIPHERTEXT_UNAVAILABLE` (CIP-309). */
+   *  `CIPHERTEXT_UNAVAILABLE` (Label 309). */
   ciphertextBytes?: Record<number, Uint8Array>;
   /** Out-of-band Merkle companion leaves-list bytes, keyed by
    *  `record.merkle[i]` index. CBOR is the normative wire form
-   *  (CIP-309 §6.5); JSON projections are parsed with an info-severity
-   *  `MERKLE_LEAVES_INFORMATIVE_FORM` warning. Per CIP-309 §4.5, the verifier
+   *  (Label 309 §6.5); JSON projections are parsed with an info-severity
+   *  `MERKLE_LEAVES_INFORMATIVE_FORM` warning. Per Label 309 §4.5, the verifier
    *  decodes the leaves blob, recomputes the canonical root, and compares
    *  it against `merkle[i].root`; the leaf count is also checked against
    *  `merkle[i].leaf_count`. */
@@ -129,7 +129,7 @@ export interface VerifyReport {
   }>;
   // Signatures attach at the record level only; the report carries no `itemSignatures[]` field.
   itemHashChecks?: Array<{ itemIndex: number; alg: string; ok: boolean }>;
-  /** One entry per `record.merkle[i]` (CIP-309 §4.5). `rootOk` is `true` when
+  /** One entry per `record.merkle[i]` (Label 309 §4.5). `rootOk` is `true` when
    *  the recomputed canonical Merkle root matches the on-record value,
    *  `false` on byte mismatch (emits `MERKLE_ROOT_MISMATCH`). `reason` is
    *  set when the off-chain leaves blob could not be obtained
@@ -143,12 +143,12 @@ export interface VerifyReport {
   itemDecryptions?: Array<{
     itemIndex: number;
     ok: boolean;
-    /** Plaintext-hash recomputation outcome per CIP-309. Iterates
+    /** Plaintext-hash recomputation outcome per Label 309. Iterates
      *  over `item.hashes` per-algorithm and compares against the recomputed
      *  digest. `true` when every content-hash entry matches, `false` when
      *  any entry mismatches (emits `URI_INTEGRITY_MISMATCH`). Every
      *  `enc`-bearing item carries at least one content-hash entry per
-     *  CIP-309 §4.4 (`ENC_REQUIRES_CONTENT_HASH`), so this field is always set
+     *  Label 309 §4.4 (`ENC_REQUIRES_CONTENT_HASH`), so this field is always set
      *  to a boolean on successful decryption. */
     plaintextHashOk?: boolean;
     note?: string;
@@ -172,7 +172,7 @@ export interface VerifyReport {
 
 export async function verifyTx(input: VerifyTxInput): Promise<VerifyReport> {
   const network: NetworkId = input.network ?? 'cardano:mainnet';
-  // Default confirmation-depth threshold per CIP-309; callers MAY override
+  // Default confirmation-depth threshold per Label 309; callers MAY override
   // via `input.confirmationDepthThreshold` (recorded into `VerifyReport`).
   const threshold = input.confirmationDepthThreshold ?? 15;
   const httpCalls: VerifyReport['httpCalls'] = [];
@@ -309,7 +309,7 @@ export async function verifyTx(input: VerifyTxInput): Promise<VerifyReport> {
   // 5. Record-level signature verification (strict Ed25519, detached, AAD)
   if (record.sigs) {
     report.recordSignatures = await verifyRecordSignatures(record, input);
-    // Verdict policy per CIP-309:
+    // Verdict policy per Label 309:
     //   - `SIGNATURE_UNSUPPORTED` is info severity on the offending entry; it
     //     does NOT by itself fail a public hash-only PoE.
     //   - Any other invalid reason (MALFORMED_SIG_COSE_SIGN1,
@@ -343,7 +343,7 @@ export async function verifyTx(input: VerifyTxInput): Promise<VerifyReport> {
     if (report.itemDecryptions.some((d) => !d.ok || d.plaintextHashOk === false)) {
       report.verdict = 'failed';
       // `CONTENT_UNAVAILABLE` is the network-class terminal state (exit code
-      // 2 per CIP-309); all other failures here are integrity / structural
+      // 2 per Label 309); all other failures here are integrity / structural
       // (exit code 1).
       const networkClass = report.itemDecryptions.some(
         (d) => !d.ok && d.reason === 'CONTENT_UNAVAILABLE',
@@ -354,7 +354,7 @@ export async function verifyTx(input: VerifyTxInput): Promise<VerifyReport> {
 
   // 8. Merkle list commitments (optional) — recompute each `merkle[i].root`
   // from the companion leaves blob and compare byte-for-byte against the
-  // on-record value (CIP-309 §4.5).
+  // on-record value (Label 309 §4.5).
   if (record.merkle && record.merkle.length > 0) {
     const { checks, warnings: merkleWarnings } = await checkMerkleCommitments(
       record,
@@ -536,7 +536,7 @@ async function resolveViaBlockfrost(
  * Returns the byte slice of the label-309 value VERBATIM as it appears in the
  * input — no decode-then-re-encode pass. This is critical: a non-canonical
  * on-chain record (unsorted map keys, non-preferred integer encoding,
- * indefinite-length, etc.) violates CIP-309 §4.9 and MUST be rejected by the
+ * indefinite-length, etc.) violates Label 309 §4.9 and MUST be rejected by the
  * structural validator. Re-encoding would silently launder it. See
  * `cbor-walker.ts` for the implementation rationale.
  */
@@ -553,12 +553,12 @@ async function verifyRecordSignatures(
   _input: VerifyTxInput,
 ): Promise<NonNullable<VerifyReport['recordSignatures']>> {
   const out: NonNullable<VerifyReport['recordSignatures']> = [];
-  // Strip `sigs` from the signed payload (CIP-309 §4.6.1). The optional
-  // CIP-30 `key` lives inside each sigs entry per CIP-309 §4.6.3.
+  // Strip `sigs` from the signed payload (Label 309 §4.6.1). The optional
+  // CIP-30 `key` lives inside each sigs entry per Label 309 §4.6.3.
   const { sigs, ...recordBody } = record;
   void sigs;
   const recordBodyBytes = encodeCanonicalCbor(recordBody);
-  // Per CIP-309 §4.6.1: to_sign = SIG_DOMAIN_RECORD_V1 || canonical_cbor(record_body)
+  // Per Label 309 §4.6.1: to_sign = SIG_DOMAIN_RECORD_V1 || canonical_cbor(record_body)
   // (the 25-byte domain separator is embedded as a prefix; external_aad stays
   // empty in the COSE Sig_structure).
   const toSign = new Uint8Array(SIG_DOMAIN_RECORD_V1.length + recordBodyBytes.length);
@@ -575,7 +575,7 @@ async function verifyRecordSignatures(
     };
     // Optional inline `cose_key` (chunked cbor<COSE_Key>) for the CIP-30 wallet
     // path 2. verifySignature consults it only when the in-signature `kid`
-    // (path 1) does not yield a 32-byte raw Ed25519 pubkey, per CIP-309 §4.6.3.
+    // (path 1) does not yield a 32-byte raw Ed25519 pubkey, per Label 309 §4.6.3.
     if (entry.cose_key) {
       args.signerPubkeyChunks = entry.cose_key;
     }
@@ -585,8 +585,8 @@ async function verifyRecordSignatures(
   return out;
 }
 
-// CIP-309 carries signatures at the record level only; there is no
-// verifyItemSignatures function. See CIP-309 §4.6 and the Rationale section.
+// Label 309 carries signatures at the record level only; there is no
+// verifyItemSignatures function. See Label 309 §4.6 and the Rationale section.
 
 interface SignatureVerification {
   signerPub?: string;
@@ -601,7 +601,7 @@ interface VerifySignatureArgs {
   externalAad: Uint8Array;
   /** Optional CIP-30 wallet inline `sigs[i].cose_key`: chunked-bytes carrying
    *  cbor<COSE_Key>. Consulted only when the in-signature `kid` path does
-   *  not yield a 32-byte raw Ed25519 pubkey (per CIP-309 §4.6.3 resolution
+   *  not yield a 32-byte raw Ed25519 pubkey (per Label 309 §4.6.3 resolution
    *  priority). */
   signerPubkeyChunks?: Uint8Array[];
 }
@@ -614,7 +614,7 @@ async function verifySignature(args: VerifySignatureArgs): Promise<SignatureVeri
     return { valid: false, reason: 'MALFORMED_SIG_COSE_SIGN1' };
   }
   // RFC 9052 §4.1: detached form MUST encode payload as nil; a zero-length
-  // byte string is NOT equivalent and MUST be rejected (CIP-309).
+  // byte string is NOT equivalent and MUST be rejected (Label 309).
   if (cose.payload !== null) {
     return { valid: false, reason: 'MALFORMED_SIG_COSE_SIGN1' };
   }
@@ -623,29 +623,29 @@ async function verifySignature(args: VerifySignatureArgs): Promise<SignatureVeri
     // The unrecognised-alg case is info severity on the entry: the per-entry
     // verification reports `valid: false` with reason `SIGNATURE_UNSUPPORTED`,
     // while the record-as-a-whole verdict still passes for a public hash-only
-    // PoE (signatures are optional in CIP-309; an unverifiable optional
+    // PoE (signatures are optional in Label 309; an unverifiable optional
     // signature does not invalidate the content claim).
     return { valid: false, reason: 'SIGNATURE_UNSUPPORTED' };
   }
 
-  // Signer-key resolution priority per CIP-309 §4.6.3 and CIP-309:
+  // Signer-key resolution priority per Label 309 §4.6.3 and Label 309:
   //   1. Protected-header `kid` if exactly 32 bytes (raw Ed25519 pubkey)
   //      → "in-signature-kid" identity-key path.
   //   2. Inline `sigs[i].cose_key` carrying `cbor<COSE_Key>` (CIP-30 wallet path)
   //      → "wallet-inline-key". Consulted only when path 1 does not yield 32 B.
   //
   // Unprotected-header `kid` values are NOT a sanctioned resolution path
-  // (CIP-309 §4.6.3): they sit outside the COSE integrity envelope and could be
+  // (Label 309 §4.6.3): they sit outside the COSE integrity envelope and could be
   // rewritten by an untrusted indexer or relay without invalidating the
   // signature, which would let a network attacker silently re-attribute a
   // signer's records. This verifier ignores them entirely for resolution
   // purposes (the spec permits surfacing them as a UI diagnostic, but this
   // reference verifier does not emit one).
   //
-  // Path 1 / path 2 are mutually exclusive at the wire level (CIP-309 §4.6.3):
+  // Path 1 / path 2 are mutually exclusive at the wire level (Label 309 §4.6.3):
   // a record carrying BOTH a 32-byte protected `kid` AND a `sigs[i].cose_key`
   // is structurally rejected by the validator as SIG_ENTRY_KID_COSE_KEY_CONFLICT
-  // (CIP-309), so this verifier never sees a conflicting record —
+  // (Label 309), so this verifier never sees a conflicting record —
   // the priority order below is a one-of-N selection, not a tie-breaker.
   const protectedKid = cose.protectedHeader.get(4) as Uint8Array | undefined;
   let signerPub: Uint8Array | null = null;
@@ -664,8 +664,8 @@ async function verifySignature(args: VerifySignatureArgs): Promise<SignatureVeri
     return { valid: false, reason: 'SIGNER_KEY_UNRESOLVED' };
   }
 
-  // CIP-8 `hashed` mode (RFC 8152 §4.1; CIP-309 §4.6.2). Hardware-wallet
-  // co-signers may set unprotected "hashed": true. Per CIP-309 §4.6.2, the
+  // CIP-8 `hashed` mode (RFC 8152 §4.1; Label 309 §4.6.2). Hardware-wallet
+  // co-signers may set unprotected "hashed": true. Per Label 309 §4.6.2, the
   // substitution happens INSIDE Sig_structure: the slot at index 3 becomes
   // Blake2b224(to_sign), not to_sign itself. Producer and verifier then
   // canonical-CBOR-encode the resulting Sig_structure and Ed25519-sign /
@@ -675,7 +675,7 @@ async function verifySignature(args: VerifySignatureArgs): Promise<SignatureVeri
 
   // Build Sig_structure with the PRESERVED original protected_bytes (RFC 9052 §4.4)
   // and the v1 empty external_aad — the cross-protocol replay defence is the
-  // domain-separator prefix embedded inside `args.payload` (CIP-309 §4.6.1).
+  // domain-separator prefix embedded inside `args.payload` (Label 309 §4.6.1).
   const sigStruct = buildSigStructure({
     context: 'Signature1',
     bodyProtectedBytes: cose.protectedBytes,
@@ -691,7 +691,7 @@ async function verifySignature(args: VerifySignatureArgs): Promise<SignatureVeri
   return result;
 }
 
-// CIP-8 hashed=true variant: per CIP-309 §4.6.2, producer and verifier substitute
+// CIP-8 hashed=true variant: per Label 309 §4.6.2, producer and verifier substitute
 // Blake2b224(to_sign) for Sig_structure[3] before canonical-CBOR-encoding the
 // Sig_structure. Output is the 28-byte Blake2b digest of `input`.
 function blake2b224(input: Uint8Array): Uint8Array {
@@ -699,7 +699,7 @@ function blake2b224(input: Uint8Array): Uint8Array {
 }
 
 // Extract the 32-byte raw Ed25519 public key from a chunked CIP-30
-// `cbor<COSE_Key>` blob (path 2 in CIP-309 §4.6.3). Returns null on any parse
+// `cbor<COSE_Key>` blob (path 2 in Label 309 §4.6.3). Returns null on any parse
 // failure or wrong key shape so the caller can fall through to the next
 // resolution path. RFC 8152 §7 COSE_Key shape for Ed25519:
 //   { 1 (kty): 1 (OKP), 3 (alg): -8 (EdDSA, optional), -1 (crv): 6 (Ed25519), -2 (x): <bytes:32> }
@@ -727,7 +727,7 @@ function extractEd25519PubFromCoseKeyChunks(chunks: Uint8Array[]): Uint8Array | 
 type ItemShape = {
   uris?: string[][];
   enc?: unknown;
-  // Per CIP-309 §4.2, `hashes` is a CBOR map keyed by hash-alg-id; cbor2 decodes
+  // Per Label 309 §4.2, `hashes` is a CBOR map keyed by hash-alg-id; cbor2 decodes
   // a string-keyed CBOR map to a plain JS object.
   hashes: Record<string, Uint8Array>;
 };
@@ -749,9 +749,9 @@ async function tryDecryptions(
       out.push({ itemIndex: dec.itemIndex, ok: false, reason: 'no_enc_envelope' });
       continue;
     }
-    // Discriminate by on-wire `enc` shape per CIP-309. The two key paths
+    // Discriminate by on-wire `enc` shape per Label 309. The two key paths
     // (`slots[]` / `passphrase`) are mutually exclusive at the wire level
-    // (CIP-309 §4.4); the verifier MUST refuse a mismatched decryption-entry shape.
+    // (Label 309 §4.4); the verifier MUST refuse a mismatched decryption-entry shape.
     const enc = item.enc as { slots?: unknown; passphrase?: unknown };
     const hasSlots = enc.slots !== undefined;
     const hasPassphrase = enc.passphrase !== undefined;
@@ -774,11 +774,11 @@ async function tryDecryptions(
       continue;
     }
 
-    // Ciphertext acquisition (per CIP-309): prefer the
+    // Ciphertext acquisition (per Label 309): prefer the
     // verifier-input-layer `ciphertextBytes[itemIndex]` when supplied (the
-    // out-of-band delivery path defined by CIP-309 §4.2); else iterate the
+    // out-of-band delivery path defined by Label 309 §4.2); else iterate the
     // on-record `item.uris[]`; else emit `CIPHERTEXT_UNAVAILABLE` per
-    // CIP-309. Within the URI-fetch branch, each individual gateway
+    // Label 309. Within the URI-fetch branch, each individual gateway
     // failure surfaces as a `URI_FETCH_FAILED` warning (per-attempt
     // diagnostic) and only the chain-exhausted terminal state escalates
     // to `CONTENT_UNAVAILABLE` (error, verdict `failed`).
@@ -829,7 +829,7 @@ async function tryDecryptions(
       }
     } catch (e) {
       // Surface the typed code from the unwrap layer when available; fall back
-      // to the canonical AEAD-verification-failure code from CIP-309. The
+      // to the canonical AEAD-verification-failure code from Label 309. The
       // code `TAMPERED_CIPHERTEXT` covers both wrong-passphrase / wrong-key
       // unwrap and bit-flip tampering — the AEAD tag check fails in both
       // cases and a public verifier cannot disambiguate.
@@ -847,11 +847,11 @@ async function tryDecryptions(
       });
       continue;
     }
-    // Per-algorithm plaintext-hash recomputation per CIP-309 §4.2 "Producer
-    // obligation (content-hash entries)" and CIP-309. Iterates
+    // Per-algorithm plaintext-hash recomputation per Label 309 §4.2 "Producer
+    // obligation (content-hash entries)" and Label 309. Iterates
     // every entry in `item.hashes` and compares against the recomputed
     // digest; every `enc`-bearing item carries at least one entry per
-    // CIP-309 §4.4, so the result is always a definite match / mismatch.
+    // Label 309 §4.4, so the result is always a definite match / mismatch.
     const hashCheck = checkItemHashes(item.hashes, plaintext);
     if (hashCheck.kind === 'match') {
       out.push({ itemIndex: dec.itemIndex, ok: true, plaintextHashOk: true });
@@ -870,7 +870,7 @@ async function tryDecryptions(
 /**
  * Per-algorithm content-hash check over a fetched plaintext.
  *
- * Iterates the `item.hashes` map keys (CIP-309 §4.2 / CIP-309):
+ * Iterates the `item.hashes` map keys (Label 309 §4.2 / Label 309):
  *   - `sha2-256`:    recompute SHA-256 and compare.
  *   - `blake2b-256`: recompute BLAKE2b-256 and compare.
  *
@@ -890,13 +890,13 @@ function checkItemHashes(
       if (!bytesEqual(blake2b(plaintext, { dkLen: 32 }), claimed)) anyMismatch = true;
     }
     // Unknown algorithms cannot reach this function — the structural
-    // validator rejects them upstream with UNSUPPORTED_HASH_ALG (CIP-309).
+    // validator rejects them upstream with UNSUPPORTED_HASH_ALG (Label 309).
   }
   return anyMismatch ? { kind: 'mismatch' } : { kind: 'match' };
 }
 
 // -----------------------------------------------------------------------------
-// Merkle list-commitment verification (per CIP-309 §4.5)
+// Merkle list-commitment verification (per Label 309 §4.5)
 // -----------------------------------------------------------------------------
 
 type MerkleCommitShape = {
@@ -910,7 +910,7 @@ type MerkleCommitShape = {
  * Walk `record.merkle[]` and recompute each canonical root from the
  * companion leaves-list blob. The verifier prefers `input.merkleLeaves[i]`
  * when supplied; otherwise it fetches the first `merkle[i].uris[]` entry
- * via `fetchOutbound`. CBOR is the normative wire form per CIP-309 §6.5;
+ * via `fetchOutbound`. CBOR is the normative wire form per Label 309 §6.5;
  * a fetched JSON projection is parsed with an info-severity
  * `MERKLE_LEAVES_INFORMATIVE_FORM` warning so producer migration is nudged
  * without breaking end-users during the transition window. Each
@@ -951,7 +951,7 @@ async function checkMerkleCommitments(
           ['merkle', i],
         );
       } catch {
-        // Per CIP-309, an unavailable Merkle companion does NOT escalate
+        // Per Label 309, an unavailable Merkle companion does NOT escalate
         // to `CONTENT_UNAVAILABLE`: the on-chain root commitment alone is
         // structurally valid, so the per-commit check is recorded as
         // `MERKLE_LEAVES_UNAVAILABLE` (warning, not error). The per-attempt
@@ -965,7 +965,7 @@ async function checkMerkleCommitments(
         continue;
       }
     }
-    // Decode the companion. CBOR is the normative wire form per CIP-309 §6.5;
+    // Decode the companion. CBOR is the normative wire form per Label 309 §6.5;
     // JSON falls back as an informative projection and triggers
     // `MERKLE_LEAVES_INFORMATIVE_FORM` (info severity).
     let leaves: Uint8Array[];
@@ -1015,7 +1015,7 @@ async function checkMerkleCommitments(
           path: ['merkle', i],
           code: 'MERKLE_LEAVES_INFORMATIVE_FORM',
           message:
-            'fetched leaves-list returned JSON; CBOR is the normative wire form per CIP-309 §6.5',
+            'fetched leaves-list returned JSON; CBOR is the normative wire form per Label 309 §6.5',
         });
       } catch {
         out.push({
@@ -1056,7 +1056,7 @@ async function checkMerkleCommitments(
 }
 
 /**
- * Per CIP-309 and CIP-309 step 5: each individual gateway failure on
+ * Per Label 309 and Label 309 step 5: each individual gateway failure on
  * the way to a chain-exhausted terminal state is a per-attempt diagnostic
  * (`URI_FETCH_FAILED`, warning), and only the terminal state escalates to
  * the record-level error code `CONTENT_UNAVAILABLE`. This helper pushes one
@@ -1072,9 +1072,9 @@ async function fetchUriCiphertext(
   warnings: ValidationIssue[],
   issuePath: ValidationIssue['path'],
 ): Promise<Uint8Array> {
-  // Each entry of `uris` is itself an array of tstr chunks per CIP-309 §4.8;
+  // Each entry of `uris` is itself an array of tstr chunks per Label 309 §4.8;
   // join the chunks before testing the scheme. The v1 fetch set is exactly
-  // `{ar://, ipfs://}` per CIP-309 §4.2; any other scheme has already been
+  // `{ar://, ipfs://}` per Label 309 §4.2; any other scheme has already been
   // rejected upstream as `INVALID_URI` by the structural validator and is
   // refused here too as defence in depth.
   const reconstructed = (item.uris ?? []).map((chunks) => chunks.join(''));

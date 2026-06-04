@@ -1,4 +1,4 @@
-// CIP-309 v1 reference implementation — standalone verifier example (offline)
+// Label 309 v1 reference implementation — standalone verifier example (offline)
 //
 // Drives the full `verifyTx` standalone verifier end to end WITHOUT any network
 // by injecting a `fetchOutbound` that serves a synthetic Cardano transaction.
@@ -20,10 +20,10 @@
 import { sha256 } from '@noble/hashes/sha2.js';
 import { blake2b } from '@noble/hashes/blake2.js';
 import { encodeCanonicalCbor } from './cbor-canonical.ts';
-import { buildRecordSignaturePayload } from './cip-309-encoder.ts';
+import { buildRecordSignaturePayload } from './label-309-encoder.ts';
 import { encodeCoseSign1, buildSigStructure } from './cose-sign1.ts';
 import { generateEd25519KeyPair, signEd25519 } from './ed25519.ts';
-import type { PoeRecord } from './cip-309-validator.ts';
+import type { PoeRecord } from './label-309-validator.ts';
 import { verifyTx, type FetchOutbound, type VerifyReport } from './standalone-verifier.ts';
 
 const enc = new TextEncoder();

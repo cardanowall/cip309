@@ -1,12 +1,12 @@
-// CIP-309 v1 reference implementation — Passphrase-derived sealed-PoE unwrap.
-// Spec: CIP-309 §4.4 (sealed-PoE passphrase path) and the passphrase-KDF registry.
+// Label 309 v1 reference implementation — Passphrase-derived sealed-PoE unwrap.
+// Spec: Label 309 §4.4 (sealed-PoE passphrase path) and the passphrase-KDF registry.
 //
 // Construction (passphrase path):
 //   CEK         ← Argon2id(passphrase_NFKC_ws, salt, m, t, p, hashLen=32)
 //   plaintext   ← XChaCha20-Poly1305_Decrypt(CEK, nonce=enc.nonce, aad=h'',
 //                                             ciphertext)
 //
-// AAD on the passphrase path is the EMPTY byte string per the CIP-309 §4.4
+// AAD on the passphrase path is the EMPTY byte string per the Label 309 §4.4
 // AAD-selection rule. Distinct from the sealed-recipient path (which uses
 // `nonce || slots_mac`).
 
@@ -38,7 +38,7 @@ export interface PassphraseArgon2idEnvelope {
 
 // Type alias kept for API-surface clarity ("this is the sealed envelope on the
 // passphrase path") and for forward-extensibility under the algorithm-agility
-// registry in CIP-309 §4.10.0 (any additive passphrase-KDF identifier becomes a new
+// registry in Label 309 §4.10.0 (any additive passphrase-KDF identifier becomes a new
 // interface and the alias widens to a union — call sites that consume the alias
 // do not change).
 export type PassphraseSealedEnvelope = PassphraseArgon2idEnvelope;
@@ -129,7 +129,7 @@ async function deriveCek(
 /**
  * Decrypt a sealed-PoE ciphertext whose `enc` carries `passphrase` (passphrase path).
  *
- * Per CIP-309 §4.4 AAD-selection rule: the passphrase path uses the EMPTY byte string
+ * Per Label 309 §4.4 AAD-selection rule: the passphrase path uses the EMPTY byte string
  * as AEAD AAD (distinct from the sealed-recipient path's `nonce || slots_mac` AAD).
  *
  * Failure modes are surfaced as `PassphraseUnwrapError` with one of:

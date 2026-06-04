@@ -1,4 +1,4 @@
-// CIP-309 v1 — canonical-CBOR byte-parity smoke test
+// Label 309 v1 — canonical-CBOR byte-parity smoke test
 // Asserts the canonical-CBOR encoder reproduces pinned wire bytes for three
 // fixtures. The expected bytes below are the cross-language conformance
 // vectors; any implementation (TS, Python, Rust, …) MUST emit them byte-for-
@@ -98,7 +98,7 @@ function checkA1(): void {
   const digestSha = sha256Of(PLAINTEXT_A1);
   const digestBlake = blake2b256Of(PLAINTEXT_A1);
 
-  // Per CIP-309 §4.2, hashes is a CBOR map keyed by alg id; cbor2 encodes a JS
+  // Per Label 309 §4.2, hashes is a CBOR map keyed by alg id; cbor2 encodes a JS
   // object with string keys identically to a Map with the same string keys.
   const record = {
     v: 1,
@@ -237,10 +237,10 @@ function checkA5(): void {
         enc: {
           scheme: env.scheme,
           aead: env.aead,
-          // Envelope-level `kem` governs every slot in `slots[]` (per CIP-309 §4.4).
+          // Envelope-level `kem` governs every slot in `slots[]` (per Label 309 §4.4).
           kem: env.kem,
           nonce: env.nonce,
-          // Wire field name per CIP-309 §4.4. Classical slot map carries `{epk, wrap}`.
+          // Wire field name per Label 309 §4.4. Classical slot map carries `{epk, wrap}`.
           slots: env.slots.map((s) => ({ epk: s.epk, wrap: s.wrap })),
           slots_mac: env.slots_mac,
         },

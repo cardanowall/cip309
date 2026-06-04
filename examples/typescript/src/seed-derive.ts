@@ -1,5 +1,5 @@
-// CIP-309 v1 reference implementation — seed → Ed25519 + X25519 + X-Wing keypairs
-// Spec: CIP-309
+// Label 309 v1 reference implementation — seed → Ed25519 + X25519 + X-Wing keypairs
+// Spec: Label 309
 // HKDF info constants:
 //   "cardano-poe-ed25519-v1"        (22 bytes) → Ed25519 secret seed (RFC 8032 §5.1.5)
 //   "cardano-poe-x25519-v1"         (21 bytes) → X25519 secret seed (clamped inside the library)
@@ -57,7 +57,7 @@ export function deriveX25519KeypairFromSeed(seed: Uint8Array): DerivedKeyPair {
 }
 
 // Derive the X-Wing (ML-KEM-768 + X25519) recipient keypair so every identity
-// can RECEIVE post-quantum sealed records (CIP-309 §3). The 32-byte HKDF output IS
+// can RECEIVE post-quantum sealed records (Label 309 §3). The 32-byte HKDF output IS
 // the X-Wing root seed: X-Wing key-gen re-expands the ML-KEM coins and the
 // X25519 scalar from it via SHAKE-256, so the returned `secretSeed` equals this
 // HKDF value. The 1216-byte `publicKey` is the on-record hybrid recipient key

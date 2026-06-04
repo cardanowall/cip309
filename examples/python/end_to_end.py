@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CIP-309 v1 reference implementation — end-to-end publish/verify demo.
+"""Label 309 v1 reference implementation — end-to-end publish/verify demo.
 
 Mirrors the TypeScript end-to-end example. It exercises the wire primitives in
 the order a producer and a verifier use them, with no network and no SDK:
@@ -20,25 +20,25 @@ Run:  uv run python end_to_end.py
 
 from __future__ import annotations
 
-from cip309_examples.cbor_canonical import (
+from label309_examples.cbor_canonical import (
     decode_canonical_cbor,
     encode_canonical_cbor,
 )
-from cip309_examples.cip_309_validator import validate_poe_record
-from cip309_examples.cose_sign1 import build_sig_structure, decode_cose_sign1
-from cip309_examples.ecies_sealed_poe import (
+from label309_examples.label309_validator import validate_poe_record
+from label309_examples.cose_sign1 import build_sig_structure, decode_cose_sign1
+from label309_examples.ecies_sealed_poe import (
     ecies_sealed_poe_unwrap,
     ecies_sealed_poe_wrap,
 )
-from cip309_examples.ed25519 import verify_ed25519
-from cip309_examples.hash_dual import blake2b_256, sha2_256
-from cip309_examples.off_host_sign import (
+from label309_examples.ed25519 import verify_ed25519
+from label309_examples.hash_dual import blake2b_256, sha2_256
+from label309_examples.off_host_sign import (
     CARDANO_POE_SIG_DOMAIN_PREFIX,
     MockHsmSigner,
     assemble_cose_sign1,
     prepare_sig_structure,
 )
-from cip309_examples.seed_derive import (
+from label309_examples.seed_derive import (
     derive_ed25519_keypair_from_seed,
     derive_x25519_keypair_from_seed,
 )

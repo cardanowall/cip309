@@ -1,9 +1,9 @@
-# Contributing to CIP-309
+# Contributing to Label 309
 
-Thank you for your interest in improving CIP-309 — an open standard for
+Thank you for your interest in improving Label 309 — an open standard for
 **Proof of Existence (PoE)** anchored on the Cardano blockchain.
 
-CIP-309 is a **working draft**, pre-1.0, and is being finalized for submission
+Label 309 is a **working draft**, pre-1.0, and is being finalized for submission
 to the formal Cardano CIP process. Contributions at this stage are especially
 valuable: they shape a standard before it is frozen. This document explains
 what lives in this repository, how to propose changes to the standard and its
@@ -39,14 +39,14 @@ The **reference implementations** are maintained in sibling repositories. Bug
 fixes, performance work, new SDK surface, packaging, and language-specific
 issues belong with the implementation, not the standard:
 
-- **`cip309-ts`** — TypeScript packages on npm: `@cardanowall/crypto-core`
+- **`label-309-ts`** — TypeScript packages on npm: `@cardanowall/crypto-core`
   (primitives), `@cardanowall/poe-standard` (wire format), `@cardanowall/sdk-ts`
   (SDK + standalone verifier).
-- **`cip309-py`** — Python SDK on PyPI (distribution `cardanowall-sdk`, import
+- **`label-309-py`** — Python SDK on PyPI (distribution `cardanowall-sdk`, import
   `cardanowall`); a byte-identical parity twin of the TypeScript SDK.
-- **`cip309-rs`** — Rust SDK on crates.io (crate `cardanowall`); the Rust
+- **`label-309-rs`** — Rust SDK on crates.io (crate `cardanowall`); the Rust
   byte-parity twin.
-- **`cip309-cli`** — the command-line tool on crates.io (crate
+- **`label-309-cli`** — the command-line tool on crates.io (crate
   `cardanowall-cli`, binary `cardanowall`); a standalone verifier and toolkit
   built on the Rust SDK.
 
@@ -137,7 +137,7 @@ identifier so every implementation can prove byte-parity support for it.
 
 ## Conformance-vector discipline
 
-Cross-implementation **byte-parity** is a core guarantee of CIP-309: the
+Cross-implementation **byte-parity** is a core guarantee of Label 309: the
 TypeScript, Python, and Rust SDKs produce and accept byte-identical output for
 the same inputs, validated against the **same canonical conformance vectors**
 in `conformance/`. The vectors — not any one implementation — are the source of

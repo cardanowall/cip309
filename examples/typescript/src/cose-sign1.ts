@@ -1,6 +1,6 @@
-// CIP-309 v1 reference implementation — COSE_Sign1 encode/decode + Sig_structure builder
+// Label 309 v1 reference implementation — COSE_Sign1 encode/decode + Sig_structure builder
 // Spec: RFC 9052 (COSE), CIP-8 (Cardano Message Signing)
-// CIP-309 §4.6: signatures are COSE_Sign1 with alg = -8 (EdDSA / Ed25519, RFC 9053 §2.2).
+// Label 309 §4.6: signatures are COSE_Sign1 with alg = -8 (EdDSA / Ed25519, RFC 9053 §2.2).
 
 import { decode } from 'cbor2';
 import { encodeCanonicalCbor } from './cbor-canonical.ts';

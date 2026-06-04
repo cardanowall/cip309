@@ -1,4 +1,4 @@
-# CIP-309 v1 reference implementation — passphrase normalization.
+# Label 309 v1 reference implementation — passphrase normalization.
 #
 # The sealed-PoE passphrase path (see ecies_passphrase_unwrap) derives the
 # content-encryption key from a user passphrase via Argon2id. Before the KDF

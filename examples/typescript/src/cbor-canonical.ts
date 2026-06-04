@@ -1,13 +1,13 @@
-// CIP-309 v1 reference implementation — Canonical CBOR encode/decode
+// Label 309 v1 reference implementation — Canonical CBOR encode/decode
 // Spec: RFC 8949 §4.2.1 Core Deterministic Encoding Requirements
 // - Preferred (shortest-form) integer/float encoding
 // - Definite-length encoding for arrays and maps
-// - No semantic tags (CIP-309 doesn't use them)
+// - No semantic tags (Label 309 doesn't use them)
 // - Map keys sorted in bytewise lexicographic order of their CBOR encoding (§4.2.1, NOT §4.2.3 length-first)
 // - No duplicate keys in any map
 // - UTF-8 for text strings
 // - **No CBOR float major-type-7 (subtype 25/26/27) values anywhere.** The
-//   CIP-309 v1 schema uses no floats — every numeric field (`v`, `enc.scheme`,
+//   Label 309 v1 schema uses no floats — every numeric field (`v`, `enc.scheme`,
 //   `merkle[i].leaf_count`, Argon2id params, recipient counts, chunk lengths)
 //   is a CBOR unsigned integer.
 //   The decoder rejects any float-encoded value as `MALFORMED_CBOR` so
@@ -41,7 +41,7 @@ function rejectFloats(bytes: Uint8Array, pos: number): number {
   if (mt === 7) {
     if (ai === 25 || ai === 26 || ai === 27) {
       throw new RangeError(
-        `MALFORMED_CBOR: CBOR float encountered (major type 7, ai=${ai}); CIP-309 v1 schema uses no floats`,
+        `MALFORMED_CBOR: CBOR float encountered (major type 7, ai=${ai}); Label 309 v1 schema uses no floats`,
       );
     }
     if (ai >= 28 && ai <= 30) {
@@ -96,7 +96,7 @@ function rejectFloats(bytes: Uint8Array, pos: number): number {
     return pos;
   }
   if (mt === 6) {
-    // CIP-309 doesn't use semantic tags, but if one appears, walk its content
+    // Label 309 doesn't use semantic tags, but if one appears, walk its content
     // — the structural validator's "no tags" rule emits a typed error later.
     return rejectFloats(bytes, pos);
   }

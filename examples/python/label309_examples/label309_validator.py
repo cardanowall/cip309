@@ -1,4 +1,4 @@
-# CIP-309 v1 reference implementation — CIP-309 record structural validator.
+# Label 309 v1 reference implementation — Label 309 record structural validator.
 # Pure-function validator: takes CBOR bytes, returns a ValidationResult.
 # Does NOT touch the network. Does NOT verify signatures cryptographically — it
 # decodes the COSE_Sign1 structurally and runs the structural-error taxonomy.
@@ -30,7 +30,7 @@ COSE_KEY_PRIVATE_MATERIAL_LABELS: set[int] = {-4}
 
 KNOWN_SIG_ALG_IDS: set[int] = {-8}  # EdDSA (RFC 9053 §2.2). This reference
 # verifier ships the mandatory baseline only. The OPT-INFO codepoint `-19`
-# (Ed25519, fully-specified per RFC 9864) is also registered in CIP-309; a
+# (Ed25519, fully-specified per RFC 9864) is also registered in Label 309; a
 # deployment wishing to accept `-19` extends this set — verification under the
 # Ed25519 primitive is identical for the two codepoints.
 # Registered content-hash algorithms. `hashes` is a CBOR map keyed by these
@@ -388,7 +388,7 @@ def _validate_encryption(enc: Any, path: list, issues: list) -> None:
             _issue(
                 path + ["aead"],
                 "UNAUTHENTICATED_CIPHER_FORBIDDEN",
-                "AES-CBC is unauthenticated; CIP-309 mandates an authenticated cipher",
+                "AES-CBC is unauthenticated; Label 309 mandates an authenticated cipher",
             )
         )
         return
@@ -796,7 +796,7 @@ def _check_record_top_level_keys(
 
 
 def validate_poe_record(cbor_bytes: bytes) -> ValidationResult:
-    """Validate a CIP-309 PoE record. Returns ValidationResult."""
+    """Validate a Label 309 PoE record. Returns ValidationResult."""
     try:
         decoded = decode_canonical_cbor(cbor_bytes)
     except Exception as e:

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://cip309.org/schemas/item-entry.schema.json",
-  "title": "CIP-309 item entry",
+  "$id": "https://label309.org/schemas/item-entry.schema.json",
+  "title": "Label 309 item entry",
   "description": "A single content item in a PoE record: a CLOSED CBOR map `{hashes, ? uris, ? enc}`. `hashes` (REQUIRED) is the non-empty content-hash map — the primary, content-first claim. `uris` (optional) is a non-empty array of chunked URI arrays locating the content (or, for sealed PoE, the ciphertext). `enc` (optional) is the sealed-PoE encryption envelope. STRUCTURAL only: `enc` is admitted here as an unconstrained value (mirroring the permissive source schema) so the validator can run the ENC_REQUIRES_CONTENT_HASH pre-check before any inner-shape error and surface the most informative code first; its intended shape is encryption-envelope.schema.json. The map is closed: unknown keys are rejected.",
   "type": "object",
   "additionalProperties": false,

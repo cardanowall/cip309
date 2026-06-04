@@ -1,6 +1,6 @@
-# CIP-309 conformance vectors
+# Label 309 conformance vectors
 
-This directory is the **single shared source of truth** for CIP-309
+This directory is the **single shared source of truth** for Label 309
 conformance. Every conforming implementation — TypeScript, Python, Rust, Go,
 native mobile, or any future port — **MUST** validate against these vectors. No
 implementation ships its own copy: an implementation is conformant if and only
@@ -12,7 +12,7 @@ implementation is wrong.
 
 ## What these vectors cover
 
-The corpus spans the full CIP-309 wire surface and its cryptographic
+The corpus spans the full Label 309 wire surface and its cryptographic
 primitives:
 
 - **Canonical CBOR** — RFC 8949 deterministic encoding, round-trip identity,

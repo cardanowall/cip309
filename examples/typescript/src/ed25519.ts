@@ -1,4 +1,4 @@
-// CIP-309 v1 reference implementation — Ed25519 sign / verify / keygen
+// Label 309 v1 reference implementation — Ed25519 sign / verify / keygen
 // Spec: RFC 8032. @noble/ed25519 v3 dropped bundled SHA-512; we inject from @noble/hashes.
 
 import * as ed from '@noble/ed25519';

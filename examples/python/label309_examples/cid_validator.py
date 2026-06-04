@@ -1,8 +1,8 @@
-# CIP-309 v1 reference implementation — IPFS CID structural validator.
+# Label 309 v1 reference implementation — IPFS CID structural validator.
 # Governs the `ipfs://<cid>` shape rules for PoE storage URIs.
 #
 # Per the CID multiformats spec (https://github.com/multiformats/cid),
-# conformant CIP-309 validators MUST parse the CID — multibase decode →
+# conformant Label 309 validators MUST parse the CID — multibase decode →
 # version byte → codec varint → multihash (hash-function code varint +
 # length varint + digest) — and reject malformed input with INVALID_URI
 # (reason `ipfs_cid_invalid`). A regex-only shape check is insufficient
@@ -202,7 +202,7 @@ __all__ = ["is_valid_cid"]
 
 
 # ---------------------------------------------------------------------------
-# Self-tests (run: python -m cip309_examples.cid_validator)
+# Self-tests (run: python -m label309_examples.cid_validator)
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":

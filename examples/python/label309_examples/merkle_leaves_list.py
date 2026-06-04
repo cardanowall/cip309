@@ -1,4 +1,4 @@
-"""CIP-309 v1 reference implementation — Merkle leaves-list codec.
+"""Label 309 v1 reference implementation — Merkle leaves-list codec.
 
 The on-storage byte-normative form of the leaves-list file is **canonical
 CBOR** (RFC 8949 §4.2). Producers publish CBOR bytes to the content-addressed

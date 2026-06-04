@@ -1,6 +1,6 @@
-// CIP-309 v1 reference implementation — HKDF-SHA-256 wrapper
+// Label 309 v1 reference implementation — HKDF-SHA-256 wrapper
 // Spec: RFC 5869 (HKDF). Used by seed-derive.ts and the ECIES constructions
-// (CIP-309).
+// (Label 309).
 
 import { hkdf } from '@noble/hashes/hkdf.js';
 import { sha256 } from '@noble/hashes/sha2.js';

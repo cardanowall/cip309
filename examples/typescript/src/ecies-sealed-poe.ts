@@ -1,5 +1,5 @@
-// CIP-309 v2 reference implementation — multi-recipient sealed-PoE.
-// Spec: CIP-309 (multi-recipient sealed PoE), CIP-309 §4.4.
+// Label 309 v2 reference implementation — multi-recipient sealed-PoE.
+// Spec: Label 309 (multi-recipient sealed PoE), Label 309 §4.4.
 //
 // Two KEM branches share ONE envelope shape, discriminated on the envelope-level
 // `kem` field:
@@ -35,7 +35,7 @@
 // and the CSPRNG shuffle — is byte-identical across the two KEMs.
 //
 // NOT RFC 9180 HPKE: this is age v1 stanza pattern transposed to CBOR with
-// CIP-309-specific HKDF constants. Recipient pubkeys are NOT on the wire —
+// Label 309-specific HKDF constants. Recipient pubkeys are NOT on the wire —
 // age-style trial-decrypt. Review against age v1 spec + Bellare-Rogaway DHIES;
 // RFC 9180's analysis does NOT apply byte-exact.
 
@@ -125,7 +125,7 @@ export interface Mlkem768X25519Slot {
  * KEM-specific so every consumer is forced — at compile time — to branch on the
  * KEM before touching kem-specific fields.
  *
- * Wire field name: `slots` (per CIP-309 §4.4 — recipient pubkeys are NOT on-wire;
+ * Wire field name: `slots` (per Label 309 §4.4 — recipient pubkeys are NOT on-wire;
  * the array carries opaque wrapped-CEK slots that recipients trial-decrypt with
  * their own private keys). User-facing API parameters (`recipientPublicKeys`,
  * `recipientSecretKey`) keep the "recipient" terminology because those describe
@@ -155,7 +155,7 @@ export interface SealedPoeOutput {
 }
 
 /**
- * Decryption error codes for the sealed-PoE unwrap path (CIP-309 §4.4).
+ * Decryption error codes for the sealed-PoE unwrap path (Label 309 §4.4).
  * Codes use SCREAMING_SNAKE so callers can branch on a stable taxonomy.
  */
 export type DecryptErrorCode =
@@ -221,7 +221,7 @@ function csprngShuffle<T>(arr: T[]): void {
  *
  * The HMAC-SHA-256 input is `canonical_cbor(slots)` — independent of whether the
  * local variable in the call site is named `slots` or `recipients`. The wire
- * field name (CIP-309 §4.4) is `slots`. */
+ * field name (Label 309 §4.4) is `slots`. */
 function slotsToCborInput(
   slots: ReadonlyArray<X25519Slot | Mlkem768X25519Slot>,
   kem: SealedKem,

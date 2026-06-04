@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://cip309.org/schemas/defs.schema.json",
-  "title": "CIP-309 shared definitions",
-  "description": "Shared $defs reused across the CIP-309 JSON Schema set: fixed-length byte-string types and the open algorithm-identifier string types for each registry. CBOR has a native byte-string type; JSON does not. Every CBOR `bstr` is therefore modelled here as a lowercase-hex JSON string whose character count is twice the documented byte length (e.g. a 32-byte digest is a 64-character hex string). The algorithm-identifier `$defs` are deliberately OPEN strings: structural validation cannot decide registry membership (whether `sha2-256`, `xchacha20-poly1305`, etc. is registered) — that is a typed error-code check performed by the validator's domain pass against the extensible registries, proven by the conformance vectors. These schemas describe only the PERMISSIVE structural superset; cross-field invariants and per-algorithm digest/field lengths are not expressible here.",
+  "$id": "https://label309.org/schemas/defs.schema.json",
+  "title": "Label 309 shared definitions",
+  "description": "Shared $defs reused across the Label 309 JSON Schema set: fixed-length byte-string types and the open algorithm-identifier string types for each registry. CBOR has a native byte-string type; JSON does not. Every CBOR `bstr` is therefore modelled here as a lowercase-hex JSON string whose character count is twice the documented byte length (e.g. a 32-byte digest is a 64-character hex string). The algorithm-identifier `$defs` are deliberately OPEN strings: structural validation cannot decide registry membership (whether `sha2-256`, `xchacha20-poly1305`, etc. is registered) — that is a typed error-code check performed by the validator's domain pass against the extensible registries, proven by the conformance vectors. These schemas describe only the PERMISSIVE structural superset; cross-field invariants and per-algorithm digest/field lengths are not expressible here.",
   "$defs": {
     "bytes32": {
       "title": "32-byte byte string (hex-encoded)",

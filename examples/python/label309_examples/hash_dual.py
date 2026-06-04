@@ -1,4 +1,4 @@
-# CIP-309 v1 reference implementation — SHA-256 + BLAKE2b-256 dual-hash.
+# Label 309 v1 reference implementation — SHA-256 + BLAKE2b-256 dual-hash.
 #
 # The two registered v1 content-hash algorithms. A single 256-bit digest is
 # sufficient for the archival threat model; the dual-hash pattern is optional

@@ -1,5 +1,5 @@
-// CIP-309 v1 reference implementation — SHA-256 + BLAKE2b-256 dual-hash
-// Spec: CIP-309 §4.3 dual-hash recommendation.
+// Label 309 v1 reference implementation — SHA-256 + BLAKE2b-256 dual-hash
+// Spec: Label 309 §4.3 dual-hash recommendation.
 
 import { sha256 } from '@noble/hashes/sha2.js';
 import { blake2b } from '@noble/hashes/blake2.js';

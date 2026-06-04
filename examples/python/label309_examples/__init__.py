@@ -1,6 +1,6 @@
-"""CIP-309 v1 reference implementation — Python examples.
+"""Label 309 v1 reference implementation — Python examples.
 
-Self-contained reference implementations of the CIP-309 wire primitives,
+Self-contained reference implementations of the Label 309 wire primitives,
 built only on public libraries (cryptography, PyNaCl, cbor2, argon2-cffi,
 kyber-py). This package does NOT depend on any published CardanoWall SDK; it
 is a byte-parity twin of the TypeScript reference examples and exists to show,

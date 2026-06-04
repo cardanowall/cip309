@@ -1,8 +1,8 @@
-// CIP-309 v1 reference implementation — IPFS CID structural validator.
-// Spec: CIP-309 §4.8.1 (`ipfs://<cid>` shape rules).
+// Label 309 v1 reference implementation — IPFS CID structural validator.
+// Spec: Label 309 §4.8.1 (`ipfs://<cid>` shape rules).
 //
 // Per the CID multiformats spec (https://github.com/multiformats/cid),
-// conformant CIP-309 validators MUST parse the CID — multibase decode →
+// conformant Label 309 validators MUST parse the CID — multibase decode →
 // version byte → codec varint → multihash (hash-function code varint +
 // length varint + digest) — and reject malformed input with INVALID_URI
 // (reason `ipfs_cid_invalid`). A regex-only shape check is insufficient
@@ -159,7 +159,7 @@ function isValidCidv1(s: string): boolean {
       break;
     default:
       // 'm' (base64) / 'M' (base64url-upper) / other bases not in the v1 fetch
-      // set — explicitly reject. CIP-309 §4.8.1 names base32 and base58btc
+      // set — explicitly reject. Label 309 §4.8.1 names base32 and base58btc
       // as the operationally common forms; producers writing other bases
       // SHOULD re-encode.
       return false;
@@ -192,7 +192,7 @@ function isValidCidv1(s: string): boolean {
 /**
  * Return `true` iff `s` is a structurally valid IPFS CID (v0 or v1).
  *
- * See `CIP-309 §4.8.1` for the normative shape rules.
+ * See `Label 309 §4.8.1` for the normative shape rules.
  */
 export function isValidCid(s: string): boolean {
   if (s.length === 0) return false;

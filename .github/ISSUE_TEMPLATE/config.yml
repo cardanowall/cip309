@@ -1,14 +1,14 @@
 blank_issues_enabled: false
 contact_links:
   - name: TypeScript SDK bug or question
-    url: https://github.com/cardanowall/cip309-ts/issues
+    url: https://github.com/cardanowall/label-309-ts/issues
     about: Issues with @cardanowall/crypto-core, @cardanowall/poe-standard, or @cardanowall/sdk-ts belong on the TypeScript reference-implementation repository.
   - name: Python SDK bug or question
-    url: https://github.com/cardanowall/cip309-py/issues
+    url: https://github.com/cardanowall/label-309-py/issues
     about: Issues with the Python SDK (cardanowall-sdk) belong on the Python reference-implementation repository.
   - name: Rust SDK bug or question
-    url: https://github.com/cardanowall/cip309-rs/issues
+    url: https://github.com/cardanowall/label-309-rs/issues
     about: Issues with the Rust SDK (the cardanowall crate) belong on the Rust reference-implementation repository.
   - name: Command-line tool bug or question
-    url: https://github.com/cardanowall/cip309-cli/issues
+    url: https://github.com/cardanowall/label-309-cli/issues
     about: Issues with the cardanowall command-line tool belong on the CLI reference-implementation repository.

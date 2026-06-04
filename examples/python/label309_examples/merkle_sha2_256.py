@@ -1,4 +1,4 @@
-"""CIP-309 v1 reference implementation — RFC 6962 §2.1 Merkle tree, SHA-256.
+"""Label 309 v1 reference implementation — RFC 6962 §2.1 Merkle tree, SHA-256.
 
 On-wire algorithm identifier: `rfc9162-sha256` (IANA COSE Verifiable Data
 Structure Algorithms registry, codepoint 1; draft-ietf-cose-merkle-tree-proofs).

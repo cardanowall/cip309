@@ -1,5 +1,5 @@
-// CIP-309 v1 — byte-slice extraction smoke test
-// Spec: CIP-309 §4.9 (canonical CBOR), §7 (standalone verification).
+// Label 309 v1 — byte-slice extraction smoke test
+// Spec: Label 309 §4.9 (canonical CBOR), §7 (standalone verification).
 //
 // Validates `sliceLabel309Value` from `cbor-walker.ts`:
 //   (a) canonical tx CBOR        → byte-identical record returned
@@ -13,7 +13,7 @@
 import { sha256 } from '@noble/hashes/sha2.js';
 import { encodeCanonicalCbor } from './cbor-canonical.ts';
 import { sliceLabel309Value } from './cbor-walker.ts';
-import { validatePoeRecord } from './cip-309-validator.ts';
+import { validatePoeRecord } from './label-309-validator.ts';
 
 // === Helpers ===
 
@@ -165,7 +165,7 @@ function checkA(): void {
 // === (b) Non-canonical label-309 value → returned unmodified, validator flags MALFORMED_CBOR ===
 
 function checkB(): void {
-  // Hand-roll a minimal CIP-309 record with the OUTER MAP KEYS in NON-canonical
+  // Hand-roll a minimal Label 309 record with the OUTER MAP KEYS in NON-canonical
   // order. Canonical (RFC 8949 §4.2.1 bytewise) order for tstr keys "v" and
   // "items" is: "v" (61 76) < "items" (65 69 74 65 6d 73) — RFC 8949 §4.2.1
   // is strict bytewise of the entire CBOR encoding, so the shorter encoding

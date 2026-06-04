@@ -1,7 +1,7 @@
 # Registries
 
 This directory holds the extensible **named-identifier registries** that make
-CIP-309 algorithm-agile. Rather than hard-coding a fixed set of algorithms, the
+Label 309 algorithm-agile. Rather than hard-coding a fixed set of algorithms, the
 record format references stable named identifiers, and these registries define
 what each identifier means and the exact wire-level values a structural
 validator pins to it. Post-quantum and future algorithms are introduced here

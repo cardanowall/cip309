@@ -1,4 +1,4 @@
-# CIP-309 v1 reference implementation — HKDF-SHA-256 wrapper.
+# Label 309 v1 reference implementation — HKDF-SHA-256 wrapper.
 # Reference: RFC 5869.
 
 from cryptography.hazmat.primitives import hashes

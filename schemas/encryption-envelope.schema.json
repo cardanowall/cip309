@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://cip309.org/schemas/encryption-envelope.schema.json",
-  "title": "CIP-309 sealed-PoE encryption envelope",
+  "$id": "https://label309.org/schemas/encryption-envelope.schema.json",
+  "title": "Label 309 sealed-PoE encryption envelope",
   "description": "The `enc` block of an item: a CLOSED CBOR map describing a sealed-PoE envelope whose ciphertext lives at the item's content-addressed URI (ar:// / ipfs://). `scheme` MUST be the unsigned integer 1 — modelled here as an unconstrained value (the structural superset), with the literal-1 requirement enforced by the domain pass (UNSUPPORTED_ENVELOPE_SCHEME). `aead` is the content cipher identifier (open). `nonce` is the AEAD nonce (hex byte string; its exact length is the per-AEAD NONCE_LENGTH_MISMATCH domain check — e.g. 24 bytes for xchacha20-poly1305). `kem`, `slots`, `slots_mac`, and `passphrase` are all OPTIONAL at this structural layer. STRUCTURAL only — the following cross-field invariants are NOT expressible here and are domain-pass checks emitting typed codes: slots XOR passphrase (mutually exclusive); slots requires both kem and slots_mac; slots non-empty; the KEM-driven per-slot shape; the argon2id floors; content-hash binding. The map is closed: unknown keys are rejected.",
   "type": "object",
   "additionalProperties": false,

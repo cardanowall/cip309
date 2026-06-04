@@ -1,4 +1,4 @@
-# CIP-309 v1 reference implementation — seed → Ed25519 + X25519 + X-Wing keypairs.
+# Label 309 v1 reference implementation — seed → Ed25519 + X25519 + X-Wing keypairs.
 #
 # Key derivation stops at the seed: how the 32-byte seed is stored and protected
 # (passphrase vault, hardware key, etc.) is an implementation concern outside

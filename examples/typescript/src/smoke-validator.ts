@@ -1,13 +1,13 @@
-// CIP-309 v1 — structural-validator behaviour smoke tests
+// Label 309 v1 — structural-validator behaviour smoke tests
 // Verifies the structural validator: hashes-as-CBOR-map, enc.slots wire field,
-// full IPFS CID validation, optional uris on enc-bearing items (CIP-309 §4.2),
+// full IPFS CID validation, optional uris on enc-bearing items (Label 309 §4.2),
 // single-algorithm hash entries, and the COSE_Key private-material rejection
-// (CIP-309 §4.6.3). Run: `npx tsx src/smoke-validator.ts`.
+// (Label 309 §4.6.3). Run: `npx tsx src/smoke-validator.ts`.
 
 import { sha256 } from '@noble/hashes/sha2.js';
 import { blake2b } from '@noble/hashes/blake2.js';
 import { encodeCanonicalCbor } from './cbor-canonical.ts';
-import { validatePoeRecord, type ValidationResult } from './cip-309-validator.ts';
+import { validatePoeRecord, type ValidationResult } from './label-309-validator.ts';
 import { eciesSealedPoeWrap } from './ecies-sealed-poe.ts';
 import { x25519PublicKey } from './x25519.ts';
 
@@ -52,7 +52,7 @@ function codes(r: ValidationResult): string[] {
   );
 }
 
-// (b) Single-hash record is fully conformant (no SINGLE_HASH warning per CIP-309 §4.3).
+// (b) Single-hash record is fully conformant (no SINGLE_HASH warning per Label 309 §4.3).
 {
   const cbor = encodeCanonicalCbor({
     v: 1,
@@ -271,7 +271,7 @@ function codes(r: ValidationResult): string[] {
 }
 
 // (k) enc present without uris validates cleanly — `uris` is OPTIONAL throughout
-//     per CIP-309 §4.2. Out-of-band ciphertext delivery is a deployment choice;
+//     per Label 309 §4.2. Out-of-band ciphertext delivery is a deployment choice;
 //     the structural record remains well-formed (verifier-input layer raises
 //     `CIPHERTEXT_UNAVAILABLE` at verify time if neither URI nor local
 //     ciphertext is available, but the validator does not).
@@ -306,7 +306,7 @@ function codes(r: ValidationResult): string[] {
 }
 
 // (l) Item carrying only `blake2b-256` (no `sha2-256`) validates cleanly —
-//     per CIP-309 §4.3, single-hash records are fully conformant. The verifier's
+//     per Label 309 §4.3, single-hash records are fully conformant. The verifier's
 //     plaintext-hash recomputation iterates `item.hashes` keys and uses the
 //     declared algorithm, so a blake2b-only item is supported end-to-end.
 {
@@ -323,7 +323,7 @@ function codes(r: ValidationResult): string[] {
 }
 
 // (m) sigs[i].cose_key carrying a COSE_Key with label -4 (private scalar `d`)
-//     → SIG_PRIVATE_KEY_LEAKED per CIP-309 §4.6.3.
+//     → SIG_PRIVATE_KEY_LEAKED per Label 309 §4.6.3.
 //
 //     Build a synthetic CBOR<COSE_Key> map:
 //       { 1 (kty): 1 (OKP),
@@ -365,10 +365,10 @@ function codes(r: ValidationResult): string[] {
 }
 
 // (p) Top-level `merkle[]` commitment paired with an items[] companion
-//     content-hash entry validates cleanly per CIP-309 §4.5. The Merkle root
+//     content-hash entry validates cleanly per Label 309 §4.5. The Merkle root
 //     lives on the record-level `merkle[i]` entry; the companion
 //     `leaves.json` content-hash lives on a regular items[] entry alongside
-//     the retrieval URI. `leaf_count` is REQUIRED per CIP-309 §4.5.
+//     the retrieval URI. `leaf_count` is REQUIRED per Label 309 §4.5.
 {
   const cbor = encodeCanonicalCbor({
     v: 1,
@@ -396,7 +396,7 @@ function codes(r: ValidationResult): string[] {
 }
 
 // (q) merkle[] entry missing the REQUIRED `leaf_count` field → invalid.
-//     Per CIP-309 §4.5 / CIP-309, the structural validator MUST reject
+//     Per Label 309 §4.5 / Label 309, the structural validator MUST reject
 //     a merkle[] commit without `leaf_count`.
 {
   const cbor = encodeCanonicalCbor({
@@ -420,7 +420,7 @@ function codes(r: ValidationResult): string[] {
 }
 
 // (r) Record with unrecognised top-level `crit` extension → invalid with
-//     EXTENSION_UNSUPPORTED_CRITICAL (CIP-309 §4.1.4 / CIP-309).
+//     EXTENSION_UNSUPPORTED_CRITICAL (Label 309 §4.1.4 / Label 309).
 {
   const cbor = encodeCanonicalCbor({
     v: 1,
@@ -438,7 +438,7 @@ function codes(r: ValidationResult): string[] {
 }
 
 // (s) Record with tolerated extension key (no crit) validates cleanly per
-//     CIP-309 §4.1.4. Vendor / experimental keys matching `^x-.+` are
+//     Label 309 §4.1.4. Vendor / experimental keys matching `^x-.+` are
 //     preserved without verification.
 {
   const cbor = encodeCanonicalCbor({
@@ -455,7 +455,7 @@ function codes(r: ValidationResult): string[] {
 }
 
 // (t) Record with a typo of a base key (e.g. `supersedess`) → SCHEMA_UNKNOWN_FIELD.
-//     Per CIP-309 §4.1.4, unknown keys NOT matching `^x-.+` / `^[a-z]+-.+` are
+//     Per Label 309 §4.1.4, unknown keys NOT matching `^x-.+` / `^[a-z]+-.+` are
 //     rejected as schema errors.
 //     `supersedess` matches `^[a-z]+-.+`? No — it has no hyphen. It is a typo.
 {
@@ -474,7 +474,7 @@ function codes(r: ValidationResult): string[] {
 }
 
 // (u) `crit[]` entry that names a base key → CRIT_SHAPE_INVALID
-//     (CIP-309 §4.1.4 / CIP-309). Base keys (`v`, `items`, `merkle`,
+//     (Label 309 §4.1.4 / Label 309). Base keys (`v`, `items`, `merkle`,
 //     `supersedes`, `sigs`, `crit`) MUST NOT appear in `crit[]`.
 {
   const cbor = encodeCanonicalCbor({

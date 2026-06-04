@@ -1,11 +1,11 @@
-// Position-aware CBOR walker for CIP-309 verifiers.
-// Spec: CIP-309 §4.9 (canonical CBOR), §7 (standalone verification).
+// Position-aware CBOR walker for Label 309 verifiers.
+// Spec: Label 309 §4.9 (canonical CBOR), §7 (standalone verification).
 //
 // Extracts and reassembles the label-309 record body from a serialised
 // Cardano transaction.
 //
-// Two transport-layer operations live here (CIP-309 §4.1 "Wire transport of the
-// record body", CIP-309 §4.8):
+// Two transport-layer operations live here (Label 309 §4.1 "Wire transport of the
+// record body", Label 309 §4.8):
 //   1. sliceLabel309Value  — unwrap Conway auxiliary_data (CBOR tag 259) and
 //      return the ORIGINAL on-chain bytes of the label-309 value VERBATIM.
 //   2. reassembleRecordBody — byte-concatenate the ≤64-byte chunk array that
@@ -25,7 +25,7 @@
 //
 // Mirrors the byte-walker style of `cbor-canonical.ts:rejectFloats`. Pure
 // stdlib, no third-party deps. Walker rejects indefinite-length encodings
-// (CIP-309 §4.9 mandates definite-length); the structural validator's
+// (Label 309 §4.9 mandates definite-length); the structural validator's
 // `decodeCanonicalCbor` performs the rest of the deterministic-encoding
 // checks (preferred integer encoding, sorted map keys, no duplicate keys).
 
@@ -111,7 +111,7 @@ export function readHead(bytes: Uint8Array, pos: number): CborHead {
     p += 8;
   } else if (ai === 31) {
     throw new RangeError(
-      'MALFORMED_CBOR: indefinite-length encoding (ai=31) not allowed under canonical CBOR (CIP-309 §4.9)',
+      'MALFORMED_CBOR: indefinite-length encoding (ai=31) not allowed under canonical CBOR (Label 309 §4.9)',
     );
   } else {
     // ai 28..30 are reserved per RFC 8949 §3 Table 1.
@@ -331,13 +331,13 @@ function decodeIntKey(h: CborHead): number {
 // -----------------------------------------------------------------------------
 
 /**
- * Reassemble the CIP-309 record body from the verbatim label-309 value bytes
+ * Reassemble the Label 309 record body from the verbatim label-309 value bytes
  * returned by `sliceLabel309Value`.
  *
  * The Cardano ledger caps every metadata byte string at 64 bytes, so the
  * canonical-CBOR record body is transported under label 309 as a CBOR array
- * of ≤ 64-byte byte strings (CIP-309 §4.1 "Wire transport of the record body",
- * CIP-309 §4.8). This function reconstructs the body:
+ * of ≤ 64-byte byte strings (Label 309 §4.1 "Wire transport of the record body",
+ * Label 309 §4.8). This function reconstructs the body:
  *
  *   - **Chunked-bytes array** (major type 4 of byte strings, the production
  *     shape): byte-concatenate the chunk contents in order. Chunk boundaries
@@ -352,7 +352,7 @@ function decodeIntKey(h: CborHead): number {
  *
  * The returned bytes are a raw slice / concatenation — never a
  * decode-then-re-encode — so the structural validator sees the exact on-chain
- * encoding (the canonical-CBOR check in CIP-309 §4.9 depends on this).
+ * encoding (the canonical-CBOR check in Label 309 §4.9 depends on this).
  */
 export function reassembleRecordBody(value: Uint8Array): Uint8Array {
   const head = readHead(value, 0);

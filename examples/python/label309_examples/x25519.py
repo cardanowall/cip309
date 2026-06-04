@@ -1,4 +1,4 @@
-# CIP-309 v1 reference implementation — X25519 keygen + ECDH.
+# Label 309 v1 reference implementation — X25519 keygen + ECDH.
 # Reference: RFC 7748. pyca/cryptography rejects an all-zero shared secret
 # (low-order points) per RFC 7748 §6.1 internally.
 

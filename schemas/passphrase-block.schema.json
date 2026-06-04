@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://cip309.org/schemas/passphrase-block.schema.json",
-  "title": "CIP-309 passphrase block",
+  "$id": "https://label309.org/schemas/passphrase-block.schema.json",
+  "title": "Label 309 passphrase block",
   "description": "The passphrase-derivation block of a sealed-PoE envelope: a CLOSED CBOR map `{alg, salt, params}` describing how the content-encryption key is derived from a shared passphrase (instead of, and mutually exclusive with, per-recipient KEM slots). `alg` is the KDF identifier (open string; registry membership ENC_PASSPHRASE_ALG_UNSUPPORTED is a domain-pass check). `salt` is a 16..64-byte byte string (hex; below/above the bound emits ENC_PASSPHRASE_SALT_TOO_SHORT / ENC_PASSPHRASE_SALT_TOO_LONG). `params` is OPEN here (any map) — the validator narrows it on the registered `alg`. STRUCTURAL note: when `alg == argon2id`, `params` is the closed map `{m, t, p}` of CBOR unsigned integers; the memory/time/parallelism FLOORS (m >= 65536, t >= 3, p >= 1) and rejection of extra keys are domain-pass checks (ENC_PASSPHRASE_ARGON2_PARAMS_TOO_LOW / SCHEMA_UNKNOWN_FIELD), not asserted structurally here. The `argon2id-params` $def below documents that closed shape for reference.",
   "type": "object",
   "additionalProperties": false,

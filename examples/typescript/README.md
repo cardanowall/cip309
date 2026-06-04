@@ -1,13 +1,13 @@
 # TypeScript Examples
 
-Self-contained TypeScript reference implementations of the CIP-309 **wire
+Self-contained TypeScript reference implementations of the Label 309 **wire
 primitives**. Each module is the smallest faithful illustration of one piece of
 the standard — content hashing, canonical CBOR, record-level `COSE_Sign1`
 signatures, key derivation, sealed-PoE encryption, the structural validator, and
 the standalone verifier — plus end-to-end demos that wire them together into a
 publish → verify flow.
 
-These examples exist to show that CIP-309 is **implementable from public
+These examples exist to show that Label 309 is **implementable from public
 cryptographic libraries alone**, independent of any SDK. They depend only on
 audited, widely-used primitives (`@noble/*`, `cbor2`, `hash-wasm`, `zod`) and
 import **none** of the `@cardanowall/*` packages. The pinned wire bytes in
@@ -16,7 +16,7 @@ implementation (TypeScript, Python, Rust, …) MUST reproduce them byte-for-byte
 
 ## Self-contained note
 
-There is no dependency on any published CIP-309 SDK. Every module here is
+There is no dependency on any published Label 309 SDK. Every module here is
 standalone and copy-pasteable; the cross-file imports are only between the
 example modules in `src/`. If you want the installable, batteries-included
 library instead, use the published packages — but these examples are
@@ -40,8 +40,8 @@ Primitive modules (`src/`):
 | `merkle-sha2-256.ts`       | RFC 6962 / RFC 9162 Merkle tree, roots + inclusion proofs (self-test).          |
 | `merkle-leaves-list.ts`    | Canonical-CBOR codec for the off-chain Merkle leaves-list.                      |
 | `cid-validator.ts`         | Full IPFS CID (v0/v1) structural parsing (self-test).                           |
-| `cip-309-encoder.ts`       | Encoding a PoE record to canonical CBOR + the record-signature payload.         |
-| `cip-309-validator.ts`     | Pure-function structural validator over record bytes.                           |
+| `label-309-encoder.ts`     | Encoding a PoE record to canonical CBOR + the record-signature payload.         |
+| `label-309-validator.ts`   | Pure-function structural validator over record bytes.                           |
 | `ecies-sealed-poe.ts`      | Multi-recipient sealed-PoE wrap/unwrap (X25519 and X-Wing KEMs).                |
 | `passphrase-kdf-unwrap.ts` | Sealed-PoE passphrase path (Argon2id → XChaCha20-Poly1305).                     |
 | `off-host-sign.ts`         | Off-host (HSM/KMS/air-gap) signing helper + CIP-8 hashed mode.                  |
@@ -94,7 +94,7 @@ regression suite.
 
 ## Out of scope
 
-These examples cover the CIP-309 **wire standard only**. The identity
+These examples cover the Label 309 **wire standard only**. The identity
 key-envelope — building or unlocking the envelope, diceware passphrases, the
 passphrase/PIN vault, and envelope discovery/recovery — is **out of scope** and
 does not appear here. Key derivation is demonstrated only down to the seed; how

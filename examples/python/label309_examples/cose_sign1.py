@@ -1,4 +1,4 @@
-# CIP-309 v1 reference implementation — COSE_Sign1 encode/decode + Sig_structure.
+# Label 309 v1 reference implementation — COSE_Sign1 encode/decode + Sig_structure.
 # References: RFC 9052 (COSE), CIP-8 (Cardano message signing).
 
 from typing import TypedDict

@@ -1,4 +1,4 @@
-# CIP-309 v1 reference implementation — off-host signing helper.
+# Label 309 v1 reference implementation — off-host signing helper.
 #
 # Builds the Sig_structure for a record-level COSE_Sign1 (with the 25-byte
 # domain-separator prefix) and assembles the COSE_Sign1 from a signature

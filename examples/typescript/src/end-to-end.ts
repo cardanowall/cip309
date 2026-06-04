@@ -1,4 +1,4 @@
-// CIP-309 v1 reference implementation — end-to-end walkthrough
+// Label 309 v1 reference implementation — end-to-end walkthrough
 //
 // Ties the primitive modules together into the two flows a real producer and
 // verifier run, using only the wire primitives in this directory (no SDK, no
@@ -24,8 +24,8 @@ import {
   encodePoeRecord,
   buildRecordSignaturePayload,
   SIG_DOMAIN_RECORD_V1,
-} from './cip-309-encoder.ts';
-import { validatePoeRecord, type PoeRecord } from './cip-309-validator.ts';
+} from './label-309-encoder.ts';
+import { validatePoeRecord, type PoeRecord } from './label-309-validator.ts';
 import { encodeCoseSign1, decodeCoseSign1, buildSigStructure } from './cose-sign1.ts';
 import { generateEd25519KeyPair, signEd25519, verifyEd25519 } from './ed25519.ts';
 import { generateX25519KeyPair } from './x25519.ts';
@@ -70,10 +70,10 @@ function signedRecordFlow(): void {
   console.log('\n--- Flow 1: signed hash-only PoE ---');
 
   // (a) Producer hashes the content. The content hash is the primary claim.
-  const content = enc.encode('the quick brown fox — CIP-309 end-to-end demo');
+  const content = enc.encode('the quick brown fox — Label 309 end-to-end demo');
   const digests = dualHash(content);
 
-  // (b) Build the record BODY (everything except `sigs`). Per CIP-309 §4.2,
+  // (b) Build the record BODY (everything except `sigs`). Per Label 309 §4.2,
   // `hashes` is a CBOR map keyed by registered hash-alg ids.
   const body: PoeRecord = {
     v: 1,
@@ -87,9 +87,9 @@ function signedRecordFlow(): void {
     ],
   };
 
-  // (c) Sign the body. Authorship is OPTIONAL in CIP-309; when present it is a
+  // (c) Sign the body. Authorship is OPTIONAL in Label 309; when present it is a
   // record-level COSE_Sign1 over `SIG_DOMAIN_RECORD_V1 || canonical_cbor(body)`
-  // with an empty external_aad (CIP-309 §4.6.1). We use the path-1 convention:
+  // with an empty external_aad (Label 309 §4.6.1). We use the path-1 convention:
   // the signer's raw 32-byte Ed25519 public key is carried as the protected
   // `kid` (COSE label 4).
   const signer = generateEd25519KeyPair();

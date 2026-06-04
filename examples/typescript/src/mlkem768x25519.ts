@@ -1,12 +1,12 @@
-// CIP-309 v1 reference implementation — X-Wing hybrid KEM (ML-KEM-768 + X25519).
-// Spec: CIP-309 (KEM registry), CIP-309.
+// Label 309 v1 reference implementation — X-Wing hybrid KEM (ML-KEM-768 + X25519).
+// Spec: Label 309 (KEM registry), Label 309.
 // Construction: draft-connolly-cfrg-xwing-kem-06 / IACR ePrint 2024/039.
 //
 // X-Wing combines a post-quantum KEM (ML-KEM-768) with a classical one (X25519):
 // an attacker must break BOTH to recover the shared secret, so the hybrid is no
 // weaker than either part. The 32-byte combined secret is fed straight into the
 // sealed-PoE per-slot KEK derivation, exactly where the classical X25519 ECDH
-// output goes — only the KEK info label differs (CIP-309 §3).
+// output goes — only the KEK info label differs (Label 309 §3).
 //
 // This module is a thin, length-pinned wrapper over @noble/post-quantum's
 // `XWing` (its alias for ml_kem768_x25519). The combiner, the SHAKE-256 seed

@@ -1,11 +1,11 @@
 # JSON Schemas
 
 This directory holds the **JSON Schema** (draft 2020-12) definitions of the
-CIP-309 PoE record and its sub-structures, for tooling and validators that
-prefer a JSON contract to the [CDDL grammar](../cddl/cip-309.cddl). They are a
+Label 309 PoE record and its sub-structures, for tooling and validators that
+prefer a JSON contract to the [CDDL grammar](../cddl/label-309.cddl). They are a
 machine-readable view of the record model defined normatively in
 [`../spec`](../spec), and are kept in **lockstep** with both the specification
-prose and `../cddl/cip-309.cddl`: the three describe the same structure, and a
+prose and `../cddl/label-309.cddl`: the three describe the same structure, and a
 record that satisfies one is expected to satisfy the others.
 
 ## Files
@@ -37,7 +37,7 @@ the envelope references `encryption-slot` and `passphrase-block`; slots and
 signatures reference `chunked-bytes-array`. Every fixed-length byte string and
 every open algorithm-identifier string resolves into `defs.schema.json`.
 
-All `$id`s use the `https://cip309.org/schemas/<name>.schema.json` form. **This
+All `$id`s use the `https://label309.org/schemas/<name>.schema.json` form. **This
 is a stable identifier convention, not a resolvable URL** — do not assume any
 `$id` dereferences over the network. Cross-references are by **relative
 filename** (e.g. `defs.schema.json#/$defs/bytes32`), so the set resolves
@@ -87,7 +87,7 @@ proven valid** — full validation requires the domain pass.
 
 ## Lockstep
 
-These schemas stay in lockstep with [`../cddl/cip-309.cddl`](../cddl/cip-309.cddl)
+These schemas stay in lockstep with [`../cddl/label-309.cddl`](../cddl/label-309.cddl)
 and the normative prose in [`../spec`](../spec). Any change to the record model
 must be reflected in all three, and the conformance vectors are the shared
 arbiter.

@@ -1,8 +1,8 @@
-# CIP-309 v1 reference implementation — Canonical CBOR encode/decode.
+# Label 309 v1 reference implementation — Canonical CBOR encode/decode.
 # Canonical form follows RFC 8949 §4.2.1 (NOT the §4.2.3 length-first ordering).
 #
 # The decoder rejects any CBOR float (major type 7, additional info 25/26/27)
-# anywhere in the byte stream. The CIP-309 v1 schema uses no floats — every
+# anywhere in the byte stream. The Label 309 v1 schema uses no floats — every
 # numeric field is a CBOR unsigned integer — so a float-encoded value
 # (including integer-valued forms such as `f9 3c 00` for 1.0) is malformed
 # and surfaces as `MALFORMED_CBOR`. Both the TypeScript and Python reference
@@ -33,7 +33,7 @@ def _reject_floats(data: bytes, pos: int) -> int:
         if ai in (25, 26, 27):
             raise ValueError(
                 f"MALFORMED_CBOR: CBOR float encountered (major type 7, ai={ai}); "
-                "CIP-309 v1 schema uses no floats"
+                "Label 309 v1 schema uses no floats"
             )
         if 28 <= ai <= 30:
             raise ValueError(f"MALFORMED_CBOR: reserved CBOR major-type-7 ai={ai}")
@@ -85,7 +85,7 @@ def _reject_floats(data: bytes, pos: int) -> int:
             pos = _reject_floats(data, pos)
         return pos
     if mt == 6:
-        # CIP-309 doesn't use semantic tags; if one appears, walk its content
+        # Label 309 doesn't use semantic tags; if one appears, walk its content
         # — the structural validator's "no tags" rule emits a typed error later.
         return _reject_floats(data, pos)
     raise ValueError(f"MALFORMED_CBOR: unknown major type {mt}")

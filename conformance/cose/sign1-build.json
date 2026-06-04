@@ -43,7 +43,7 @@
       "expected_cose_sign1_hex": "845826a201270458203d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660ca0f658403053fdd109f2528ca4b9c2077d5b7783a38474ec1380a2047e1c39845eb9470b312d5f16c2f82c61f62ccdcf023a43e4d18475c6f6398422df460f0454b8e503"
     },
     {
-      "name": "cip309-v1-minimal-hashes-only",
+      "name": "label309-v1-minimal-hashes-only",
       "source": "KAT — minimal items[0].hashes-only record (hash-only PoE)",
       "signer_secret_key_hex": "1111111111111111111111111111111111111111111111111111111111111111",
       "signer_public_key_hex": "d04ab232742bb4ab3a1368bd4615e4e6d0224ab71a016baf8520a332c9778737",
@@ -63,7 +63,7 @@
       "expected_sigs_entry_cbor_hex": "a16a636f73655f7369676e31825840845826a20127045820d04ab232742bb4ab3a1368bd4615e4e6d0224ab71a016baf8520a332c9778737a0f65840c2b1a45fbbe837991fd3146053a0f0f38251d8582d10cdd2728989f22806b7072659300f5b8a923e773e873e3fb75dc52cf000478159a8bb75f6f2726f4078c1090c"
     },
     {
-      "name": "cip309-v2-sealed-self",
+      "name": "label309-v2-sealed-self",
       "source": "KAT — sealed-self record body (single recipient, mirrors sealed-self wrap output)",
       "signer_secret_key_hex": "2222222222222222222222222222222222222222222222222222222222222222",
       "signer_public_key_hex": "a09aa5f47a6759802ff955f8dc2d2a14a5c99d23be97f864127ff9383455a4f0",
@@ -83,7 +83,7 @@
       "expected_sigs_entry_cbor_hex": "a16a636f73655f7369676e31825840845826a20127045820a09aa5f47a6759802ff955f8dc2d2a14a5c99d23be97f864127ff9383455a4f0a0f65840ca867f697a886a5739f0171da00fbad2c2e0f3582d33ca27c088cd400eaae5cf18bca65837b0303460bc65fbf054f87823f9c4698679a684f40f1fa7615975137903"
     },
     {
-      "name": "cip309-v3-supersedes",
+      "name": "label309-v3-supersedes",
       "source": "KAT — record with supersedes (bare 32-byte tx hash)",
       "signer_secret_key_hex": "3333333333333333333333333333333333333333333333333333333333333333",
       "signer_public_key_hex": "17cb79fb2b4120f2b1ec65e4198d6e08b28e813feb01e4a400839b85e18080ce",

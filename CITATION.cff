@@ -1,10 +1,10 @@
 cff-version: 1.2.0
-message: 'If you use or implement CIP-309, please cite it as below.'
-title: 'CIP-309: Proof of Existence on Cardano'
+message: 'If you use or implement Label 309, please cite it as below.'
+title: 'Label 309: Proof of Existence on Cardano'
 type: software
 authors:
   - name: 'CardanoWall'
     email: 'hello@cardanowall.com'
-url: 'https://github.com/cardanowall/cip309'
-repository-code: 'https://github.com/cardanowall/cip309'
+url: 'https://github.com/cardanowall/label-309'
+repository-code: 'https://github.com/cardanowall/label-309'
 license: 'CC-BY-4.0'

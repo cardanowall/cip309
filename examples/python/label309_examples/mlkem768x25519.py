@@ -1,4 +1,4 @@
-# CIP-309 v1 reference implementation — X-Wing hybrid KEM (ML-KEM-768 + X25519).
+# Label 309 v1 reference implementation — X-Wing hybrid KEM (ML-KEM-768 + X25519).
 # Construction: draft-connolly-cfrg-xwing-kem-06 / IACR ePrint 2024/039.
 #
 # X-Wing combines a post-quantum KEM (ML-KEM-768) with a classical one (X25519):

@@ -1,5 +1,5 @@
 <!--
-Thank you for contributing to CIP-309. Please complete the checklist below.
+Thank you for contributing to Label 309. Please complete the checklist below.
 Contributions are accepted under the Developer Certificate of Origin (DCO);
 there is no CLA.
 -->

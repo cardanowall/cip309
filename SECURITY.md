@@ -1,6 +1,6 @@
 # Security Policy
 
-CIP-309 is a standard for cryptographic Proof of Existence. Its security
+Label 309 is a standard for cryptographic Proof of Existence. Its security
 properties matter to everyone who relies on a proof, so we take reports
 seriously and ask that they be handled responsibly.
 
@@ -21,8 +21,8 @@ In scope for a report here:
 
 Out of scope here (report it in the relevant implementation repository instead):
 
-- Bugs in a specific SDK or the CLI — `cip309-ts`, `cip309-py`, `cip309-rs`,
-  `cip309-cli`. Use that repository's security policy.
+- Bugs in a specific SDK or the CLI — `label-309-ts`, `label-309-py`, `label-309-rs`,
+  `label-309-cli`. Use that repository's security policy.
 
 ## Core security goals
 
@@ -64,4 +64,4 @@ Please include, as far as you can:
 - Because this standard is a **pre-1.0 working draft**, there are no
   long-term-supported released versions yet; fixes land on the current draft.
 
-Thank you for helping keep CIP-309 trustworthy.
+Thank you for helping keep Label 309 trustworthy.
