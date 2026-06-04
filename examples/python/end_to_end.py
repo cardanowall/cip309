@@ -24,7 +24,6 @@ from label309_examples.cbor_canonical import (
     decode_canonical_cbor,
     encode_canonical_cbor,
 )
-from label309_examples.label309_validator import validate_poe_record
 from label309_examples.cose_sign1 import build_sig_structure, decode_cose_sign1
 from label309_examples.ecies_sealed_poe import (
     ecies_sealed_poe_unwrap,
@@ -32,6 +31,7 @@ from label309_examples.ecies_sealed_poe import (
 )
 from label309_examples.ed25519 import verify_ed25519
 from label309_examples.hash_dual import blake2b_256, sha2_256
+from label309_examples.label309_validator import validate_poe_record
 from label309_examples.off_host_sign import (
     CARDANO_POE_SIG_DOMAIN_PREFIX,
     MockHsmSigner,
