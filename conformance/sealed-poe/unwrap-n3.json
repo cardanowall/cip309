@@ -1,7 +1,7 @@
 {
   "version": 1,
   "primitive": "sealed-poe-unwrap",
-  "source": "reuses wrap-n3 envelope/ciphertext (N=3 recipients, 32-byte plaintext)",
+  "source": "reuses wrap-n3",
   "vector": {
     "name": "n3",
     "recipient_secrets_hex": [
@@ -28,9 +28,9 @@
           "wrap_hex": "aff28d0fcebf959b7a965408e9f686080371c3a28192740de6cfc4d8bf9ab3d12e34c272ad28fc9ee0f3af5fe0f7fb48"
         }
       ],
-      "slots_mac_hex": "09de49b54ce73f1dd94827537d215103868fe5a229fb6fa40b5c44b4c23f6e78"
+      "slots_mac_hex": "f92dcf70650445d8793528cc84260dc81e7bafc7628d7a18dacefb9317d5df1c"
     },
-    "ciphertext_hex": "03cfdd4f111e6b2bf110c71953b8e2f123eca3d0adbcac26e4a89a67ad8bae88657d0451e186ea846f7e5ef54989abb4",
+    "ciphertext_hex": "aeaa37b7f1d59756b517daf8feb654161ad1c7da8bc8294cd7606e3b0eb43f90c9cdb32505a77e863f86fee74136d6e0",
     "expected_plaintext_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
   }
 }

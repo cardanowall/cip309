@@ -1,4 +1,4 @@
-// Label 309 v2 reference implementation — multi-recipient sealed-PoE.
+// Label 309 reference implementation — multi-recipient sealed-PoE (scheme 1).
 // Spec: Label 309 (multi-recipient sealed PoE), Label 309 §4.4.
 //
 // Two KEM branches share ONE envelope shape, discriminated on the envelope-level
@@ -20,19 +20,31 @@
 //     slot_i      = { epk: epk_i, wrap: wrap_i }
 //   For each recipient i — hybrid (mlkem768x25519):
 //     (enc_i, shared_i) ← X-Wing.Encapsulate(pub_R_i; eseed_i)  # enc = 1120 B, ss = 32 B
-//     KEK_i       ← HKDF-SHA-256(ikm=shared_i, salt="",
+//     salt_i      ← SHA-256("cardano-poe-xwing-kek-salt-v1" || enc_i || pub_R_i)
+//     KEK_i       ← HKDF-SHA-256(ikm=shared_i, salt=salt_i,
 //                                  info="cardano-poe-kek-mlkem768x25519-v1", L=32)
 //     wrap_i      ← ChaCha20-Poly1305(KEK_i, nonce=zeros(12),
 //                                      aad="cardano-poe-kek-mlkem768x25519-v1", CEK)
 //     slot_i      = { kem_ct: chunk64(enc_i), wrap: wrap_i }
 //   CSPRNG-shuffle the slot array (security-critical — prevents ordering leak).
-//   HMAC_KEY      ← HKDF-SHA-256(CEK, info="cardano-poe-slots-mac-v1", L=32)
-//   slots_mac     ← HMAC-SHA-256(HMAC_KEY, canonicalCBOR(slots))   # KEM-driven slot CBOR
-//   nonce         ← randomBytes(24)
-//   ciphertext    ← XChaCha20-Poly1305(CEK, nonce, aad=nonce||slots_mac, plaintext)
+//   Reject duplicate per-slot KEM material so the zero-nonce wrap never reuses
+//   a (KEK, nonce) pair.
 //
-// Everything outside the per-slot KEM — the content AEAD, slots_mac, AAD layout,
-// and the CSPRNG shuffle — is byte-identical across the two KEMs.
+//   slots_hash  ← SHA-256("cardano-poe-slots-transcript-v1" || canonicalCBOR(TRANSCRIPT))
+//                  where TRANSCRIPT is the closed map
+//                  { scheme, path: "slots", aead, kem, nonce, slots }.
+//   HMAC_KEY    ← HKDF-SHA-256(ikm=CEK, salt="", info="cardano-poe-slots-mac-v1", L=32)
+//   slots_mac   ← HMAC-SHA-256(HMAC_KEY, slots_hash)
+//   nonce       ← randomBytes(24)
+//   payload_key ← HKDF-SHA-256(ikm=CEK, salt=nonce, info="cardano-poe-payload-v1", L=32)
+//   AAD_CONTENT ← canonicalCBOR({ scheme, path: "slots", aead, kem, nonce,
+//                                 slots_hash, slots_mac })
+//   ciphertext  ← XChaCha20-Poly1305(payload_key, nonce, aad=AAD_CONTENT, plaintext)
+//
+// The content is encrypted under a payload_key derived from the CEK, never under
+// the CEK directly. The slots transcript hash binds the cross-KEM header fields
+// to the slot set; the content AAD re-binds the same header plus both the
+// transcript hash and the CEK-keyed MAC.
 //
 // NOT RFC 9180 HPKE: this is age v1 stanza pattern transposed to CBOR with
 // Label 309-specific HKDF constants. Recipient pubkeys are NOT on the wire —
@@ -49,6 +61,7 @@ import { hkdfSha256 } from './hkdf.ts';
 import {
   mlkem768x25519Decapsulate,
   mlkem768x25519Encapsulate,
+  mlkem768x25519Keygen,
   MLKEM768X25519_ENC_LENGTH,
   MLKEM768X25519_ESEED_LENGTH,
   MLKEM768X25519_PUBLIC_KEY_LENGTH,
@@ -63,8 +76,46 @@ const INFO_KEK_V1: Uint8Array = enc.encode('cardano-poe-kek-v1'); // 18 ASCII by
 // as the per-slot wrap AEAD AAD, exactly as the classical path reuses its own.
 const INFO_KEK_MLKEM768X25519_V1: Uint8Array = enc.encode('cardano-poe-kek-mlkem768x25519-v1'); // 33 ASCII bytes
 const INFO_SLOTS_MAC_V1: Uint8Array = enc.encode('cardano-poe-slots-mac-v1'); // 24 ASCII bytes
+// SHA-256 prefix over the slots transcript; the resulting slots_hash is the
+// constant-across-the-loop message the CEK-keyed HMAC signs.
+const SLOTS_TRANSCRIPT_PREFIX_V1: Uint8Array = enc.encode('cardano-poe-slots-transcript-v1'); // 31 ASCII bytes
+// HKDF info for the slots-path content payload_key (derived from the CEK; the
+// content is never encrypted under the CEK directly).
+const INFO_PAYLOAD_V1: Uint8Array = enc.encode('cardano-poe-payload-v1'); // 22 ASCII bytes
+// SHA-256 prefix binding the reassembled hybrid kem_ct and the recipient X-Wing
+// public key into the per-slot KEK salt, mirroring the classical salt's two
+// bindings (slot-unique value + recipient public key) through a fixed-length
+// digest because the hybrid inputs are oversized.
+const XWING_KEK_SALT_PREFIX_V1: Uint8Array = enc.encode('cardano-poe-xwing-kek-salt-v1'); // 29 ASCII bytes
 const ZERO_NONCE_12: Uint8Array = new Uint8Array(12);
-export const MAX_RECIPIENTS = 32;
+const EMPTY_SALT: Uint8Array = new Uint8Array(0);
+
+// XChaCha20-Poly1305 is a single-shot AEAD over the whole plaintext; its 32-bit
+// internal block counter bounds one (key, nonce) invocation at 2^32 64-byte
+// ChaCha20 blocks, the first of which is consumed by the Poly1305 one-time key.
+// MAX_SEALED_PLAINTEXT is therefore (2^32 - 1) * 64 = 2^38 - 64 bytes; a payload
+// at or above it risks a counter-overflow keystream collision and MUST be
+// rejected before the AEAD runs on either side. The ciphertext carries an extra
+// 16-byte Poly1305 tag, so the ciphertext bound is + 16.
+export const MAX_SEALED_PLAINTEXT = 2 ** 38 - 64;
+const MAX_SEALED_CIPHERTEXT = MAX_SEALED_PLAINTEXT + 16;
+
+// Verifier-side resource bounds enforced BEFORE any KEM/AEAD primitive runs, so a
+// malformed envelope cannot drive unbounded per-slot work. Both are
+// deployment-pinned reference constants (not wire fields); deployments MAY tighten
+// them. They sit far above the ~16 KiB Cardano transaction-metadata ceiling that
+// bounds honest records, so a conformant record never trips them.
+//   • MAX_SLOTS — the maximum slot count; an envelope with more slots is rejected.
+//   • MAX_DECODED_ENVELOPE_BYTES — a backstop on the decoded envelope's aggregate
+//     byte size (nonce + slots_mac + per-slot wire fields).
+export const MAX_SLOTS = 1024;
+export const MAX_DECODED_ENVELOPE_BYTES = 65536;
+
+// Component sizes the decoded-envelope backstop adds up.
+const NONCE_LENGTH = 24;
+const SLOTS_MAC_LENGTH = 32;
+const X25519_PUBLIC_KEY_LENGTH = 32;
+const WRAP_LENGTH = 48;
 
 // Cardano ledger CDDL caps every transaction_metadatum byte string at 64 bytes,
 // so the 1120-byte X-Wing `enc` is carried as an array of <=64-byte chunks
@@ -129,7 +180,9 @@ export interface Mlkem768X25519Slot {
  * the array carries opaque wrapped-CEK slots that recipients trial-decrypt with
  * their own private keys). User-facing API parameters (`recipientPublicKeys`,
  * `recipientSecretKey`) keep the "recipient" terminology because those describe
- * identities, not slots. At least one entry; no upper bound is enforced here.
+ * identities, not slots. At least one entry; the producer polices its own
+ * per-record byte budget, while the verifier enforces `MAX_SLOTS` /
+ * `MAX_DECODED_ENVELOPE_BYTES` before any primitive runs.
  */
 export type SealedEnvelope =
   | {
@@ -164,10 +217,23 @@ export type DecryptErrorCode =
   | 'UNSUPPORTED_KEM_ALG'
   | 'INVALID_ENVELOPE_SHAPE'
   | 'ENC_SLOTS_EMPTY'
+  // Resource bounds tripped before any KEM/AEAD primitive: more than MAX_SLOTS
+  // slots, or a decoded envelope larger than MAX_DECODED_ENVELOPE_BYTES.
+  | 'ENC_SLOTS_TOO_MANY'
+  | 'ENC_ENVELOPE_TOO_LARGE'
   // (mlkem768x25519) a slot's `kem_ct` reassembles to a byte string whose
   // length != 1120; checked BEFORE any X-Wing decapsulation (partitioning-
   // oracle defence; the hybrid analogue of the classical epk-length check).
   | 'KEM_CT_LENGTH_MISMATCH'
+  // Two slots carry identical per-slot KEM material (duplicate `epk` for
+  // x25519, or duplicate reassembled `kem_ct` for the hybrid path). The
+  // zero-nonce per-slot wrap is sound only under per-slot KEK uniqueness;
+  // repeated KEM material can repeat the (KEK, nonce) pair, so the envelope is
+  // rejected before any decapsulation.
+  | 'ENC_SLOTS_DUPLICATE_KEM_MATERIAL'
+  // A payload at or above the XChaCha20-Poly1305 single-shot keystream bound;
+  // enforced on both encrypt and decrypt before the AEAD primitive runs.
+  | 'PAYLOAD_TOO_LARGE'
   | 'INVALID_RECIPIENT_KEY'
   | 'WRONG_RECIPIENT_KEY'
   | 'TAMPERED_HEADER'
@@ -213,32 +279,129 @@ function csprngShuffle<T>(arr: T[]): void {
   }
 }
 
-/** Encode the slot set as canonical CBOR — input to slots_mac. KEM-driven so the
- * hybrid `kem_ct` is committed by the MAC exactly as it appears on the wire:
+/** Canonicalise the slot set — the value bound under the `slots` key of the
+ * slots transcript and the slots_mac. KEM-driven so the hybrid `kem_ct` is
+ * committed exactly as it appears on the wire:
  *
  *   • x25519:         each slot → { epk: bstr, wrap: bstr }
  *   • mlkem768x25519: each slot → { kem_ct: [ bstr, ... ], wrap: bstr }
  *
- * The HMAC-SHA-256 input is `canonical_cbor(slots)` — independent of whether the
- * local variable in the call site is named `slots` or `recipients`. The wire
- * field name (Label 309 §4.4) is `slots`. */
-function slotsToCborInput(
+ * The hybrid form re-chunks `kem_ct` into its canonical <=64-byte sequence so
+ * the transcript depends on the kem_ct BYTES, not on whatever chunk boundaries
+ * arrived on the wire: a record re-chunked in transit still verifies, and any
+ * byte flip in kem_ct still changes the transcript. */
+function canonicalizeSlots(
+  slots: ReadonlyArray<X25519Slot | Mlkem768X25519Slot>,
+  kem: SealedKem,
+): unknown {
+  if (kem === 'x25519') {
+    return (slots as ReadonlyArray<X25519Slot>).map((s) => ({ epk: s.epk, wrap: s.wrap }));
+  }
+  return (slots as ReadonlyArray<Mlkem768X25519Slot>).map((s) => ({
+    kem_ct: chunkKemCt(joinKemCt(s.kem_ct)),
+    wrap: s.wrap,
+  }));
+}
+
+/** slots_hash = SHA-256("cardano-poe-slots-transcript-v1" || canonicalCBOR(TRANSCRIPT)).
+ * TRANSCRIPT is the closed six-key map binding the cross-KEM header fields
+ * (scheme, path, aead, kem, nonce) to the canonicalised slot set, so a relay
+ * that flips any header field while leaving slot shapes valid yields a different
+ * `slots_hash` and the MAC fails. The map keys are a SET — their wire order is
+ * fixed by the canonical-encode sort, never hand-arranged here. Computed ONCE
+ * per envelope and held constant across the recipient trial-decrypt loop. */
+function computeSlotsHash(
+  nonce: Uint8Array,
   slots: ReadonlyArray<X25519Slot | Mlkem768X25519Slot>,
   kem: SealedKem,
 ): Uint8Array {
-  if (kem === 'x25519') {
-    return encodeCanonicalCbor(
-      (slots as ReadonlyArray<X25519Slot>).map((s) => ({ epk: s.epk, wrap: s.wrap })),
-    );
+  const transcript = {
+    scheme: 1,
+    path: 'slots',
+    aead: 'xchacha20-poly1305',
+    kem,
+    nonce,
+    slots: canonicalizeSlots(slots, kem),
+  };
+  const encoded = encodeCanonicalCbor(transcript);
+  return sha256(concat(SLOTS_TRANSCRIPT_PREFIX_V1, encoded));
+}
+
+/** slots_mac = HMAC-SHA-256(HKDF(CEK, "", "cardano-poe-slots-mac-v1", 32), slots_hash). */
+function computeSlotsMac(cek: Uint8Array, slotsHash: Uint8Array): Uint8Array {
+  const hmacKey = hkdfSha256({ ikm: cek, salt: EMPTY_SALT, info: INFO_SLOTS_MAC_V1, length: 32 });
+  return hmac(sha256, hmacKey, slotsHash);
+}
+
+/** canonicalCBOR(AD_CONTENT_SLOTS): the closed seven-key content-AEAD AAD for the
+ * slots path. It re-binds the slots-path header AND carries both `slots_hash`
+ * (binding to the exact transcript) and `slots_mac` (tying the content layer to
+ * the CEK-keyed MAC the recipient matched). */
+function adContentSlots(
+  nonce: Uint8Array,
+  kem: SealedKem,
+  slotsHash: Uint8Array,
+  slotsMac: Uint8Array,
+): Uint8Array {
+  return encodeCanonicalCbor({
+    scheme: 1,
+    path: 'slots',
+    aead: 'xchacha20-poly1305',
+    kem,
+    nonce,
+    slots_hash: slotsHash,
+    slots_mac: slotsMac,
+  });
+}
+
+/** Slots-path content key: HKDF-SHA-256(ikm=CEK, salt=nonce, info=payload-v1). */
+function slotsPayloadKey(cek: Uint8Array, nonce: Uint8Array): Uint8Array {
+  return hkdfSha256({ ikm: cek, salt: nonce, info: INFO_PAYLOAD_V1, length: 32 });
+}
+
+/** Hybrid (X-Wing) per-slot KEK salt:
+ * SHA-256("cardano-poe-xwing-kek-salt-v1" || kem_ct || pub_R). `kem_ct` is the
+ * reassembled 1120-byte X-Wing ciphertext (anchoring the KEK to a slot-unique
+ * value) and `pub_R` the 1216-byte recipient public key (binding the KEK to the
+ * specific recipient) — the same two bindings the classical `epk || pub_R` salt
+ * provides, through a fixed-length digest because the hybrid inputs are
+ * oversized. Computed over the slot's own wire bytes, so X-Wing stays a
+ * black-box KEM. */
+function xwingKekSalt(kemCt: Uint8Array, pubR: Uint8Array): Uint8Array {
+  return sha256(concat(XWING_KEK_SALT_PREFIX_V1, kemCt, pubR));
+}
+
+/** Reject duplicate per-slot KEM material — a repeated `epk` (x25519) or a
+ * repeated reassembled `kem_ct` (hybrid). The zero-nonce wrap is sound only when
+ * every slot's KEK is unique; the KEK is a deterministic function of the slot's
+ * KEM material, so two slots with identical material against the same recipient
+ * repeat the (KEK, nonce) pair. Enforced on both the producer side (before the
+ * wire) and the verifier side (before any decapsulation). */
+function assertUniqueSlotKemMaterial(
+  slots: ReadonlyArray<X25519Slot | Mlkem768X25519Slot>,
+  kem: SealedKem,
+): void {
+  const seen = new Set<string>();
+  for (let i = 0; i < slots.length; i++) {
+    const slot = slots[i]!;
+    const material =
+      kem === 'x25519' ? (slot as X25519Slot).epk : joinKemCt((slot as Mlkem768X25519Slot).kem_ct);
+    const key = hex(material);
+    if (seen.has(key)) {
+      const field = kem === 'x25519' ? 'epk' : 'kem_ct';
+      throw new SealedPoeDecryptError(
+        'ENC_SLOTS_DUPLICATE_KEM_MATERIAL',
+        `slots[${i}].${field} duplicates an earlier slot; per-slot KEK uniqueness is violated`,
+      );
+    }
+    seen.add(key);
   }
-  return encodeCanonicalCbor(
-    (slots as ReadonlyArray<Mlkem768X25519Slot>).map((s) => ({
-      // Spread the chunk views into a fresh array so the encoder receives a
-      // plain array of byte strings (the wire form).
-      kem_ct: s.kem_ct.map((c) => c),
-      wrap: s.wrap,
-    })),
-  );
+}
+
+function hex(b: Uint8Array): string {
+  let out = '';
+  for (let i = 0; i < b.length; i++) out += (b[i] ?? 0).toString(16).padStart(2, '0');
+  return out;
 }
 
 // ----- Public API: wrap -----
@@ -302,10 +465,11 @@ function wrapSlotMlkem768X25519(args: {
   if (kemCt.length !== MLKEM768X25519_ENC_LENGTH) {
     throw new Error(`internal: enc length ${kemCt.length}, expected ${MLKEM768X25519_ENC_LENGTH}`);
   }
-  // Empty salt: the X-Wing combiner already binds the transcript.
+  // Salt binds the reassembled kem_ct and the recipient public key, so both
+  // KEMs uniformly anchor the KEK to a slot-unique value and to the recipient.
   const kek = hkdfSha256({
     ikm: ss,
-    salt: new Uint8Array(0),
+    salt: xwingKekSalt(kemCt, args.pubR),
     info: INFO_KEK_MLKEM768X25519_V1,
     length: 32,
   });
@@ -355,6 +519,15 @@ export function eciesSealedPoeWrap(args: WrapArgs): SealedPoeOutput {
     }
   }
 
+  // Reject before any keystream is drawn: a payload at or above the single-shot
+  // bound cannot be safely encrypted.
+  if (plaintext.length >= MAX_SEALED_PLAINTEXT) {
+    throw new SealedPoeDecryptError(
+      'PAYLOAD_TOO_LARGE',
+      `plaintext length ${plaintext.length} is at or above the single-shot bound ${MAX_SEALED_PLAINTEXT}`,
+    );
+  }
+
   const cek = args.cek ?? randomBytes(32);
   const nonce = args.nonce ?? randomBytes(24);
   if (cek.length !== 32) throw new RangeError('CEK MUST be 32 bytes');
@@ -373,9 +546,14 @@ export function eciesSealedPoeWrap(args: WrapArgs): SealedPoeOutput {
         }),
       );
     }
-    // CSPRNG-shuffle to prevent ordering leak (security-critical).
+    // Per-slot KEK uniqueness is the safety condition for the zero-nonce wrap;
+    // reject a duplicate epk before committing anything to the wire.
+    assertUniqueSlotKemMaterial(slots, 'x25519');
+    // CSPRNG-shuffle to prevent ordering leak (security-critical). The slots_mac
+    // is computed AFTER the shuffle, binding the on-wire order.
     if (!args.skipShuffle) csprngShuffle(slots);
-    const slotsMac = computeSlotsMac(cek, slots, 'x25519');
+    const slotsHash = computeSlotsHash(nonce, slots, 'x25519');
+    const slotsMac = computeSlotsMac(cek, slotsHash);
     envelope = {
       scheme: 1,
       aead: 'xchacha20-poly1305',
@@ -395,8 +573,10 @@ export function eciesSealedPoeWrap(args: WrapArgs): SealedPoeOutput {
         }),
       );
     }
+    assertUniqueSlotKemMaterial(slots, 'mlkem768x25519');
     if (!args.skipShuffle) csprngShuffle(slots);
-    const slotsMac = computeSlotsMac(cek, slots, 'mlkem768x25519');
+    const slotsHash = computeSlotsHash(nonce, slots, 'mlkem768x25519');
+    const slotsMac = computeSlotsMac(cek, slotsHash);
     envelope = {
       scheme: 1,
       aead: 'xchacha20-poly1305',
@@ -407,25 +587,14 @@ export function eciesSealedPoeWrap(args: WrapArgs): SealedPoeOutput {
     };
   }
 
-  // Content layer. AAD = nonce || slots_mac (24 + 32 = 56 bytes). KEM-independent.
-  const aadContent = concat(nonce, envelope.slots_mac);
-  const ciphertext = xchacha20poly1305(cek, nonce, aadContent).encrypt(plaintext);
+  // Content layer. The content is encrypted under a payload_key derived from the
+  // CEK (never the CEK directly), with a structured AAD that re-binds the
+  // slots-path header plus both slots_hash and slots_mac.
+  const slotsHash = computeSlotsHash(nonce, envelope.slots, envelope.kem);
+  const payloadKey = slotsPayloadKey(cek, nonce);
+  const aadContent = adContentSlots(nonce, envelope.kem, slotsHash, envelope.slots_mac);
+  const ciphertext = xchacha20poly1305(payloadKey, nonce, aadContent).encrypt(plaintext);
   return { envelope, ciphertext };
-}
-
-/** Slot-set MAC binds canonical-CBOR(slots) to the CEK (KEM-driven slot CBOR). */
-function computeSlotsMac(
-  cek: Uint8Array,
-  slots: ReadonlyArray<X25519Slot | Mlkem768X25519Slot>,
-  kem: SealedKem,
-): Uint8Array {
-  const hmacKey = hkdfSha256({
-    ikm: cek,
-    salt: new Uint8Array(0),
-    info: INFO_SLOTS_MAC_V1,
-    length: 32,
-  });
-  return hmac(sha256, hmacKey, slotsToCborInput(slots, kem));
 }
 
 // ----- Public API: unwrap (trial-decrypt) -----
@@ -440,9 +609,24 @@ export interface UnwrapArgs {
   recipientSecretKey: Uint8Array;
 }
 
+// All-zero IKM for the dummy KEK an invalid-ECDH slot derives so it pays the same
+// HKDF work as a live slot (see tryOpenX25519Slot).
+const ZERO_IKM_32: Uint8Array = new Uint8Array(32);
+
 /**
  * Attempt to open one classical slot. Returns the candidate CEK on AEAD-tag
- * success, or null on any non-match (low-order epk rejection / AEAD failure).
+ * success, or null on any non-match.
+ *
+ * Acceptance is `kem_ok AND open_ok`. `kem_ok` is the X25519 validity bit: a
+ * small-order epk drives the shared secret to all-zero, which RFC 7748 §6.1
+ * rejects. @noble signals that all-zero case by throwing, so a fully branchless
+ * ct-select over the shared secret is not expressible against this library API.
+ * The equivalent form is taken instead: on the all-zero rejection the slot
+ * derives a DUMMY KEK from `ikm=0^32` (same salt/info) so it performs the
+ * identical HKDF work, then returns a non-match WITHOUT attempting the AEAD — so
+ * an invalid-ECDH slot can never be accepted regardless of the wrap outcome
+ * (`kem_ok=false` ⟹ the AEAD is never reached), while the failed path still
+ * costs the same per-slot KEK derivation as a live one.
  */
 function tryOpenX25519Slot(
   slot: X25519Slot,
@@ -450,18 +634,20 @@ function tryOpenX25519Slot(
   pubRLocal: Uint8Array,
 ): Uint8Array | null {
   if (slot.epk.length !== 32 || slot.wrap.length !== 48) return null;
+  const salt = concat(slot.epk, pubRLocal);
   let shared: Uint8Array;
   try {
     shared = x25519.getSharedSecret(privR, slot.epk);
   } catch {
-    return null; // low-order epk (RFC 7748 §6.1 contributory-check rejection)
+    // kem_ok = false (low-order epk; RFC 7748 §6.1 contributory-check rejection).
+    // Derive the dummy KEK so the failed slot pays the same HKDF cost a live slot
+    // would, then short-circuit to a non-match: the AEAD is never attempted, so
+    // this slot can never be accepted.
+    hkdfSha256({ ikm: ZERO_IKM_32, salt, info: INFO_KEK_V1, length: 32 });
+    return null;
   }
-  const kek = hkdfSha256({
-    ikm: shared,
-    salt: concat(slot.epk, pubRLocal),
-    info: INFO_KEK_V1,
-    length: 32,
-  });
+  // kem_ok = true. Derive the real KEK and attempt the wrap AEAD.
+  const kek = hkdfSha256({ ikm: shared, salt, info: INFO_KEK_V1, length: 32 });
   try {
     return chacha20poly1305(kek, ZERO_NONCE_12, INFO_KEK_V1).decrypt(slot.wrap);
   } catch {
@@ -474,17 +660,22 @@ function tryOpenX25519Slot(
  * wire data (ML-KEM implicit rejection yields a pseudorandom shared secret), so
  * a wrong seed simply produces a KEK whose AEAD tag fails — returned as a
  * non-match (null). The slot's `kem_ct` MUST already have been length-checked.
+ * `pubRLocal` is the recipient's own 1216-byte X-Wing public key, recomputed
+ * from the held seed — the same value the producer bound into the KEK salt.
  */
 function tryOpenMlkem768X25519Slot(
   slot: Mlkem768X25519Slot,
   secretSeed: Uint8Array,
+  pubRLocal: Uint8Array,
 ): Uint8Array | null {
   if (slot.wrap.length !== 48) return null;
-  const ss = mlkem768x25519Decapsulate({ secretSeed, enc: joinKemCt(slot.kem_ct) });
-  // Empty salt: the X-Wing combiner already binds the transcript.
+  const kemCt = joinKemCt(slot.kem_ct);
+  const ss = mlkem768x25519Decapsulate({ secretSeed, enc: kemCt });
+  // Salt binds the reassembled kem_ct and the recipient public key, computed
+  // over the slot's own wire bytes (X-Wing stays a black-box KEM).
   const kek = hkdfSha256({
     ikm: ss,
-    salt: new Uint8Array(0),
+    salt: xwingKekSalt(kemCt, pubRLocal),
     info: INFO_KEK_MLKEM768X25519_V1,
     length: 32,
   });
@@ -520,6 +711,15 @@ export function eciesSealedPoeUnwrap(args: UnwrapArgs): Uint8Array {
   if (privR.length !== MLKEM768X25519_SEED_LENGTH) {
     throw new SealedPoeDecryptError('INVALID_RECIPIENT_KEY', 'recipient secret length');
   }
+  // Resource bound: reject an envelope with more than MAX_SLOTS slots before any
+  // KEM/AEAD primitive runs, so a malformed record cannot drive unbounded
+  // per-slot work.
+  if (envelope.slots.length > MAX_SLOTS) {
+    throw new SealedPoeDecryptError(
+      'ENC_SLOTS_TOO_MANY',
+      `slots.length=${envelope.slots.length} exceeds MAX_SLOTS=${MAX_SLOTS}`,
+    );
+  }
   // Partitioning-oracle defence (hybrid): every `kem_ct` MUST reassemble to the
   // exact X-Wing enc length BEFORE any decapsulation, so malformed records
   // cannot probe per-slot failure ordering.
@@ -530,48 +730,91 @@ export function eciesSealedPoeUnwrap(args: UnwrapArgs): Uint8Array {
       }
     }
   }
-
-  // Pre-compute slots_mac inputs once (constant across slots), KEM-driven.
-  const slotsCbor = slotsToCborInput(
+  // Decoded-envelope byte backstop. Every per-slot field is fixed-length, so the
+  // decoded envelope's aggregate size is determined here: nonce + slots_mac +
+  // per-slot (epk|kem_ct + wrap). Reject before any KEM/AEAD primitive when it
+  // exceeds the bound — the byte cap a parser that can see the decoded size
+  // enforces, alongside the slot-count cap above.
+  const perSlotBytes =
+    envelope.kem === 'x25519'
+      ? X25519_PUBLIC_KEY_LENGTH + WRAP_LENGTH
+      : MLKEM768X25519_ENC_LENGTH + WRAP_LENGTH;
+  const decodedEnvelopeBytes =
+    NONCE_LENGTH + SLOTS_MAC_LENGTH + envelope.slots.length * perSlotBytes;
+  if (decodedEnvelopeBytes > MAX_DECODED_ENVELOPE_BYTES) {
+    throw new SealedPoeDecryptError(
+      'ENC_ENVELOPE_TOO_LARGE',
+      `decoded envelope size ${decodedEnvelopeBytes} exceeds MAX_DECODED_ENVELOPE_BYTES=${MAX_DECODED_ENVELOPE_BYTES}`,
+    );
+  }
+  // Per-slot KEK uniqueness — rejected before any decapsulation so a duplicate
+  // never enters the trial-decrypt loop.
+  assertUniqueSlotKemMaterial(
     envelope.slots as ReadonlyArray<X25519Slot | Mlkem768X25519Slot>,
     envelope.kem,
   );
-  // X25519 recipient public key, needed only by the classical salt.
-  const pubRLocal = envelope.kem === 'x25519' ? x25519.getPublicKey(privR) : undefined;
 
-  // Distinguish "no slot ever opened under the recipient secret" (WRONG_RECIPIENT_KEY)
-  // from "some slot opened but no opened slot's CEK satisfies slots_mac"
-  // (TAMPERED_HEADER). A malicious sender can inject a slot opening under the
-  // recipient secret with an attacker-controlled CEK; early-exit on first
-  // AEAD-success would let the forged slot shadow the real one. We therefore
-  // continue scanning until an opened slot's CEK verifies slots_mac or the slot
-  // list is exhausted.
+  // The slots transcript hash is constant across every trial-decrypt pass
+  // (depends only on the envelope), so it is computed once here.
+  const slotsHash = computeSlotsHash(
+    envelope.nonce,
+    envelope.slots as ReadonlyArray<X25519Slot | Mlkem768X25519Slot>,
+    envelope.kem,
+  );
+  // Recipient public key, recomputed from the held secret. The classical salt
+  // is `epk || pub_R`; the hybrid salt binds the recipient's X-Wing public key.
+  const pubRLocal =
+    envelope.kem === 'x25519' ? x25519.getPublicKey(privR) : mlkem768x25519Keygen(privR).publicKey;
+
+  // Trial-decrypt loop. Iterate ALL slots — no early break on a match — so the
+  // acceptance follows the spec loop shape:
+  //
+  //   ok           = kem_ok AND open_ok AND mac_ok        ; mac folded in
+  //   first        = ok AND NOT found                      ; first matching slot
+  //   cek_conflict = cek_conflict OR (ok AND found AND NOT ctEq(cand, selected))
+  //   selected_CEK = first ? cand : selected
+  //   found        = found OR ok
+  //
+  // Folding the slots_mac check into acceptance is load-bearing: a malicious
+  // sender can inject a slot that opens under the recipient secret with an
+  // attacker-chosen CEK; requiring the candidate CEK to also reproduce the
+  // on-wire slots_mac over the constant slots_hash defeats slot substitution,
+  // removal, and reorder. Multiple matching slots are PERMITTED (a producer may
+  // seal the same CEK to one recipient in several slots to pad the count); the
+  // FIRST match's CEK is selected. The narrow anomaly rejected is two matching
+  // slots that recover DIFFERENT CEKs (constant-time compare) — a commitment
+  // collision that fails the record closed (cekConflict), distinct from the
+  // within-record duplicate-KEM-material rejection above.
   let cek: Uint8Array | null = null;
-  let openedAny = false;
+  let openedAny = false; // a wrap AEAD opened under the recipient secret (no MAC yet)
+  let cekConflict = false;
 
   for (const slot of envelope.slots) {
     const candidateCek =
       envelope.kem === 'x25519'
-        ? tryOpenX25519Slot(slot as X25519Slot, privR, pubRLocal!)
-        : tryOpenMlkem768X25519Slot(slot as Mlkem768X25519Slot, privR);
+        ? tryOpenX25519Slot(slot as X25519Slot, privR, pubRLocal)
+        : tryOpenMlkem768X25519Slot(slot as Mlkem768X25519Slot, privR, pubRLocal);
     if (candidateCek === null) continue;
     openedAny = true;
-    // Verify slots_mac under THIS candidate CEK. Only the slot whose CEK matches
-    // the sender's HMAC_KEY can produce the on-wire slots_mac.
-    const hmacKey = hkdfSha256({
-      ikm: candidateCek,
-      salt: new Uint8Array(0),
-      info: INFO_SLOTS_MAC_V1,
-      length: 32,
-    });
-    const slotsMacCalc = hmac(sha256, hmacKey, slotsCbor);
-    if (constantTimeEqual(slotsMacCalc, envelope.slots_mac)) {
-      cek = candidateCek;
-      break;
+    // Verify slots_mac under THIS candidate CEK over the constant slots_hash.
+    // Only a slot whose CEK matches the sender's HMAC_KEY can produce the on-wire
+    // slots_mac, so `ok` includes the MAC check.
+    const slotsMacCalc = computeSlotsMac(candidateCek, slotsHash);
+    if (!constantTimeEqual(slotsMacCalc, envelope.slots_mac)) {
+      continue; // a forged or tampered slot — keep scanning
     }
-    // Otherwise this is a forged or tampered slot — keep scanning.
+    if (cek === null) {
+      cek = candidateCek; // first matching slot
+    } else if (!constantTimeEqual(candidateCek, cek)) {
+      // A later matching slot recovered a CEK that differs from the selected one.
+      // Fail closed (defence-in-depth against a commitment collision).
+      cekConflict = true;
+    }
   }
 
+  if (cekConflict) {
+    throw new SealedPoeDecryptError('TAMPERED_HEADER', 'matching slots recovered conflicting CEKs');
+  }
   if (cek === null) {
     if (!openedAny) {
       throw new SealedPoeDecryptError(
@@ -582,11 +825,21 @@ export function eciesSealedPoeUnwrap(args: UnwrapArgs): Uint8Array {
     throw new SealedPoeDecryptError('TAMPERED_HEADER', 'opened slot(s) did not satisfy slots_mac');
   }
 
-  // Decrypt content (KEM-independent).
-  const aadContent = concat(envelope.nonce, envelope.slots_mac);
+  // Guard the single-shot bound before invoking the AEAD.
+  if (ciphertext.length >= MAX_SEALED_CIPHERTEXT) {
+    throw new SealedPoeDecryptError(
+      'PAYLOAD_TOO_LARGE',
+      `ciphertext length ${ciphertext.length} is at or above the single-shot bound ${MAX_SEALED_CIPHERTEXT}`,
+    );
+  }
+
+  // Content is opened under a payload_key derived from the recovered CEK, with
+  // the structured slots-path AAD recomputed from the envelope (KEM-independent).
+  const payloadKey = slotsPayloadKey(cek, envelope.nonce);
+  const aadContent = adContentSlots(envelope.nonce, envelope.kem, slotsHash, envelope.slots_mac);
   let plaintext: Uint8Array;
   try {
-    plaintext = xchacha20poly1305(cek, envelope.nonce, aadContent).decrypt(ciphertext);
+    plaintext = xchacha20poly1305(payloadKey, envelope.nonce, aadContent).decrypt(ciphertext);
   } catch (e) {
     throw new SealedPoeDecryptError(
       'TAMPERED_CIPHERTEXT',

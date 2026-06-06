@@ -520,6 +520,101 @@ function codes(r: ValidationResult): string[] {
   record('(w) crit duplicate entries → CRIT_SHAPE_INVALID', has, `codes=${codes(r).join(',')}`);
 }
 
+// (x) Two slots sharing one epk → ENC_SLOTS_DUPLICATE_KEM_MATERIAL. A
+//     within-record duplicate breaks per-slot KEK uniqueness, on which the
+//     zero-nonce wrap depends.
+{
+  const dupSlot = { epk: new Uint8Array(32).fill(0x05), wrap: new Uint8Array(48).fill(0x06) };
+  const cbor = encodeCanonicalCbor({
+    v: 1,
+    items: [
+      {
+        hashes: { 'sha2-256': SHA },
+        enc: {
+          scheme: 1,
+          aead: 'xchacha20-poly1305',
+          kem: 'x25519',
+          nonce: new Uint8Array(24),
+          slots: [dupSlot, dupSlot],
+          slots_mac: new Uint8Array(32),
+        },
+      },
+    ],
+  });
+  const r = validatePoeRecord(cbor);
+  const has = !r.valid && r.issues.some((i) => i.code === 'ENC_SLOTS_DUPLICATE_KEM_MATERIAL');
+  record(
+    '(x) duplicate epk across slots → ENC_SLOTS_DUPLICATE_KEM_MATERIAL',
+    has,
+    `codes=${codes(r).join(',')}`,
+  );
+}
+
+// (y) More than MAX_SLOTS (1024) slots → ENC_SLOTS_TOO_MANY. A resource bound
+//     enforced before any KEM/AEAD primitive runs.
+{
+  const slots = Array.from({ length: 1025 }, (_, i) => {
+    const epk = new Uint8Array(32);
+    epk[31] = i & 0xff;
+    epk[30] = (i >> 8) & 0xff;
+    return { epk, wrap: new Uint8Array(48) };
+  });
+  const cbor = encodeCanonicalCbor({
+    v: 1,
+    items: [
+      {
+        hashes: { 'sha2-256': SHA },
+        enc: {
+          scheme: 1,
+          aead: 'xchacha20-poly1305',
+          kem: 'x25519',
+          nonce: new Uint8Array(24),
+          slots,
+          slots_mac: new Uint8Array(32),
+        },
+      },
+    ],
+  });
+  const r = validatePoeRecord(cbor);
+  const has = !r.valid && r.issues.some((i) => i.code === 'ENC_SLOTS_TOO_MANY');
+  record('(y) more than MAX_SLOTS slots → ENC_SLOTS_TOO_MANY', has, `codes=${codes(r).join(',')}`);
+}
+
+// (z) A decoded envelope above the 65536-byte backstop (but at or below
+//     MAX_SLOTS) → ENC_ENVELOPE_TOO_LARGE. x25519 per-slot bytes = 80, so the
+//     byte backstop trips at 819 slots (24 + 32 + 819 * 80 = 65576).
+{
+  const slots = Array.from({ length: 819 }, (_, i) => {
+    const epk = new Uint8Array(32);
+    epk[31] = i & 0xff;
+    epk[30] = (i >> 8) & 0xff;
+    return { epk, wrap: new Uint8Array(48) };
+  });
+  const cbor = encodeCanonicalCbor({
+    v: 1,
+    items: [
+      {
+        hashes: { 'sha2-256': SHA },
+        enc: {
+          scheme: 1,
+          aead: 'xchacha20-poly1305',
+          kem: 'x25519',
+          nonce: new Uint8Array(24),
+          slots,
+          slots_mac: new Uint8Array(32),
+        },
+      },
+    ],
+  });
+  const r = validatePoeRecord(cbor);
+  const has = !r.valid && r.issues.some((i) => i.code === 'ENC_ENVELOPE_TOO_LARGE');
+  record(
+    '(z) decoded envelope above the byte backstop → ENC_ENVELOPE_TOO_LARGE',
+    has,
+    `codes=${codes(r).join(',')}`,
+  );
+}
+
 const failed = results.filter((r) => !r.pass);
 if (failed.length > 0) {
   console.log(`\n${failed.length} smoke test(s) FAILED: ${failed.map((f) => f.label).join('; ')}`);

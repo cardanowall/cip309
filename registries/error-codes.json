@@ -1,6 +1,6 @@
 {
   "registry": "error-codes",
-  "description": "The complete CIP-309 v1 error-code catalogue. Codes are SCREAMING_SNAKE_CASE and stable; implementations MUST emit them byte-exact and MUST NOT introduce lowercase synonyms. Part A codes are emitted by the structural validator (a pure function over CBOR bytes — no I/O, no signature verification, no decryption). Part B codes are emitted by the public verifier and recipient verifier (which fetch metadata, verify signatures, resolve URIs, and decrypt). Severities are taken from the frozen severity map: `error` fails the record, `warning` is a non-fatal runtime anomaly, and `info` is a deliberate non-check that does not fail the record. Two codes carry dual severity (`dual_severity: true`): their default reading is `info`, and a strict / merkle-only verifier promotes them to `error`. Additions are additive-only and must ship with conformance vectors.",
+  "description": "The complete Label 309 v1 error-code catalogue. Codes are SCREAMING_SNAKE_CASE and stable; implementations MUST emit them byte-exact and MUST NOT introduce lowercase synonyms. Part A codes are emitted by the structural validator (a pure function over CBOR bytes — no I/O, no signature verification, no decryption). Part B codes are emitted by the public verifier and recipient verifier (which fetch metadata, verify signatures, resolve URIs, and decrypt). Severities are taken from the frozen severity map: `error` fails the record, `warning` is a non-fatal runtime anomaly, and `info` is a deliberate non-check that does not fail the record. Two codes carry dual severity (`dual_severity: true`): their default reading is `info`, and a strict / merkle-only verifier promotes them to `error`. Additions are additive-only and must ship with conformance vectors.",
   "entries": [
     {
       "code": "MALFORMED_CBOR",
@@ -153,6 +153,24 @@
       "description": "An encryption envelope declares `slots_mac` but carries no `slots` for it to bind."
     },
     {
+      "code": "ENC_SLOTS_DUPLICATE_KEM_MATERIAL",
+      "part": "A",
+      "severity": "error",
+      "description": "Two slots in one `slots[]` carry identical encapsulation material — the same `epk` (x25519) or the same reassembled `kem_ct` (mlkem768x25519). Rejected before any KEM or AEAD primitive: a within-record duplicate breaks per-slot KEK uniqueness, on which the zero-nonce wrap depends."
+    },
+    {
+      "code": "ENC_SLOTS_TOO_MANY",
+      "part": "A",
+      "severity": "error",
+      "description": "An encryption envelope's `slots[]` exceeds the verifier's slot-count resource bound (reference bound 1024; deployments MAY tighten). Rejected before any KEM or AEAD primitive to bound parser resource use."
+    },
+    {
+      "code": "ENC_ENVELOPE_TOO_LARGE",
+      "part": "A",
+      "severity": "error",
+      "description": "A decoded encryption envelope exceeds the verifier's size resource bound (reference bound 65536 bytes; deployments MAY tighten). Rejected before any KEM or AEAD primitive to bound parser resource use."
+    },
+    {
       "code": "ENC_EXCLUSIVITY_VIOLATION",
       "part": "A",
       "severity": "error",
@@ -252,7 +270,7 @@
       "code": "METADATA_NOT_FOUND",
       "part": "B",
       "severity": "error",
-      "description": "No CIP-309 metadata (label 309) was found at the referenced transaction."
+      "description": "No Label 309 metadata (label 309) was found at the referenced transaction."
     },
     {
       "code": "INSUFFICIENT_CONFIRMATIONS",

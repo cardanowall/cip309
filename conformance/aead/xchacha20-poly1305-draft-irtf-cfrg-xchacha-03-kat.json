@@ -1,7 +1,7 @@
 {
   "version": 1,
   "primitive": "xchacha20-poly1305",
-  "source": "draft-irtf-cfrg-xchacha-03 Appendix A.3 (XChaCha20-Poly1305 AEAD encryption example — sunscreen test)",
+  "source": "draft-irtf-cfrg-xchacha-03 Appendix A.3.1 (AEAD_XChaCha20_Poly1305 encryption example — the 24-byte-nonce sunscreen test). Not an RFC; the XChaCha20-Poly1305 construction is pinned to this draft revision.",
   "vectors": [
     {
       "name": "draft-irtf-cfrg-xchacha-03-A.3-sunscreen",

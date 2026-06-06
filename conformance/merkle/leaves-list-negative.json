@@ -1,7 +1,7 @@
 {
   "version": 1,
   "primitive": "merkle-leaves-list-negative",
-  "source": "CIP-309 cross-SDK reconciliation",
+  "source": "Label 309 cross-SDK reconciliation",
   "vectors": [
     {
       "name": "wrong-tree-alg",

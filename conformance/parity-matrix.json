@@ -1,6 +1,6 @@
 {
-  "schema": "cip-309-conformance-parity-matrix/v1",
-  "description": "Machine-readable manifest splitting the CIP-309 conformance corpus into vectors that MUST be byte-identical across every conforming implementation versus vectors where only structural (semantic) parity is required. Any pair of conforming implementations (e.g. TypeScript, Python, Rust, Go, native mobile) MUST produce byte-identical output for every entry under `byte_identical`. The `structural_parity_only` entries assert the same outcome (recovered plaintext, accepted/rejected verdict, emitted error code) but are not byte-pinned, because their inputs are non-deterministic (random keypairs/nonces) or their wire form admits writer-dependent variation (JSON whitespace and key ordering).",
+  "schema": "label-309-conformance-parity-matrix/v1",
+  "description": "Machine-readable manifest splitting the Label 309 conformance corpus into vectors that MUST be byte-identical across every conforming implementation versus vectors where only structural (semantic) parity is required. Any pair of conforming implementations (e.g. TypeScript, Python, Rust, Go, native mobile) MUST produce byte-identical output for every entry under `byte_identical`. The `structural_parity_only` entries assert the same outcome (recovered plaintext, accepted/rejected verdict, emitted error code) but are not byte-pinned, because their inputs are non-deterministic (random keypairs/nonces) or their wire form admits writer-dependent variation (JSON whitespace and key ordering).",
   "spec_section": "Section I — Cross-language parity matrix",
   "rules": {
     "byte_identical": "For these vectors `encode(decode(bytes)) == bytes` and every emitted output byte string MUST match across implementations. A diverging byte is a conformance failure.",
@@ -35,6 +35,13 @@
       "notes": "Externally pinned, transcribed verbatim from RFC 5869."
     },
     {
+      "vector_class": "HKDF-SHA-256 zero-length salt (RFC 5869 section 2.2 absent salt)",
+      "area": "kdf",
+      "files": ["hkdf-sha256-empty-salt-kat.json"],
+      "kind": "kat",
+      "notes": "Pins the absent-salt extract (salt is the empty octet string, substituted with HashLen zero bytes) against a non-empty info string, mirroring the slots_mac HKDF call so the construction's zero-length salt is byte-exact rather than library-dependent."
+    },
+    {
       "vector_class": "Argon2id v1.3 KDF + fixed parameter constants",
       "area": "kdf",
       "files": ["argon2id-v13-kat.json", "argon2id-params-consts.json"],
@@ -63,11 +70,12 @@
       "files": [
         "mlkem768x25519-keygen-kat.json",
         "mlkem768x25519-encaps-kat.json",
+        "mlkem768x25519-encaps-deterministic-draft10-kat.json",
         "mlkem768x25519-decaps-kat.json",
         "mlkem768x25519-shake-expand-kat.json"
       ],
       "kind": "kat",
-      "notes": "X-Wing primitive output emitted byte-exact by the reference implementation; 1120-byte ciphertext and 1216-byte public key reproduced from pinned inputs."
+      "notes": "X-Wing primitive output emitted byte-exact by the reference implementation; 1120-byte ciphertext and 1216-byte public key reproduced from pinned inputs. The deterministic-draft10 file pins the full seed -> pk -> (eseed -> ct, ss) chain copied verbatim from draft-connolly-cfrg-xwing-kem-10 Appendix C."
     },
     {
       "vector_class": "Ed25519 signing/verification (RFC 8032 §7.1 Test 2 signer)",
@@ -118,23 +126,23 @@
     {
       "vector_class": "Seed-derive — recipient bech32 encodings (age X25519 + age1pqc X-Wing)",
       "area": "seed-derive",
-      "files": ["recipients-from-seed.json"],
+      "files": ["recipients-from-seed.json", "recipient-strings-kat.json"],
       "kind": "kat",
-      "notes": "Sealed-PoE recipient public-key encodings derived from seed; bech32 strings MUST match byte-exact."
+      "notes": "Sealed-PoE recipient public-key encodings; bech32 strings MUST match byte-exact. recipients-from-seed keys the encodings by identity seed; recipient-strings-kat keys them by raw public key (public key <-> exact string, both directions) and pins the HRP / visible-prefix distinction: HRP 'age' renders 'age1...', HRP 'age1pqc' renders 'age1pqc1...'."
     },
     {
       "vector_class": "Multi-recipient sealed-PoE wrap — x25519 KEM",
       "area": "sealed-poe",
       "files": ["wrap-n1-empty.json", "wrap-n3.json", "wrap-n32.json"],
       "kind": "kat",
-      "notes": "Per-slot epk + wrap, slots_mac, ciphertext for pinned inputs. AAD bindings: per-slot wrap = cardano-poe-kek-v1; content AAD = nonce || slots_mac."
+      "notes": "Per-slot epk + wrap, slots_mac, ciphertext for pinned inputs. slots_mac = HMAC-SHA-256(HKDF(CEK, info=cardano-poe-slots-mac-v1), slots_hash) where slots_hash = SHA-256(cardano-poe-slots-transcript-v1 || canonicalEncode(SLOTS_TRANSCRIPT)). Content is encrypted under payload_key = HKDF(CEK, salt=nonce, info=cardano-poe-payload-v1) with AAD = canonicalEncode(AD_CONTENT_SLOTS). Per-slot wrap AAD = cardano-poe-kek-v1. The classical epk/wrap are unchanged from the prior corpus; only slots_mac and ciphertext reflect the header-bound construction."
     },
     {
       "vector_class": "Multi-recipient sealed-PoE wrap — mlkem768x25519 (X-Wing) KEM",
       "area": "sealed-poe",
       "files": ["wrap-hybrid-n1.json", "wrap-hybrid-n3.json"],
       "kind": "kat",
-      "notes": "Per-slot kem_ct (reassembles to 1120 B) + wrap, slots_mac, ciphertext. AAD: per-slot wrap = cardano-poe-kek-mlkem768x25519-v1; content AAD = nonce || slots_mac. Bytes emitted byte-exact by the reference implementation at first release."
+      "notes": "Per-slot kem_ct (reassembles to 1120 B) + wrap, slots_mac, ciphertext. The hybrid KEK is salt-bound: KEK = HKDF(xwing_shared, salt=SHA-256(cardano-poe-xwing-kek-salt-v1 || kem_ct || pub_R), info=cardano-poe-kek-mlkem768x25519-v1), so the wrap binds the reassembled kem_ct and recipient public key. slots_mac and content AAD use the same header-bound construction as the classical path. kem_ct is byte-identical to the prior corpus; wrap, slots_mac, and ciphertext reflect the salt binding."
     },
     {
       "vector_class": "Multi-recipient sealed-PoE unwrap — round-trip + multi-private-key matching + rechunking",
@@ -143,6 +151,7 @@
         "unwrap-n1-empty.json",
         "unwrap-n3.json",
         "unwrap-n32.json",
+        "unwrap-duplicate-recipient.json",
         "unwrap-hybrid-rechunked.json",
         "unwrap-multipriv-current-match.json",
         "unwrap-multipriv-archived-match.json",
@@ -155,14 +164,42 @@
         "unwrap-multipriv-n32-k10-worst-case.json"
       ],
       "kind": "kat",
-      "notes": "Recovered plaintext = original; slot/private-key matching is deterministic given pinned inputs. Hybrid path adds the KEM_CT_LENGTH_MISMATCH pre-decapsulation guard."
+      "notes": "Recovered plaintext = original; slot/private-key matching is deterministic given pinned inputs. Hybrid path adds the KEM_CT_LENGTH_MISMATCH pre-decapsulation guard. unwrap-hybrid-rechunked pins kem_ct chunking-invariance: a non-canonical chunk layout reassembles to the same flat bytes and carries the same canonical slots_mac, while a byte-flipped twin fails slots_mac (TAMPERED_HEADER). unwrap-duplicate-recipient pins the legitimate same-recipient-in-two-slots case (fresh distinct ephemerals, same CEK): both slots recover the same CEK, so the CEK-conflict defence does NOT trip and the record decrypts — a verifier must keep decrypting honest recipient padding and reject only when two matching slots recover DIFFERENT CEKs."
+    },
+    {
+      "vector_class": "Sealed-PoE passphrase path — Argon2id KAT",
+      "area": "sealed-poe",
+      "files": ["passphrase-n1.json"],
+      "kind": "kat",
+      "notes": "CEK = Argon2id(normalize(passphrase), salt, params); payload_key = HKDF(CEK, salt=nonce, info=cardano-poe-payload-passphrase-v1); content AAD = canonicalEncode(AD_CONTENT_PASSPHRASE), which binds the argon2id salt/params and the cardano-poe-pw-norm-v1 normalization profile id (a scheme-fixed constant, never on the wire). Argon2id params are CI-cheap pins below the producer floor. Ciphertext bytes MUST be byte-identical across implementations."
+    },
+    {
+      "vector_class": "Sealed-PoE canonical transcript / AAD bytes",
+      "area": "sealed-poe",
+      "files": ["transcript-bytes.json"],
+      "kind": "encode-kat",
+      "notes": "Pins the exact canonicalEncode output of SLOTS_TRANSCRIPT (x25519 + mlkem768x25519), AD_CONTENT_SLOTS (both KEMs), and AD_CONTENT_PASSPHRASE, derived from the committed wrap-n3, wrap-hybrid-n1, and passphrase-n1 inputs. These byte strings are the message hashed into slots_hash and the AEAD AAD, so pinning them catches a cross-SDK canonical-encoding mismatch directly rather than only via a downstream slots_mac / AEAD-tag failure. Every emitted hex byte MUST match across implementations."
+    },
+    {
+      "vector_class": "Sealed-PoE hybrid KEK salt derivation",
+      "area": "sealed-poe",
+      "files": ["hybrid-kek-salt.json"],
+      "kind": "kat",
+      "notes": "Pins kek_salt = SHA-256(cardano-poe-xwing-kek-salt-v1 || kem_ct || pub_R) over the reassembled 1120-byte X-Wing ciphertext and the 1216-byte recipient public key, plus the resulting slots_mac and ciphertext. The salt MUST be byte-identical across implementations."
     },
     {
       "vector_class": "Sealed-PoE wrap/unwrap — negative (tamper detection)",
       "area": "sealed-poe",
       "files": ["wrap-negative.json", "unwrap-negative.json", "unwrap-multipriv-ac9-no-match.json"],
       "kind": "negative",
-      "notes": "Tampered slots_mac / wrap / ciphertext MUST be rejected identically across implementations."
+      "notes": "Tampered slots_mac / wrap / ciphertext MUST be rejected identically across implementations. unwrap-negative additionally pins the header-binding nonce-swap (TAMPERED_HEADER) and the per-slot KEK-reuse rejection (duplicate epk/kem_ct → ENC_SLOTS_DUPLICATE_KEM_MATERIAL)."
+    },
+    {
+      "vector_class": "Sealed-PoE construction negatives (header binding / all-zero shared / cross-path)",
+      "area": "sealed-poe",
+      "files": ["construction-negative.json"],
+      "kind": "negative",
+      "notes": "All-zero X25519 shared secret (the slot is treated as failed; no CEK recovered → WRONG_RECIPIENT_KEY), cross-path confusion (a slots-shaped record decrypted with a passphrase input, or vice versa, MUST be refused before any AEAD), and hybrid header-binding via nonce swap (TAMPERED_HEADER). The rejection verdict is pinned; envelope bytes are deterministic."
     },
     {
       "vector_class": "Record canonical CBOR — maximal record with extension keys",

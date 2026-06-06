@@ -1,7 +1,7 @@
 {
   "name": "maximal-record-with-extension-keys",
   "source": "project-authored — frozen cross-impl canonical-CBOR record vector",
-  "description": "Single maximal CIP-309 v1 record exercising items (two hashes + ar:// and ipfs:// uris + sealed x25519 enc envelope), merkle, supersedes, a detached Ed25519 sigs[0].cose_sign1, crit, and extension keys (x-note text, x-meta map). Frozen bytes are the byte oracle for cross-language SDK parity.",
+  "description": "Single maximal Label 309 v1 record exercising items (two hashes + ar:// and ipfs:// uris + sealed x25519 enc envelope), merkle, supersedes, a detached Ed25519 sigs[0].cose_sign1, crit, and extension keys (x-note text, x-meta map). Frozen bytes are the byte oracle for cross-language SDK parity.",
   "record": {
     "v": 1,
     "items": [

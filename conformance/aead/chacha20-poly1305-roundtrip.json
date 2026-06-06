@@ -36,7 +36,7 @@
       "expected_ciphertext_with_tag_hex": "d43e5637b11438195d13cb6323ae274c447b91a6c9e12cbbe767facac230313501e3048d6ea5c84a808107357e4bbd93e4870bb964e4cd3d24502f0e8808cac5d2cd313c0a28506d5e3af0b1dcab2747"
     },
     {
-      "name": "project-cip-309-shape-cek-wrap",
+      "name": "project-label-309-shape-cek-wrap",
       "key_hex": "fa0efefb62109667cd4e22e543bd2b654ca2447b78d260d34a5a10d5c1639b7c",
       "nonce_hex": "000000000000000000000000",
       "aad_hex": "63617264616e6f2d706f652d6b656b2d7631",

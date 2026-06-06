@@ -1,7 +1,7 @@
 {
   "version": 1,
   "primitive": "cose-sign1-build",
-  "source": "RFC 9052 §4.2 + §4.4 sig-01 + production CIP-309 record-level, in-signature-kid path",
+  "source": "RFC 9052 §4.2 + §4.4 sig-01 + production Label 309 record-level, in-signature-kid path",
   "vectors": [
     {
       "name": "rfc-9052-sig-01-embedded",
@@ -29,7 +29,7 @@
   "cardano_poe_vectors": [
     {
       "name": "cardano-poe-record-sig-v1-a2-in-signature-kid",
-      "source": "CIP-309 record-level path-1 in-signature-kid reference vector",
+      "source": "Label 309 record-level path-1 in-signature-kid reference vector",
       "signer_secret_key_hex": "4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb",
       "signer_public_key_hex": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
       "protected_header_int_int_pairs": [[1, -8]],
@@ -63,7 +63,7 @@
       "expected_sigs_entry_cbor_hex": "a16a636f73655f7369676e31825840845826a20127045820d04ab232742bb4ab3a1368bd4615e4e6d0224ab71a016baf8520a332c9778737a0f65840c2b1a45fbbe837991fd3146053a0f0f38251d8582d10cdd2728989f22806b7072659300f5b8a923e773e873e3fb75dc52cf000478159a8bb75f6f2726f4078c1090c"
     },
     {
-      "name": "label309-v2-sealed-self",
+      "name": "label309-sealed-self",
       "source": "KAT — sealed-self record body (single recipient, mirrors sealed-self wrap output)",
       "signer_secret_key_hex": "2222222222222222222222222222222222222222222222222222222222222222",
       "signer_public_key_hex": "a09aa5f47a6759802ff955f8dc2d2a14a5c99d23be97f864127ff9383455a4f0",

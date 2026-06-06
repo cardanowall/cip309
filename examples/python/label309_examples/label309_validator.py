@@ -108,6 +108,19 @@ REGISTERED_SIG_ENTRY_KEYS: set[str] = {"cose_sign1", "cose_key"}
 REGISTERED_MERKLE_COMMIT_KEYS: set[str] = {"alg", "root", "leaf_count", "uris"}
 KEM_ALGS: set[str] = {"x25519"}
 
+# Verifier resource bounds enforced before any KEM/AEAD primitive, so a
+# malformed envelope cannot drive unbounded work. Both are deployment-pinned
+# reference values (not wire fields); deployments MAY tighten them. They sit far
+# above the ~16 KiB Cardano transaction-metadata ceiling that bounds an honest
+# record, so a conformant record never trips them. The decoded-envelope measure
+# (nonce + slots_mac + per-slot (epk + wrap)) matches the sealed-PoE unwrap
+# layer's, so the two layers reject the same envelopes.
+MAX_SLOTS = 1024
+MAX_DECODED_ENVELOPE_BYTES = 65536
+_X25519_NONCE_LENGTH = 24
+_X25519_SLOTS_MAC_LENGTH = 32
+_X25519_PER_SLOT_BYTES = 32 + 48  # epk (32) + wrap (48)
+
 # === Result types ===
 
 
@@ -437,9 +450,54 @@ def _validate_encryption(enc: Any, path: list, issues: list) -> None:
             issues.append(
                 _issue(path + ["slots"], "ENC_SLOTS_EMPTY", "slots must be a non-empty array")
             )
+        elif len(slots) > MAX_SLOTS:
+            # Slot-count resource bound — reject before per-slot work; the byte
+            # backstop and duplicate pass are skipped (the array is rejected
+            # outright), matching the unwrap layer's early reject.
+            issues.append(
+                _issue(
+                    path + ["slots"],
+                    "ENC_SLOTS_TOO_MANY",
+                    f"slots length {len(slots)} exceeds MAX_SLOTS={MAX_SLOTS}",
+                )
+            )
         else:
+            # Per-slot KEK uniqueness: two slots sharing the same `epk` derive
+            # the same KEK and repeat a (KEK, zero-nonce) wrap, so a
+            # within-record duplicate is rejected before any KEM/AEAD primitive.
+            seen_epk: set[bytes] = set()
             for i, slot in enumerate(slots):
                 _validate_recipient_slot(slot, path + ["slots", i], issues)
+                if isinstance(slot, dict):
+                    epk = slot.get("epk")
+                    if isinstance(epk, (bytes, bytearray)) and len(epk) == 32:
+                        if bytes(epk) in seen_epk:
+                            issues.append(
+                                _issue(
+                                    path + ["slots", i, "epk"],
+                                    "ENC_SLOTS_DUPLICATE_KEM_MATERIAL",
+                                    f"slot {i} epk duplicates an earlier slot "
+                                    "— per-slot KEK uniqueness is violated",
+                                )
+                            )
+                        else:
+                            seen_epk.add(bytes(epk))
+            # Decoded-envelope byte backstop — the same aggregate the unwrap
+            # layer measures (nonce + slots_mac + len(slots) * (epk + wrap)).
+            decoded_envelope_bytes = (
+                _X25519_NONCE_LENGTH
+                + _X25519_SLOTS_MAC_LENGTH
+                + len(slots) * _X25519_PER_SLOT_BYTES
+            )
+            if decoded_envelope_bytes > MAX_DECODED_ENVELOPE_BYTES:
+                issues.append(
+                    _issue(
+                        path + ["slots"],
+                        "ENC_ENVELOPE_TOO_LARGE",
+                        f"decoded envelope size {decoded_envelope_bytes} exceeds "
+                        f"MAX_DECODED_ENVELOPE_BYTES={MAX_DECODED_ENVELOPE_BYTES}",
+                    )
+                )
 
     if has_slots_mac:
         slots_mac = enc["slots_mac"]

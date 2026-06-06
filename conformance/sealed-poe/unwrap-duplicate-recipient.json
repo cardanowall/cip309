@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "primitive": "sealed-poe-unwrap",
+  "source": "Same recipient public key in two slots with fresh distinct ephemerals carrying the same CEK. The per-slot epk differs, so the KEK-uniqueness gate is not tripped; both slots recover the same CEK. A verifier MUST decrypt normally (legitimate recipient padding); the CEK-conflict check rejects only DIFFERENT recovered CEKs.",
+  "vector": {
+    "name": "duplicate-recipient-2slots",
+    "recipient_secrets_hex": ["d0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedee61"],
+    "envelope": {
+      "scheme": 1,
+      "aead": "xchacha20-poly1305",
+      "kem": "x25519",
+      "nonce_hex": "e0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7",
+      "slots": [
+        {
+          "epk_hex": "53f5757ff07187e9e0635868f80bbe358e246053db581d3442785abd9123380b",
+          "wrap_hex": "3fd90f1f0a7a5eb24d329ce59c1c45b976b12352694fbd75d4ab1c78bac598eebd82d2afff27ab86f6e22f1cc04991ac"
+        },
+        {
+          "epk_hex": "c885eb35c38b33b25e84b2ada65be3c35d5a4cccbb24611439c0a819161dfe32",
+          "wrap_hex": "4ed8abb910b888e66db85ce9e0c17eb2ffd74f8f7ca934d64da37132940e2a25111d59189253e7790eb45c086c37293a"
+        }
+      ],
+      "slots_mac_hex": "c352c5546c30e262c457197e9db14d514124c752467a41552f0cdf3aacb37686"
+    },
+    "ciphertext_hex": "f626e4a1621cb79b70822b655cee5c0ccef964d3c9505488bedfea1c114b83027e13b9fd9c1e0366d7865d28b28ef5cf244354013d034622286c4d54b0db20",
+    "expected_plaintext_hex": "6475706c696361746520726563697069656e742c20667265736820657068656d6572616c732c2073616d652043454b"
+  }
+}

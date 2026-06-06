@@ -26,6 +26,19 @@ const AEAD_NONCE_LENGTHS: Record<string, number> = {
   'xchacha20-poly1305': 24,
 };
 
+// Verifier resource bounds enforced before any KEM/AEAD primitive, so a
+// malformed envelope cannot drive unbounded work. Both are deployment-pinned
+// reference values (not wire fields); deployments MAY tighten them. They sit
+// far above the ~16 KiB Cardano transaction-metadata ceiling that bounds an
+// honest record, so a conformant record never trips them. The decoded-envelope
+// measure (nonce + slots_mac + per-slot (epk + wrap)) matches the sealed-PoE
+// unwrap layer's, so the two layers reject the same envelopes.
+const MAX_SLOTS = 1024;
+const MAX_DECODED_ENVELOPE_BYTES = 65536;
+const X25519_NONCE_LENGTH = 24;
+const X25519_SLOTS_MAC_LENGTH = 32;
+const X25519_PER_SLOT_BYTES = 32 + 48; // epk (32) + wrap (48)
+
 // Registered content-hash algorithms (per Label 309 §4.10.2). `hashes` is a CBOR
 // map keyed by these identifiers; canonical CBOR map-key sort gives a single
 // byte-stable ordering. CBOR map-key uniqueness (RFC 8949 §3.1) guarantees
@@ -375,13 +388,57 @@ const EncryptionEnvelopeSchema = z
       });
     }
 
-    if (enc.slots !== undefined && enc.slots.length < 1) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['slots'],
-        message: `slots length ${enc.slots.length} < 1`,
-        params: { code: 'ENC_SLOTS_EMPTY' },
-      });
+    if (enc.slots !== undefined) {
+      const slotCount = enc.slots.length;
+      if (slotCount < 1) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['slots'],
+          message: `slots length ${slotCount} < 1`,
+          params: { code: 'ENC_SLOTS_EMPTY' },
+        });
+      } else if (slotCount > MAX_SLOTS) {
+        // Slot-count resource bound — reject before per-slot work; the byte
+        // backstop and duplicate pass are skipped (the array is rejected
+        // outright), matching the unwrap layer's early reject.
+        ctx.addIssue({
+          code: 'custom',
+          path: ['slots'],
+          message: `slots length ${slotCount} exceeds MAX_SLOTS=${MAX_SLOTS}`,
+          params: { code: 'ENC_SLOTS_TOO_MANY' },
+        });
+      } else {
+        // Per-slot KEK uniqueness: two slots sharing the same `epk` derive the
+        // same KEK and repeat a (KEK, zero-nonce) wrap, so a within-record
+        // duplicate is rejected before any KEM/AEAD primitive.
+        const seenEpk = new Set<string>();
+        enc.slots.forEach((slot, si) => {
+          if (slot.epk === undefined || slot.epk.length !== 32) return;
+          const key = Buffer.from(slot.epk).toString('hex');
+          if (seenEpk.has(key)) {
+            ctx.addIssue({
+              code: 'custom',
+              path: ['slots', si, 'epk'],
+              message: `slot ${si} epk duplicates an earlier slot — per-slot KEK uniqueness is violated`,
+              params: { code: 'ENC_SLOTS_DUPLICATE_KEM_MATERIAL' },
+            });
+          } else {
+            seenEpk.add(key);
+          }
+        });
+        // Decoded-envelope byte backstop — the same aggregate the unwrap layer
+        // measures (nonce + slots_mac + slotCount * (epk + wrap)).
+        const decodedEnvelopeBytes =
+          X25519_NONCE_LENGTH + X25519_SLOTS_MAC_LENGTH + slotCount * X25519_PER_SLOT_BYTES;
+        if (decodedEnvelopeBytes > MAX_DECODED_ENVELOPE_BYTES) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['slots'],
+            message: `decoded envelope size ${decodedEnvelopeBytes} exceeds MAX_DECODED_ENVELOPE_BYTES=${MAX_DECODED_ENVELOPE_BYTES}`,
+            params: { code: 'ENC_ENVELOPE_TOO_LARGE' },
+          });
+        }
+      }
     }
 
     // Key-path exclusivity: exactly one of (slots + slots_mac) or passphrase

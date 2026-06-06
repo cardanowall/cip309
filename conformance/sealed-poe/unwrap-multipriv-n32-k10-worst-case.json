@@ -151,9 +151,9 @@
           "wrap_hex": "bb838464bbd9f8061e65b9a0e77c6760dd76f125cf1b40f5e0b5310c99be283b2f94f58ad326d673030a6ef3b5c9b597"
         }
       ],
-      "slots_mac_hex": "95b40ab473fb5ba65d56d4fb0dcfc2032ebfa34b7f75dfac4cada562b2e44930"
+      "slots_mac_hex": "48aaa618f107bbdd2befbbe9ca40cc608869a46179abb08b9652464c5d80d2fc"
     },
-    "ciphertext_hex": "e0f9865914a398d8bab4e9bf5ef85f22b35ffd2c01e6d17855d93b210b4c239d40fd9fc90440ad17071fa76041602efe",
+    "ciphertext_hex": "fb88b66a8c40423c014557d3b6c3aae9a19398cdc1d96ec28866fddfe8a3aa85b875c8c57a28c2af820ace4cf51dbf2a",
     "expected_plaintext_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
     "expected_matching_priv_index": 9,
     "expected_outer_loop_count": 10,

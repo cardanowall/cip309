@@ -1,7 +1,7 @@
 {
   "version": 1,
   "primitive": "cose-sig-structure",
-  "source": "RFC 9052 §4.4 sig-01 + production CIP-309 record-sig-v1",
+  "source": "RFC 9052 §4.4 sig-01 + production Label 309 record-sig-v1",
   "vectors": [
     {
       "name": "rfc-9052-sig-01-empty-aad",

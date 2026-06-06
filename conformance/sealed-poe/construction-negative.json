@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "primitive": "sealed-poe-construction-negative",
+  "source": "Construction negatives: all-zero X25519 shared (slot treated as failed), cross-path confusion, and hybrid header-binding via nonce swap.",
+  "all_zero_shared_vectors": [
+    {
+      "name": "all-zero-x25519-shared",
+      "envelope": {
+        "scheme": 1,
+        "aead": "xchacha20-poly1305",
+        "kem": "x25519",
+        "nonce_hex": "202122232425262728292a2b2c2d2e2f3031323334353637",
+        "slots": [
+          {
+            "epk_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+            "wrap_hex": "1fd36933a83bf4f79d8bc3670f89e4312960c64beffcd756fdcb1df35bc496cf90e2bfa6f6311dae3c8f26342d0979ff"
+          },
+          {
+            "epk_hex": "edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+            "wrap_hex": "ae8b46fc2dfda54e970219aa4ea242e30a0b06ecae747a4986cf3d46851be6acbb92b1257bee4b612096d86c3ad4a1c2"
+          }
+        ],
+        "slots_mac_hex": "e1a3ab33624eec41b1bdc10217fd844a35bf42e4c5905e8359498c07318ce452"
+      },
+      "ciphertext_hex": "e5eef4b6e0b15e5042f9ebd58cc16880163b02efdacc105f57974e853f7490",
+      "recipient_secret_hex": "12131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f3031",
+      "expected_reason": "WRONG_RECIPIENT_KEY"
+    }
+  ],
+  "cross_path_vectors": [
+    {
+      "name": "cross-path-confusion",
+      "slots_envelope": {
+        "scheme": 1,
+        "aead": "xchacha20-poly1305",
+        "kem": "x25519",
+        "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+        "slots": [
+          {
+            "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
+            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+          }
+        ],
+        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+      },
+      "passphrase_envelope": {
+        "scheme": 1,
+        "aead": "xchacha20-poly1305",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 8,
+            "t": 1,
+            "p": 1
+          }
+        }
+      },
+      "note": "A slots-shaped record decrypted with a passphrase input, or a passphrase-shaped record decrypted with a recipient key, MUST be refused as WRONG_DECRYPTION_INPUT_SHAPE before any AEAD."
+    }
+  ],
+  "hybrid_header_binding_vectors": [
+    {
+      "name": "hybrid-header-binding-nonce-swap",
+      "envelope": {
+        "scheme": 1,
+        "aead": "xchacha20-poly1305",
+        "kem": "mlkem768x25519",
+        "nonce_hex": "999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb1",
+        "slots": [
+          {
+            "kem_ct_chunks_hex": [
+              "58e7b044acc18691807a68f2e4c6fd6032ed910b163dfa63625504c68b53a92cdd53af739911b8e9327cca615ff659b214736a55217d5d04beed46dfbe60aad8",
+              "974f4d1078f07f9239970615432b1289a53237d5a261c562a3bc112970d7c3a60146e6c073bef7b39159a6e34ce273b12f606b4b47ad82ff7f340f21ad9fb68c",
+              "460f7d43f9869eb47b4ca67d107a6a2b910446f8c306e311418a20e31dc920b8fa788dbb3b82a6d892f24c2444b5075c4d6211438d923dc1507431dafac04b67",
+              "ea92f2aac8e30394b6c0eed5cbb912cf3943599eb7a8f7ce71da2631e6923856a0f03225163685bfd7068789d6da52b740350e58535d0afa6e40f041d186e128",
+              "7dfa9f0914eade3c287dafee43e1d43e4f6adf7b3ec9a0b7f4a61c0c0ac282fb5ae32240ac73d034d63b295091aaa42896a7e028c5b63120b70e5e278744d773",
+              "b13c1aa9b7418e9a35f4888852101c2a38add7b0c629dc55fa5eb0fee58636257939613b4b0eb47b552536f68777d5356227c72c2565e895d8c56ff674f49dd3",
+              "28947bc7b77cef123cec4deddb11bab67c110d0e5eea0687fee38d48385f7557f11997c84200e55b724ff363f0bc15612da4a4b3871888436de585a3a70f9683",
+              "340fb08acd6049b34521f9286032fbbe6f406ebeed84f33464d94b4ea663f54f9cb376ceb1e1443a349d7c2b10c9a9c5eab89004ed81509c058560d685cbe948",
+              "2bccf98de861b1b90426f5c15cf0567d0d1084f84f788c2486ea4851e5c1701e799571d6618180144460574ac4544b3b6e3c9fee0af5185963ac06a4a554ca89",
+              "558932f26da4febd1fd0be846f1ea8c6ab5c377ccbd74939ce09a6149d69ea608b7d1dd741ba54bdfe48e66d5258365f3394520e9bd23d394cd798e107fe2869",
+              "650b526a905288549036f228a9dc3b20ca6cdf3a67d1778d81de6a08e40f2ed834e32eae0ee58f34232e5e2e6261c04d106f370d7f57bf6f403bcd63d5dfb093",
+              "6ff8b606f0355e6ba0a396f9700859c473551a58dc14ddb551c39f0208e2ceb19422de0b7c72d55d542b0b6f3f5cae4a9043fc2180dbec3ab812470a2a17c271",
+              "0f1eb1eb49beecf2a99133f00287140389ffeea46bac211262b0eed013646e8c28724b0b857b5e18492165673040d29123f565585cfeba2f8b6321bae528c95d",
+              "fc998b7abc89fbd05db9ddc627de7f2f86423fd0905fc870c5045dbe46b7039dbd25c5e14caf2e3582937482ac4a5c302b1f42478d3601aed6b5132d81f51d16",
+              "52e1bc4cd49a78c8f3f0d590275c6b9f8a1b95788cc9ccb53eb2e3fdd1cd81e20de51402859e6f4c8ef32d61d6c31d4b11125874223beb6273ea513aad2af97e",
+              "6f32baa7a104a8a48feddfd8fb2bb4a7ffffc7f6617525ef8068831b8751afd32c58c5ddd5273b985315f570ddc3ecd534026ffc4d951ac4e4a414830edb0f19",
+              "d5fc16ee0fdab6e422b21b743b481a790b1f10f4fe8976103466c62fe70f8699dc57e05b3fdb4f45b18bba1d60373353bfa3d6df3291e1eb2e9b7ca82395939b",
+              "d87a9cb8b89ec911ce8e7cc97cf61b6fc37936d237ee67f29956d89311301806"
+            ],
+            "wrap_hex": "b2f3bb1ac16cde36def6423fd6289882bef172a20cae29271796cc0a2ef1ae5d22002c4da1e0751b80f7513ad796b482"
+          }
+        ],
+        "slots_mac_hex": "9013c68260abc2b6d37eb01807d7c8df8ffb5324ba6a8aad6492f4c2afbb0ca9"
+      },
+      "ciphertext_hex": "bac69e0f779045b25cf7e3636c84bac3",
+      "recipient_seed_hex": "7070707070707070707070707070707070707070707070707070707070707070",
+      "expected_reason": "TAMPERED_HEADER"
+    }
+  ]
+}

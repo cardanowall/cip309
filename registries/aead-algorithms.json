@@ -6,7 +6,7 @@
       "identifier": "xchacha20-poly1305",
       "description": "XChaCha20-Poly1305 AEAD with an extended 24-byte nonce. The extended nonce permits random nonce generation per ciphertext without birthday-bound collision concerns. This is the sole wire-selectable content AEAD for sealed-PoE ciphertext.",
       "nonce_length_bytes": 24,
-      "reference": "RFC 8439 (ChaCha20 and Poly1305) and draft-irtf-cfrg-xchacha (XChaCha20 extended-nonce construction)"
+      "reference": "XChaCha20-Poly1305 (24-byte nonce), the extended-nonce construction of draft-irtf-cfrg-xchacha-03 (an IRTF CFRG Internet-Draft, not an RFC) over ChaCha20 and Poly1305 (RFC 8439)"
     }
   ]
 }

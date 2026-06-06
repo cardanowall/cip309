@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "primitive": "sealed-poe-passphrase",
+  "source": "Passphrase path: CEK = Argon2id(normalize(pw)); payload_key = HKDF(CEK, salt=nonce, info='cardano-poe-payload-passphrase-v1'); AAD = canonicalEncode(AD_CONTENT_PASSPHRASE). Argon2id params are CI-cheap pins; the normalization profile id is in the AAD only.",
+  "vector": {
+    "name": "passphrase-n1",
+    "passphrase": "correct horse battery staple",
+    "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+    "params": {
+      "m": 8,
+      "t": 1,
+      "p": 1
+    },
+    "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+    "plaintext_hex": "70617373706872617365207365616c6564207061796c6f6164",
+    "expected_ciphertext_hex": "6b4e8a97dff32f3cce144820dbe9803f51c80ef6d81c183883f91c92ffe6d0d1620ea79459d50d73be",
+    "expected_plaintext_hex": "70617373706872617365207365616c6564207061796c6f6164"
+  }
+}

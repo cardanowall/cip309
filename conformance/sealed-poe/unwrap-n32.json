@@ -1,7 +1,7 @@
 {
   "version": 1,
   "primitive": "sealed-poe-unwrap",
-  "source": "N=32 (reuses wrap-n32 envelope/ciphertext)",
+  "source": "reuses wrap-n32",
   "vector": {
     "name": "n32",
     "recipient_secrets_hex": [
@@ -173,9 +173,9 @@
           "wrap_hex": "3ed8bf5e6095fb902d9d12389ca72b453e5d33a6dd920b05256956c460583fd67079599b2c687bb85f20b7a340dbae29"
         }
       ],
-      "slots_mac_hex": "d1f1344b44d9f9a9e2f84183fe616ec41f07ad9d57c72715952a6f6da3790977"
+      "slots_mac_hex": "8baf8013baee2bf98229bf8ec3c414bb2dae287eec7d9d9d10811f65564f507a"
     },
-    "ciphertext_hex": "c040d86af7b68872469b0ae48b0454a6718ba6b0c27a233944b2ebca5fcb5b849a03517ab0f6d30a93a897bf31ce0dbf33bb6e95841af9061b3a594fda34747f638e3549c1e9261dd482f329ec8c54b0",
+    "ciphertext_hex": "c0f7aaa415dc675ab79838dd70466d9a10cb6903699fa7d92c4e58473b900bbcf44e9ac7b9d2846bfbcfc98fb1b620f5f573bd1d582454fe2d948d3316df92404131de1b1cc8fe5a7e0b21c469cce532",
     "expected_plaintext_hex": "d9276e2b667eab7476961a8a0d9e03041582bbe07eaa9c6298b7846a5e0095bdebfad10d096559c018b748f435acc6937d2a3a40663b48624d8d014cccb37a92"
   }
 }

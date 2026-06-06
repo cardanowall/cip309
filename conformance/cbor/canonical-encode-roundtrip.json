@@ -1,7 +1,7 @@
 {
   "version": 1,
   "primitive": "canonical-cbor-encode",
-  "source": "project-internal — anticipates the CIP-309 record encoder consumer",
+  "source": "project-internal — anticipates the Label 309 record encoder consumer",
   "vectors": [
     {
       "name": "map-ab-out-of-order-ac1",

@@ -1,11 +1,11 @@
 {
   "registry": "signature-algorithms",
-  "description": "Record-signature algorithm registry, keyed by COSE algorithm label as it appears in a COSE_Sign1 protected header. Record-level signatures are ALWAYS OPTIONAL in CIP-309: authorship is an opt-in claim, never required for a record to verify. A signature's COSE protected `alg` MUST name a registered label; any other label surfaces as SIGNATURE_UNSUPPORTED at info severity (it does not fail the record). Verification is strict, non-cofactored Ed25519 per RFC 8032 §5.1.7 regardless of which registered label is used. Additions are additive-only and must ship with conformance vectors.",
+  "description": "Record-signature algorithm registry, keyed by COSE algorithm label as it appears in a COSE_Sign1 protected header. Record-level signatures are ALWAYS OPTIONAL in Label 309: authorship is an opt-in claim, never required for a record to verify. A signature's COSE protected `alg` MUST name a registered label; any other label surfaces as SIGNATURE_UNSUPPORTED at info severity (it does not fail the record). Verification is strict, non-cofactored Ed25519 per RFC 8032 §5.1.7 regardless of which registered label is used. Additions are additive-only and must ship with conformance vectors.",
   "entries": [
     {
       "identifier": "EdDSA",
       "cose_alg_label": -8,
-      "description": "EdDSA, the curve-agnostic COSE label, pinned to Ed25519 by CIP-309. This is the mandatory baseline label that every conforming verifier MUST accept.",
+      "description": "EdDSA, the curve-agnostic COSE label, pinned to Ed25519 by Label 309. This is the mandatory baseline label that every conforming verifier MUST accept.",
       "curve": "Ed25519",
       "mandatory": true,
       "reference": "RFC 9053 §2.2 (CBOR Object Signing and Encryption — EdDSA) and RFC 8032 (Edwards-Curve Digital Signature Algorithm, Ed25519)"

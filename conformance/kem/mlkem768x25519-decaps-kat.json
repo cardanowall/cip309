@@ -1,7 +1,7 @@
 {
   "version": 1,
   "primitive": "mlkem768x25519",
-  "source": "https://github.com/RustCrypto/KEMs/blob/2425fe5a3380fcc125f01ae7662e467c8857148d/x-wing/src/test-vectors.json (draft-connolly-cfrg-xwing-kem-06)",
+  "source": "draft-connolly-cfrg-xwing-kem-10 (2026-03-02) Appendix C, enc + sk=seed -> ss. Byte-identical to the RustCrypto X-Wing draft-06 vector set (https://github.com/RustCrypto/KEMs/blob/2425fe5a3380fcc125f01ae7662e467c8857148d/x-wing/src/test-vectors.json), the secondary provenance these bytes were transcribed from; the construction is unchanged across draft revisions.",
   "vectors": [
     {
       "name": "rustcrypto-xwing-v06-vec0",

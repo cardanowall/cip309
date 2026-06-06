@@ -11,7 +11,7 @@
         "epk_length_bytes": 32,
         "wrap_length_bytes": 48
       },
-      "hrp": "age1",
+      "hrp": "age",
       "reference": "RFC 7748 (Elliptic Curves for Security, Curve25519)"
     },
     {
@@ -28,7 +28,7 @@
       "kem_ct_length_bytes": 1120,
       "combiner": "SHA3-256",
       "hrp": "age1pqc",
-      "reference": "draft-connolly-cfrg-xwing-kem-06 (X-Wing hybrid KEM), FIPS 203 (ML-KEM), RFC 7748 (X25519), and FIPS 202 (SHA3-256 combiner)"
+      "reference": "draft-connolly-cfrg-xwing-kem-10 (X-Wing hybrid KEM), FIPS 203 (ML-KEM), RFC 7748 (X25519), and FIPS 202 (SHA3-256 combiner)"
     }
   ]
 }

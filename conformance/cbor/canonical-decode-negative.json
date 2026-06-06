@@ -1,7 +1,7 @@
 {
   "version": 1,
   "primitive": "canonical-cbor-decode-negative",
-  "source": "RFC 8949 §8 + CIP-309 validator catalogue",
+  "source": "RFC 8949 §8 + Label 309 validator catalogue",
   "vectors": [
     {
       "name": "indefinite-array",
