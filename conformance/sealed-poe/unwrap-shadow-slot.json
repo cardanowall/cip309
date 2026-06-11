@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "primitive": "sealed-poe-unwrap",
+  "source": "Forged shadow slot placed BEFORE the honest slot: slot 0 wrap-opens under the recipient's key with an attacker-chosen CEK, but that CEK does not reproduce slots_mac, so the per-slot acceptance fold (kem_ok AND wrap_open_ok AND mac_ok) skips it and the honest slot 1 wins. A verifier MUST decrypt this envelope under the honest CEK; accepting a slot on wrap-open success alone is non-conformant.",
+  "vector": {
+    "name": "shadow-slot-before-honest",
+    "recipient_secrets_hex": [
+      "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff000102030405060708090a0b0c0d0e4f"
+    ],
+    "envelope": {
+      "scheme": 1,
+      "aead": "chacha20-poly1305-stream64k",
+      "kem": "x25519",
+      "nonce_hex": "404142434445464748494a4b4c4d4e4f5051525354555657",
+      "slots": [
+        {
+          "epk_hex": "7f888c953394d5839fa2f5d609e30c8de06c73abd5aaa0c4ffb5d0787836a154",
+          "wrap_hex": "f8e6979e545215872e519e9b1c273b64c1ad371230713475e084fcc29458ed4cdd00396c66151c351b74d0e57c2f38c6"
+        },
+        {
+          "epk_hex": "1a7971c6a03ba22392d97159a917f1a32e2490114279430547faff4fb841db27",
+          "wrap_hex": "740127e10b263a631da02252a769fcf0c9ac17d718a2314cfbaa018aa48569a7eba02584f98e54d71c127e10a26b53e3"
+        }
+      ],
+      "slots_mac_hex": "e632fd2f345d7de3fb7a6f061be74a6df9080ddb119d72388340700a20bb0a70"
+    },
+    "hashes": {
+      "sha2-256": "e4b430084a5f550acffdff383cc4e39c2e95f75f2ae7b73164cdd846d486bc74"
+    },
+    "ciphertext_hex": "98508174fcc26476a3a36fa17b52712eb678b8f256840adac5eb1425cdbed86d49bd37f2fad7662e04cfb9e93bcf02620b5aa97305591e9b8477afb030c4479f",
+    "expected_plaintext_hex": "736861646f7720736c6f7420697320696e65727420756e64657220746865207065722d736c6f74204d414320666f6c64",
+    "expected_matched_slot_idx": 1,
+    "attacker_cek_hex": "fefdfcfbfaf9f8f7f6f5f4f3f2f1f0efeeedecebeae9e8e7e6e5e4e3e2e1e0df",
+    "honest_cek_hex": "0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"
+  }
+}

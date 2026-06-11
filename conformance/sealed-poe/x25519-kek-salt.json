@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "primitive": "sealed-poe-x25519-kek-salt",
+  "source": "Pins kek_salt = SHA-256('cardano-poe-x25519-kek-salt-v1' || enc.nonce || epk || pub_R) and the per-slot KEK = HKDF-SHA-256(ikm=shared, salt=kek_salt, info='cardano-poe-kek-v1', L=32).",
+  "vector": {
+    "name": "x25519-kek-salt-n1",
+    "enc_nonce_hex": "303132333435363738393a3b3c3d3e3f4041424344454647",
+    "recipient_secret_hex": "6162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f80",
+    "recipient_public_hex": "244fe3b963e899dd295baffce248d3530f3a9a7479ba063002680ebfe7adad49",
+    "ephemeral_secret_hex": "636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182",
+    "epk_hex": "95d2b57c9f49b01106f95b1dd593d4ac11c9a7623bedd06f32d5e00bda17e90e",
+    "salt_label_ascii": "cardano-poe-x25519-kek-salt-v1",
+    "expected_kek_salt_hex": "1a5b94233b44453c51bbd75ec5ba164915032e7eba089ed0048274f0f9fea194",
+    "expected_kek_hex": "02d4ce7f26ddc9fe1de73f56b544d2560ca62b17f1393dd99b4e0b9164cb8ce9"
+  }
+}

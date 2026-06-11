@@ -1,15 +1,15 @@
 {
   "registry": "merkle-commitment-algorithms",
-  "description": "Merkle list-commitment algorithm registry. Each identifier names the tree construction used to compute the `root` of a `merkle[]` commitment, which lets one record commit to many content digests under a single on-chain root. The pinned `root_length_bytes` is the exact byte length the structural validator requires for the root under that identifier; any other length is a HASH_DIGEST_LENGTH_MISMATCH, and any unregistered identifier is an UNSUPPORTED_MERKLE_COMMIT_ALG. Additions are additive-only and must ship with conformance vectors.",
+  "description": "Merkle list-commitment algorithm registry. Each identifier names the tree construction used to compute the `root` of a `merkle[]` commitment, which lets one record commit to many content digests under a single on-chain root. List-commitment identifiers are disjoint from content-hash identifiers: a `merkle[i].alg` MUST be from this registry and MUST NOT be a content-hash identifier. The pinned `root_length_bytes` is the exact byte length the structural validator requires for the root under that identifier; any other length is a HASH_DIGEST_LENGTH_MISMATCH, and any identifier outside the registered set is an UNSUPPORTED_MERKLE_COMMIT_ALG. The registered identifier is OPT-INFO: a verifier that does not implement Merkle-fold reports each `merkle[i]` commitment as MERKLE_UNSUPPORTED (info severity, escalating to error on a merkle-only record) and validates the record's `items[i].hashes` content claim normally — a recognised identifier the verifier did not implement is MERKLE_UNSUPPORTED, never UNSUPPORTED_MERKLE_COMMIT_ALG. The REQUIRED `merkle[i].leaf_count` lets the structural validator reject an empty tree or an out-of-range count (SCHEMA_MERKLE_LEAF_COUNT_INVALID) with no off-chain bytes. Additions are additive-only and must ship with conformance vectors.",
   "entries": [
     {
       "identifier": "rfc9162-sha256",
-      "description": "Binary Merkle tree per the RFC 9162 Merkle Tree Hash, using SHA-256. Domain-separation prefixes are applied before hashing: a 0x00 byte prefixes each leaf input and a 0x01 byte prefixes each internal-node input, which prevents second-preimage attacks that swap a leaf for an internal node. The root is the SHA-256 output of the tree.",
+      "description": "Binary Merkle tree per the RFC 9162 §2.1.1 Merkle Tree Hash, using SHA-256. Domain-separation prefixes are applied before hashing: a 0x00 byte prefixes each leaf input and a 0x01 byte prefixes each internal-node input, which prevents second-preimage attacks that swap a leaf for an internal node. Each leaf is exactly 32 bytes; an empty tree is forbidden; for a single leaf the root is SHA-256(0x00 ‖ d_0), NOT the leaf itself — single-file PoE uses a content-hash identifier directly, never a 1-leaf tree. The root is the 32-byte SHA-256 output of the tree.",
       "root_length_bytes": 32,
       "leaf_domain_prefix": "0x00",
       "internal_domain_prefix": "0x01",
       "hash": "sha2-256",
-      "reference": "RFC 9162 §2.1.1 (Certificate Transparency v2.0, Merkle Tree definition)"
+      "reference": "RFC 9162 §2.1.1 (Certificate Transparency v2.0, Merkle Tree definition — a re-publication of RFC 6962 §2.1 with identical prefixes); the identifier is codepoint 1 of the IANA COSE Verifiable Data Structure Algorithms registry (draft-ietf-cose-merkle-tree-proofs)"
     }
   ]
 }

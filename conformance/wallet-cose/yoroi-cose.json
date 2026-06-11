@@ -1,10 +1,8 @@
 {
   "wallet": "yoroi",
-  "captured_at": "1970-01-01T00:00:00Z",
-  "wallet_version": "synthetic-placeholder",
-  "wallet_api_version": "synthetic-placeholder",
-  "browser_user_agent": "synthetic-placeholder",
+  "kind": "shape-vector",
   "cardano_network": "mainnet",
+  "note": "Synthetic deterministic shape-vector: it models the CIP-30 signData wire form of the path-2 (inline cose_key) signing path as this wallet family emits it. The byte shapes are the conformance contract; the bytes were produced from pinned test keys, not captured from a wallet build.",
   "record_body_cbor_hex": "a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
   "to_sign_bytes_hex": "63617264616e6f2d706f652d7265636f72642d7369672d7631a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
   "stake_addr_hex": "e1bababd8ecf577521a2b8bdc901d7549befe3ff01c71958da19dbc93b",

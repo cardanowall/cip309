@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "primitive": "seed-encoding",
+  "source": "Checksummed identity-seed encoding: the 32 seed bytes -> bech32 (BIP-173, classic, no length limit) under HRP 'l309-seed-' (the trailing hyphen is part of the HRP, so the bech32 separator renders the visible 'l309-seed-1...' prefix). Encoding returns the UPPERCASE display form 'L309-SEED-1...' (secrets are loud; visually distinct from lowercase recipient addresses); the all-lowercase form is equally valid input. Parsing accepts the bech32 form in a single case (mixed case rejected per BIP-173, checksum verified, payload exactly 32 bytes) and raw hex (64 hex digits, case-insensitive, tolerating a '0x' prefix and surrounding/internal whitespace). 'vectors' pins seed -> both encoded forms (encode MUST emit the uppercase string byte-exact; parse MUST accept both); 'parse_vectors' pins hex-tolerance inputs that MUST parse to the seed; 'negative_vectors' pins rejected inputs with their construction-API error code. The first three seeds are the pinned identity seeds (see seed-from-*.json); the wrong-HRP input is the seed-zero x25519 recipient from recipient-strings-kat.json.",
+  "vectors": [
+    {
+      "name": "seed-zero",
+      "seed_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+      "encoded": "L309-SEED-1QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQLFUN82",
+      "encoded_lowercase": "l309-seed-1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlfun82"
+    },
+    {
+      "name": "seed-ff",
+      "seed_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "encoded": "L309-SEED-1LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLSAHLZWA",
+      "encoded_lowercase": "l309-seed-1lllllllllllllllllllllllllllllllllllllllllllllllllllsahlzwa"
+    },
+    {
+      "name": "seed-deadbeef",
+      "seed_hex": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+      "encoded": "L309-SEED-1M6KMAM774KLWLH4DHMHAATD7AL02M0H0M6KMAM774KLWLH4DHMHSZSZA7U",
+      "encoded_lowercase": "l309-seed-1m6kmam774klwlh4dhmhaatd7al02m0h0m6kmam774klwlh4dhmhszsza7u"
+    },
+    {
+      "name": "seed-incrementing",
+      "seed_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "encoded": "L309-SEED-1QQQSYQCYQ5RQWZQFPG9SCRGWPUGPZYSNZS23V9CCRYDPK8QARC0SKAH38N",
+      "encoded_lowercase": "l309-seed-1qqqsyqcyq5rqwzqfpg9scrgwpugpzysnzs23v9ccrydpk8qarc0skah38n"
+    }
+  ],
+  "parse_vectors": [
+    {
+      "name": "hex-0x-prefix",
+      "input": "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+      "expected_seed_hex": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+    },
+    {
+      "name": "hex-uppercase",
+      "input": "DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF",
+      "expected_seed_hex": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+    },
+    {
+      "name": "hex-whitespace-padded",
+      "input": "  ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\n",
+      "expected_seed_hex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    },
+    {
+      "name": "hex-internal-whitespace",
+      "input": "00010203 04050607 08090a0b 0c0d0e0f 10111213 14151617 18191a1b 1c1d1e1f",
+      "expected_seed_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
+    }
+  ],
+  "negative_vectors": [
+    {
+      "name": "bad-checksum-char-flip",
+      "input": "l309-seed-1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlfun8q",
+      "expected_error_code": "SEED_STRING_BAD_CHECKSUM"
+    },
+    {
+      "name": "truncated-string",
+      "input": "l309-seed-1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqql",
+      "expected_error_code": "SEED_STRING_BAD_CHECKSUM"
+    },
+    {
+      "name": "mixed-case",
+      "input": "L309-seed-1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlfun82",
+      "expected_error_code": "SEED_STRING_MIXED_CASE"
+    },
+    {
+      "name": "wrong-hrp-age-recipient",
+      "input": "age1c5nucqtq8scv8pccm69lhjn275rrdy7pf6a4mnzzk0mn3807v4rs854kww",
+      "expected_error_code": "SEED_STRING_WRONG_HRP"
+    },
+    {
+      "name": "short-payload-31-bytes",
+      "input": "l309-seed-1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzvsyy9",
+      "expected_error_code": "SEED_STRING_WRONG_LENGTH"
+    },
+    {
+      "name": "oversize-payload-33-bytes",
+      "input": "l309-seed-1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqrsgrp2",
+      "expected_error_code": "SEED_STRING_WRONG_LENGTH"
+    },
+    {
+      "name": "hex-63-digits",
+      "input": "000000000000000000000000000000000000000000000000000000000000000",
+      "expected_error_code": "SEED_STRING_WRONG_LENGTH"
+    },
+    {
+      "name": "garbage",
+      "input": "not a seed, not even close",
+      "expected_error_code": "SEED_STRING_UNRECOGNIZED"
+    },
+    {
+      "name": "empty",
+      "input": "",
+      "expected_error_code": "SEED_STRING_UNRECOGNIZED"
+    }
+  ]
+}

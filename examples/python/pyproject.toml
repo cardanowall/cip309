@@ -1,20 +1,19 @@
 [project]
 name = "label-309-examples"
 version = "0.1.0"
-description = "Self-contained Python reference implementations of the Label 309 wire primitives. Byte-parity twin of the TypeScript examples; depends only on public cryptography libraries, not on any published SDK."
+description = "Runnable Python examples for the Label 309 Proof-of-Existence standard, driving the published reference SDK (cardanowall-sdk). Behavioural twin of the TypeScript examples."
 readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.11"
-authors = [{ name = "CardanoWall", email = "hello@cardanowall.com" }]
-keywords = ["label-309", "cardano", "proof-of-existence", "cbor", "cose", "reference-implementation"]
+keywords = ["label-309", "cardano", "proof-of-existence", "cbor", "cose", "examples"]
 
 dependencies = [
-  "cryptography>=44,<49",
-  "PyNaCl>=1.5,<2",
-  "cbor2>=5.6,<7",
-  "argon2-cffi>=23,<26",
-  "kyber-py==1.2.0",
-  "httpx>=0.28,<1",
+  # The reference SDK: wire format (cardanowall.poe_standard), standalone
+  # verifier (cardanowall.verifier), sealed-PoE encryption, seed-derived keys,
+  # and Merkle tooling. The range tracks the current published 0.x line; the
+  # examples are written against the same revision of the standard as the
+  # specification beside them.
+  "cardanowall-sdk>=0.3,<1",
 ]
 
 [project.optional-dependencies]
@@ -23,15 +22,13 @@ dev = [
   "mypy>=1.15,<3",
 ]
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[tool.hatch.build.targets.wheel]
-packages = ["label309_examples"]
+# Example scripts, not a distributable package: nothing is built or installed
+# beyond the dependencies above.
+[tool.uv]
+package = false
 
 # ---------------------------------------------------------------------------
-# Ruff — lint + format. Clean-project defaults for a small, auditable codebase.
+# Ruff — lint + format.
 # ---------------------------------------------------------------------------
 [tool.ruff]
 target-version = "py311"
@@ -48,26 +45,12 @@ select = [
   "SIM",  # flake8-simplify
   "RUF",  # ruff-specific
 ]
-# The reference impls deliberately catch broad exceptions at trust boundaries
-# (trial-decrypt non-matches, gateway failures) and return typed results rather
-# than propagate — that pattern is intentional, not a lint smell.
 ignore = [
-  "E501",   # long lines in pinned hex / comments are fine
-  "BLE001", # blind-except is intentional at the decrypt / fetch trust boundary
-  "B904",   # not every re-raise needs `from` in these reference snippets
-  "RUF005", # `path + [key]` reads clearer than `[*path, key]` in the validator
+  "E501", # long lines in pinned hex / table-style comments are fine
 ]
 
-[tool.ruff.lint.per-file-ignores]
-# Internal ML-KEM primitives are addressed by name on purpose; keep them visible.
-"label309_examples/mlkem768x25519.py" = ["SLF001"]
-"label309_examples/ecies_sealed_poe.py" = ["S101"]  # asserts document invariant lengths
-"label309_examples/off_host_sign.py" = ["S101"]
-"end_to_end.py" = ["S101", "T201"]
-
 # ---------------------------------------------------------------------------
-# Mypy — type-check the package. Third-party crypto libs ship partial stubs;
-# ignore missing imports rather than vendor stub packages.
+# Mypy — type-check the example scripts.
 # ---------------------------------------------------------------------------
 [tool.mypy]
 python_version = "3.11"

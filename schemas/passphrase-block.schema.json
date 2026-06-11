@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://label309.org/schemas/passphrase-block.schema.json",
   "title": "Label 309 passphrase block",
-  "description": "The passphrase-derivation block of a sealed-PoE envelope: a CLOSED CBOR map `{alg, salt, params}` describing how the content-encryption key is derived from a shared passphrase (instead of, and mutually exclusive with, per-recipient KEM slots). `alg` is the KDF identifier (open string; registry membership ENC_PASSPHRASE_ALG_UNSUPPORTED is a domain-pass check). `salt` is a 16..64-byte byte string (hex; below/above the bound emits ENC_PASSPHRASE_SALT_TOO_SHORT / ENC_PASSPHRASE_SALT_TOO_LONG). `params` is OPEN here (any map) — the validator narrows it on the registered `alg`. STRUCTURAL note: when `alg == argon2id`, `params` is the closed map `{m, t, p}` of CBOR unsigned integers; the memory/time/parallelism FLOORS (m >= 65536, t >= 3, p >= 1) and rejection of extra keys are domain-pass checks (ENC_PASSPHRASE_ARGON2_PARAMS_TOO_LOW / SCHEMA_UNKNOWN_FIELD), not asserted structurally here. The `argon2id-params` $def below documents that closed shape for reference.",
+  "description": "The passphrase-derivation block of a sealed-PoE envelope: a CLOSED CBOR map `{alg, salt, params}` describing how the content-encryption key is derived from a shared passphrase (instead of, and mutually exclusive with, per-recipient KEM slots). `alg` is the KDF identifier (open string; registry membership ENC_PASSPHRASE_ALG_UNSUPPORTED is a domain-pass check). `salt` is a 16..64-byte byte string (hex; below/above the bound emits ENC_PASSPHRASE_SALT_TOO_SHORT / ENC_PASSPHRASE_SALT_TOO_LONG). `params` is the CLOSED map `{m, t, p}` of CBOR unsigned integers, exactly as the grammar pins it for the registered alg (argon2id); extra keys are rejected (SCHEMA_UNKNOWN_FIELD). The memory/time/parallelism FLOORS (m >= 65536, t >= 3, p >= 1) and the deployment ceilings are domain-pass checks (ENC_PASSPHRASE_ARGON2_PARAMS_TOO_LOW / ENC_PASSPHRASE_PARAMS_EXCEED_POLICY), not asserted structurally. There is no on-chain MAC or verifier field on the passphrase path: the key commitment lives inside the ciphertext blob.",
   "type": "object",
   "additionalProperties": false,
   "required": ["alg", "salt", "params"],
@@ -16,21 +16,21 @@
       "pattern": "^([0-9a-f]{2}){16,64}$"
     },
     "params": {
-      "$comment": "Open here; validator narrows on `alg`. For argon2id this is the closed {m,t,p} unsigned-integer map (see $defs/argon2id-params).",
-      "type": "object"
-    }
-  },
-  "$defs": {
-    "argon2id-params": {
-      "title": "Argon2id parameters (reference shape for alg == argon2id)",
-      "description": "Closed map of CBOR unsigned integers. Floors (m >= 65536, t >= 3, p >= 1) are NOT asserted here — they are domain-pass checks (ENC_PASSPHRASE_ARGON2_PARAMS_TOO_LOW). Shown for documentation; not $ref'd by the permissive `params` above so the structural superset stays algorithm-agile.",
+      "title": "KDF parameters",
+      "description": "Closed map of CBOR unsigned integers (0 .. 2^32 − 1, exact-integer handling): `m` (memory cost, KiB), `t` (passes), `p` (parallelism).",
       "type": "object",
       "additionalProperties": false,
       "required": ["m", "t", "p"],
       "properties": {
-        "m": { "type": "integer", "minimum": 0 },
-        "t": { "type": "integer", "minimum": 0 },
-        "p": { "type": "integer", "minimum": 0 }
+        "m": {
+          "$ref": "defs.schema.json#/$defs/uint32"
+        },
+        "t": {
+          "$ref": "defs.schema.json#/$defs/uint32"
+        },
+        "p": {
+          "$ref": "defs.schema.json#/$defs/uint32"
+        }
       }
     }
   }

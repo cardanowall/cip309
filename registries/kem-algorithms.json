@@ -1,10 +1,10 @@
 {
   "registry": "kem-algorithms",
-  "description": "Key-encapsulation-mechanism registry. Each identifier names the KEM used to wrap a content-encryption key to a recipient and pins the exact recipient-slot shape. A slot is a closed 2-key map: the KEM's ciphertext-bearing field plus a 48-byte `wrap` (32-byte CEK + 16-byte AEAD tag). The validator branches on the descriptor for the declared `kem` to know which ciphertext field MUST be present (and at what reassembled length) and which MUST be absent; a slot carrying the other KEM's field, a stray key, or a wrong-length field is an ENC_SLOT_INVALID_SHAPE, a wrong-length ciphertext field is KEM_EPK_LENGTH_MISMATCH or KEM_CT_LENGTH_MISMATCH, a wrong-length wrap is WRAP_LENGTH_MISMATCH, and an unregistered identifier is an UNSUPPORTED_KEM_ALG. The `hrp` is the Bech32 human-readable prefix of the recipient public-key encoding for that KEM. Additions are additive-only and must ship with conformance vectors.",
+  "description": "Key-encapsulation-mechanism registry: the KEMs selectable on the wire via an encryption envelope's `kem` field. Each identifier names the KEM used to wrap a content-encryption key to a recipient and pins the exact recipient-slot shape. A slot is a closed 2-key map: the KEM's ciphertext-bearing field plus a 48-byte `wrap` (32-byte wrapped CEK + 16-byte AEAD tag). The validator branches on the descriptor for the declared `kem` to know which ciphertext field MUST be present (and at what byte length) and which MUST be absent; a slot carrying the other KEM's field, a stray key, or a missing field is an ENC_SLOT_INVALID_SHAPE, a wrong-length ciphertext field is KEM_EPK_LENGTH_MISMATCH or KEM_CT_LENGTH_MISMATCH, a wrong-length wrap is WRAP_LENGTH_MISMATCH, and duplicate encapsulation material within one `slots[]` is ENC_SLOTS_DUPLICATE_KEM_MATERIAL. An unregistered `enc.kem` follows the unknown-envelope rule: the envelope becomes opaque with ENC_UNSUPPORTED in the default public reading, and the recipient verifier / strict sealed-crypto mode rejects with UNSUPPORTED_KEM_ALG. The `hrp` is the Bech32 human-readable prefix of the recipient public-key encoding for that KEM. ml-kem-768 (standalone ML-KEM-768, without the X25519 hybrid wrapper) is reserved and not registered under v1. Additions are additive-only and must ship with conformance vectors.",
   "entries": [
     {
       "identifier": "x25519",
-      "description": "Classical ephemeral-static X25519 key agreement. Each slot carries the 32-byte ephemeral public key `epk`; there is no separate KEM ciphertext field.",
+      "description": "Classical ephemeral-static X25519 key agreement. Each slot carries the 32-byte ephemeral public key `epk`; there is no separate KEM ciphertext field. MANDATORY-to-implement for verifiers; producer-side it exists for recipients whose published key is X25519-only, and sealing with it is NOT RECOMMENDED where confidentiality must outlive the elliptic-curve era (harvest-now, decrypt-later).",
       "post_quantum": false,
       "default": false,
       "slot": {
@@ -16,12 +16,11 @@
     },
     {
       "identifier": "mlkem768x25519",
-      "description": "X-Wing hybrid KEM combining ML-KEM-768 (post-quantum) with X25519 (classical), with a SHA3-256 combiner binding both shared secrets. The hybrid post-quantum default: it remains secure if either component holds. Each slot carries the X-Wing KEM ciphertext `kem_ct` as a chunked byte-string array (each chunk 1..64 bytes) that MUST reassemble to exactly 1120 bytes; there is no per-slot `epk` on the hybrid path. The recipient public key is 1216 bytes. The human-readable prefix is age1pqc — NOT age1pq (which collides with an upstream native ML-KEM-768+X25519 encoding).",
+      "description": "X-Wing hybrid KEM combining ML-KEM-768 (post-quantum) with X25519 (classical), with a SHA3-256 combiner binding both shared secrets; it remains secure if either component holds. MANDATORY-to-implement and the RECOMMENDED producer default. Each slot carries the X-Wing KEM ciphertext `kem_ct` as a single 1120-byte byte string (ML-KEM-768 ciphertext 1088 bytes ‖ X25519 ephemeral public key 32 bytes); there is no per-slot `epk` on the hybrid path. The recipient public key is 1216 bytes (ML-KEM-768 encapsulation key 1184 bytes ‖ X25519 public key 32 bytes); the decapsulation key is a 32-byte seed (implicit-rejection KEM). The identifier spelling carries no internal hyphens, matching the X-Wing / age ecosystem, and is frozen on the byte behaviour of draft-connolly-cfrg-xwing-kem-10 — a byte-divergent successor revision enters this registry under a new identifier. The human-readable prefix is age1pqc — NOT age1pq (which collides with an upstream native ML-KEM-768+X25519 encoding).",
       "post_quantum": true,
       "default": true,
       "slot": {
         "kem_ct_length_bytes": 1120,
-        "kem_ct_chunk_length_bytes": "1..64",
         "wrap_length_bytes": 48
       },
       "pubkey_length_bytes": 1216,

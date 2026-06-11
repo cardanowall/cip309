@@ -1,0 +1,7 @@
+# Local environment + caches; the dependency range floats on the published
+# 0.x SDK line, so no lockfile is committed for these example scripts.
+.venv/
+uv.lock
+__pycache__/
+.mypy_cache/
+.ruff_cache/

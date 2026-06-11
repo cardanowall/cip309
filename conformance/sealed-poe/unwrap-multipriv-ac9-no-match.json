@@ -11,144 +11,147 @@
       "5454545454545454545454545454545454545454545454545454545454545454",
       "5555555555555555555555555555555555555555555555555555555555555555"
     ],
+    "hashes": {
+      "sha2-256": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd"
+    },
     "envelope": {
       "scheme": 1,
-      "aead": "xchacha20-poly1305",
+      "aead": "chacha20-poly1305-stream64k",
       "kem": "x25519",
       "nonce_hex": "b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9",
       "slots": [
         {
           "epk_hex": "06453fcd9cef5a1f53acc4f942104c0c8e9e27d5c7b37f5507cdcd1628105963",
-          "wrap_hex": "519eba8e2cb9ff1caffe0a5b586dcf15c00f138eb3cac200dd619edbb92670bb5a0950050158c919c70422834bf9b557"
+          "wrap_hex": "a855706731cf3dec5a40f51977bcf08531a42168489062a49bc3ecb8468cc759135c5d760c289f1705273e8bd3bf5010"
         },
         {
           "epk_hex": "7d34a4815fa6b982535e60af3bd9b49556816080f1641ff81d2b7c8ae8268a44",
-          "wrap_hex": "938e3a49f607ae2ceac208ad4478ac8b04c8967ea97104ba8e62bb30448749162be940299d846f46cce73e97dfd1e0fa"
+          "wrap_hex": "e5de0b46cf7cf83b4fcd80885f69f75e6aa3d18bf409dbcb4d53bb831f5e5aef133d9e3e70bbd02cb4736c8cc39757cd"
         },
         {
           "epk_hex": "0faa684ed28867b97f4a6a2dee5df8ce974e76b7018e3f22a1c4cf2678570f20",
-          "wrap_hex": "aa5098b287dbb987748dbb71db8bb395e06f614bf73766c75151253586b80a41370940871e4a317a70d64f49cc992286"
+          "wrap_hex": "89d6737d17898561c561e974fd8f88edce5eb861fdd8c7114920945cd05941f188719085c671f65a9a00661d726cd747"
         },
         {
           "epk_hex": "9a4503a98ab10fe8d354c9c42cbd0c9d7944f52e7d14d8ea59775e7dc9e3bf4b",
-          "wrap_hex": "f723d6684c4c9e68465ee6d337c18eedf85c6f3f9df304f0ba108336f4a86d60012c5f93cc99fa06b7c1488ba71b3eaa"
+          "wrap_hex": "c4cbabdae986184ae5706584a6ce50d1e459080aac61cde657382956e14cc994e3cdb75c127fcfeb1563d7874410aec7"
         },
         {
           "epk_hex": "04bcd2e0d00f2cce5fe8f1c6c2fbec5c07fa56e3aa5c88a5689975d88b3fce05",
-          "wrap_hex": "5fa39a9b03339b85b85b808364fa6c16ed4058beb021e6c988207ecb32a602a6c86881f18efaf0ff6a54b5b767a24acb"
+          "wrap_hex": "0cb7dec37f7c92114ea8c4a4039a0edaf74fb140b62ce357dc3d8f032260a3b9ec91a7337c9421f626ff7464b7e03146"
         },
         {
           "epk_hex": "3430e0014dd50b6127e4beb4eecc411591e061ef9792a317c36056191002b72f",
-          "wrap_hex": "b969bb600c1468149931c85da78cfa0175f7d84c33eba8828f486ebabf91b9520ca39ec295489665ff4fd438ce4486fd"
+          "wrap_hex": "d250ecd777a4b5ae398c7137a043e6ef83b2487fd70075cec35c85336a733f980010be5e19029f200214b76327c960af"
         },
         {
           "epk_hex": "920b867cb9471215b75421067517e5a9bd4677e1e1ce13a4c3b7d42d3386b864",
-          "wrap_hex": "14347960c2fec41f51ab0e65c374ed52419a2e929142b0562ad8499797d8a33c629003f2e57cd0dcfbb8fcd80282d150"
+          "wrap_hex": "9698f4f7390ba075115c1d91ac2fc1ab57675b1dd8b47c890418b47b4749ead51da0365830eaa08d98cc7f642741d618"
         },
         {
           "epk_hex": "c46a59ee2665151f8b187429ca63ec06dab9dad3750b38d70f7780e7b51f5e49",
-          "wrap_hex": "c6aee9f97aed3e99a288b7fa4e4a7bf5cc510b656fee33af99691d4e62b70ef49e7b58d4fe80deb2d8089655428e5bef"
+          "wrap_hex": "2421e5986f2853f080fceb4429257599d3b4aa26d2be1f4147f6eba3887e596de3359818796245ed2a9f5f2d651e61a4"
         },
         {
           "epk_hex": "4fa81de0dedc4ff02f8d8cffd486b7d2bd621e01b7813abcf2f4cd683828a54e",
-          "wrap_hex": "a72bb99e219bd7940a981e8d48d3a436e8065351f0dc4760705749c993c0a2deb5e2bf5f83eff5a06771368f5481428d"
+          "wrap_hex": "ca8a061b872cdc50ab02a89e0c60063bc1b9e61e5fd599769a465d85649a006c8e11d884a74f597094a58bd90998ac7d"
         },
         {
           "epk_hex": "17d7e2acd30bf5e19d861ae80988d17fae8f662f5d80b0053f6cc73cdab1d264",
-          "wrap_hex": "4038769ca56146759bf4c9c5c4f639c1d8a5fcb22266959dcb76fe15169272acb570132482560727b8d9f8d0b2d79feb"
+          "wrap_hex": "48ddfca511ad6f70086ae2d00ab55230edb08caf48e78a79567d69e5b138399f5a10939dec97595d320a55b3c2096ec9"
         },
         {
           "epk_hex": "07aaff3e9fc167275544f4c3a6a17cd837f2ec6e78cd8a57b1e3dfb3cc035a76",
-          "wrap_hex": "12b476d1e8b1548fa12981c69471af115eaecd5116c4e99743a2a40127f9bd550e44a0bc74176db58c4a6813c8eea8c2"
+          "wrap_hex": "f4600d763221104fbc03cf41927ca72ab8b152d3ff2ea71b438274d99df71830245d982c3949960f4e280d44a48f4002"
         },
         {
           "epk_hex": "45c7e0150b2d6ab9f25c8257194b1498c74222181369b5e1ff0d97a985159a53",
-          "wrap_hex": "370a76633bc2bca16b276eb80be9aa860316bab6ff9b4c65caf00c83dc35d8ec10d80e12f277f732e0db15112ee71ad7"
+          "wrap_hex": "8c0f6767f0c105ba9e442a15447a570ee139a6f59f7804524ad0b085ec5f894154a05c2833da84966a28b234e6af6e36"
         },
         {
           "epk_hex": "1007e3794a6e21990af2cfed48551a244f30d2f2e682882bacd96cbcb305dd03",
-          "wrap_hex": "a8a881d3a7e588ede00405ac0037368fab16fc2f2907721a60ee40d338c5ba92fc775b06c9e35f9da7417e34a1a7d615"
+          "wrap_hex": "d7af3e9260291824be89fa54972f716a78744564921a98efe7fb36856b7435248237581a3cb412b7980890198902d3c9"
         },
         {
           "epk_hex": "46fb1f6531de6edb8473bce2d66bd3f1c4da1b5c1ccc983b6a4ceacfef690f67",
-          "wrap_hex": "b65ef27d4e766c8cb187734aaa0c7e97331f6766994bc35db8caa9a8e706b1fece0835877cef74ab2ff28f4a408129b6"
+          "wrap_hex": "155f9ab4d09ac240a4bcd17dc8936ce761d0eee0caa9c517fad9f44cbec4d1f83551c97fe5b6d1c30c1d5b9c1d8ce127"
         },
         {
           "epk_hex": "6083833cf3c7caa89e1b9cad95491b0dbaa7e8f88ac93ee960d45eac913d7678",
-          "wrap_hex": "327d5f62c1b6b144665d0d637613ee7037d4f5d27c46017a7a57d99a8dc9666c38d8b0738e0a7afd947751bcc722f8f9"
+          "wrap_hex": "7e8a10918bdda987eb1eae21f5f3854b2e6dfd1195db35d7e7dc178373abbd621040eeff8ab6f9a4ff7a7090795451e5"
         },
         {
           "epk_hex": "7dc5e595dbb278dfdf2a01852d93344cdf30c7a6eb3a75336d897f15f4013f6d",
-          "wrap_hex": "964d1877b07fdefa4b9ff9459d72b9604e97fab723c8f359c7a06e5651d04bd244c5e0244a7e7e2763e02c7f5dc20e6f"
+          "wrap_hex": "2f12f389e400da73e87bc3a7705be92bb8a6a271b475b37f397d11910f50ab8b7fa02148123a1bd75d2e66b1bcba36ba"
         },
         {
           "epk_hex": "e50c239bc204f1341664c9d9c50c6a0d0fff6fc79d9301f1e713aab2e0344b3f",
-          "wrap_hex": "c618726e9dd0a9f8508e47337d96c5b3a31bd1ded67eb9224016bbbab5cd74b2f937b33389e5f257d25a7fc8a3625113"
+          "wrap_hex": "89c96a6d20183796af508b73b299010de55d177d9c8f09ef950932ee7f56f08364cfdaee5d1c2b4abb3b1b0a3e3945dc"
         },
         {
           "epk_hex": "04f5f29162c31a8defa18e6e742224ee806fc1718a278be859ba5620402b8f3a",
-          "wrap_hex": "2d9c82fa13e7cb79046106c508924f4c7933637dccd2f87a0ba0b24d4a4ff97a649fdbb7849b3e4245bd759440b02da9"
+          "wrap_hex": "51dc8d99bddd242f048cf10edea3d2446432441ab05cdce5205aadda89e1b5e07b571756e03afd719b8c93765da7619e"
         },
         {
           "epk_hex": "59d9225473451efffe6b36dbcaefdbf7b1895de62084509a7f5b58bf01d06418",
-          "wrap_hex": "3e4bb3eb68e1aab02f53eefe74118d0deead5362c14ff16e00a460b31ca653a2cbeb6c74ded925d104be6247475f7b2a"
+          "wrap_hex": "55c366f6d5c340f516c54419bd1b247e5a1b7e63d34247232b5d571486e67009fdd6cc999bcc19cc6b4dd36473bcfe05"
         },
         {
           "epk_hex": "7b0d47d93427f8311160781c7c733fd89f88970aef490d8aa0ee19a4cb8a1b14",
-          "wrap_hex": "a3c7521fefc9def0faca1901c2f80ba38a090a53b37c596963d0011030db0a5ac7954e827523bde379beab23ef8d42cd"
+          "wrap_hex": "97e2e9ac0d55f053e4dfddd31009c49b8bedcab9253a612d7f5d843f7793e841146b2eeb13ea3a849f048c641fbdfedd"
         },
         {
           "epk_hex": "ffc951aa6f2fa03096d1d1b579735b2f6f84019fe2f617aa65ff3d68705f2527",
-          "wrap_hex": "8db22a863ff4c891ab81a4f0509038cd6cee12a30148018e281431718f82a2db6ed621ab8965b4f25f476e9ca951b9e9"
+          "wrap_hex": "ddf19b48753f6c0f0459482fcbf778da1e1d4c7ff01dcbb05b3eb24589accbbb688616abf54a00b2988e00c2e3b4bdf4"
         },
         {
           "epk_hex": "627967ac833d07ad274bdfb6fb7ba2a336780e721e82f1447e859bf90a69ad62",
-          "wrap_hex": "d078fedd7c2288d5f7f3949a6f75aae619844072b8fbdeef1a178ba29b98020ed55b62b3d8310d6a41374d0a289bfb12"
+          "wrap_hex": "25da423ad84cb4166391841f2b06bd00d89ef00bb2bc125626daae78f53dc3a89fd5586704e238dd849042cdbe1a8e4e"
         },
         {
           "epk_hex": "e5cde2019dc0b3e464d3d8e12952426e0acca21beabd1e499fb0265bd1e9614d",
-          "wrap_hex": "434b81c587c127ef35898fcf16aa49cb8eae8274d5ce7dca4c40a3f6470d2240b183f7fef682bc64a7113001ef47926f"
+          "wrap_hex": "489a5e6069ff9befb2c06d6bef3b1d2085cdf29fc4dfca737bbf75406de848b01e1b3c5c8b9d07862a4c60b3111d9e32"
         },
         {
           "epk_hex": "b7565b6daf0749c27dcbc6f842c32cf217371165bc2d2505146b30d8b3536434",
-          "wrap_hex": "e8b160f21d1502a150d86286a9a2b43fced43a141a4891aeaa9187eb5efb924249a80acd25374987a34782585497971f"
+          "wrap_hex": "7414b499f5851db7a3281731655d0d89c3015ee5c4f3134e8017853d90f2a16ea8f5b809175e4051b509c7aaf91509de"
         },
         {
           "epk_hex": "95f3c97784c7a161c9e9b1c334384f625f0b9f872424ecf49d20ca8fc674fe42",
-          "wrap_hex": "806a4bcefabee94d09d7579249c2667fc19492cce1f8df34c7e75e86e65f521ab6e2965910d117468e6056c39dfccb8c"
+          "wrap_hex": "c8faae3ec59b6703481401cea1c266fd73262586557c82de5cdcb5f47c360f6fe753aed9ba38c22cf92f0c0056c44001"
         },
         {
           "epk_hex": "1f3e70a25b7f25ceccc7fe12233790573c95084b3e0f8f80738d33e50a6d6943",
-          "wrap_hex": "6b392cda68d3ff616089760230672d1b241dcbbd473f2f704b4032eee94c035d9faa6da49b1585807c53692ef36d4fbe"
+          "wrap_hex": "7013e0033604a95243effd2ac52b1234a4d13d2d12944707a9a68fa6bf024983bd10353fe053766cb4c404e477a4f268"
         },
         {
           "epk_hex": "0d43915fb4b40a2e9f111ae150197e643d39d000ec6977d28551a04caa189354",
-          "wrap_hex": "369c0c3a23b8ba6d1395fd90375d19358430572290d442a9971c5ac124881b8138d68f86f6393dba3552fd666478d37d"
+          "wrap_hex": "520d5dd17d47aa5cb0a3ca0f0a82433d5ea88ee155aae4270e8b2c98db18b98ebd4709df93358d17def4ab3742299ac5"
         },
         {
           "epk_hex": "437f462c58a8964fa718164019ee3dcaab6023db339c857ecd2a31a56b89d54e",
-          "wrap_hex": "30503299925c3bb8de36958825a1fc5e865e9279be968cecdb12047bd5612aef63b64664733554a950c8d5cd583b7a98"
+          "wrap_hex": "ff4ceb4d86e66bd41e7b2b3ccf8aa742f71965523df537541b006d6bd9fa96a3c25333a65b5f4f9f0efa095733e66f22"
         },
         {
           "epk_hex": "513f6639b3e84e8db530e84bba689373da3b6f3ecf45df32414738d58d792d66",
-          "wrap_hex": "6355eb9e8538522e6f0955d2daea35bb4db150309462b959973fa17fafdf605696be5d94fca2551013d921a016a7e213"
+          "wrap_hex": "687b3632701d1ccdf1faa30a005b0072bed26c81af4b4aea86410159cd6e61bf3dbcc249018ffde157511d5528ec48f1"
         },
         {
           "epk_hex": "41d9804a02dd08bf5e7b7e63024c3290dec5f8fcdef01bd02f016fb2a7ad5e0a",
-          "wrap_hex": "6817006436b36762bad99fd7a90062580cca7008ff3840b92ecf472a6ac0f010ec73efeb9fb358df0b2c7e56248cc3e1"
+          "wrap_hex": "66b82107cdf34c9f825402df4a9f0a64b1ed44b3413f15c1862102e6f4d37a44fd9d1a802be7b88918e6f9dc6f152a84"
         },
         {
           "epk_hex": "1fdaa2ca6f50b7ed41eb6f914cd90d869e97f7ec88306c4684bdc0228a448a4d",
-          "wrap_hex": "65d526300d2d972bad85bf939d955a5ee7987ef081655a1589537b020bfb7601a8629d55c7f1a4de9b49113fc0cd1870"
+          "wrap_hex": "9f2cbe7cff04fdbb66e5ae16d19a7361863a85f2ab0e004545519e6fe04d6d8f92a3dfa433108249def63b2383132347"
         },
         {
           "epk_hex": "8855b39f1b92789433851a5ce8348487ec0cf7dd7777b8b9c2673d6994de6745",
-          "wrap_hex": "3f29cce609b8fecdb356cd230e913c22d34813a9c369f7e6bb389fa503679ae85b9c6fecf42284df67485a73bfce6a12"
+          "wrap_hex": "8f2cffe680fbc21020d7705d367f49c61c7b90d9d22f7e8bfd6bfc4323bd3829060995d8c4486721cec948cb4a63ac57"
         }
       ],
-      "slots_mac_hex": "7c5c9e557459da726fc263e49c19c85e58055e6471cadfb9c7cf4e55f3fb5225"
+      "slots_mac_hex": "c2e976fb4bdd3efcba50f7cbf9badc84b29035d1ddc3fc92bbd4e5aee7902da6"
     },
-    "ciphertext_hex": "105fe5156908775b4aba8c3df3d88fcc44500dc5cca3854a10fa4e6b33f6bfa1dc22881d308537409aba9ec5b25cdc96",
+    "ciphertext_hex": "02f23513ca0ff4c7a8cf9e2b1c29b5cf2cc08821fed72819f645a64e9b82fb4ab61ab09276d0e899f3dfa7124cdd8cf7",
     "expected_plaintext_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
     "expected_matching_priv_index": null,
     "expected_outer_loop_count": 5,

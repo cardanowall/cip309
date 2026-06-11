@@ -1,7 +1,10 @@
 {
   "wallet": "typhon",
+  "kind": "shape-vector",
   "tamper_variant": "wrong-network-header",
-  "captured_from_positive_fixture": "typhon-cose.json",
+  "derived_from": "typhon-cose.json",
+  "cardano_network": "mainnet",
+  "note": "Shape-vector negative: the expected network header byte is derived from the containing transaction's network (mainnet, 0xe1), never echoed from the record; a testnet-headed (0xe0) address fails the full-29-byte comparison with WALLET_ADDRESS_MISMATCH.",
   "record_body_cbor_hex": "a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
   "to_sign_bytes_hex": "63617264616e6f2d706f652d7265636f72642d7369672d7631a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
   "tamper_signer_pubkey_hex": "486afa41c27005a491828da79a0fb9cf1498ee03cb339e3e14b70f06af20a623",

@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "primitive": "poe-record-enc-unsupported-roles",
+  "source": "Label 309 unknown-envelope rule \u2014 role-dependent dual-severity dispositions",
+  "description": "Each case pins one record body and two expected dispositions for the same bytes: `public` is the default public-verifier reading (the envelope degrades to opaque; ENC_UNSUPPORTED is info; the content-hash claim is still validated), `recipient_or_strict` is the recipient-verifier / strict-sealed-crypto-mode reading (ENC_UNSUPPORTED escalates to error and co-fires with the identifier-specific UNSUPPORTED_* code). Codes are listed sorted; implementations MUST emit exactly these sets at the stated severities.",
+  "vectors": [
+    {
+      "name": "enc-scheme-2-opaque",
+      "cbor_hex": "a2617601656974656d7381a263656e63a3626b31480101010101010101626b32666f706171756566736368656d650266686173686573a168736861322d32353658201111111111111111111111111111111111111111111111111111111111111111",
+      "expected_by_role": {
+        "public": {
+          "valid": true,
+          "error_codes": [],
+          "info_codes": ["ENC_UNSUPPORTED"]
+        },
+        "recipient_or_strict": {
+          "valid": false,
+          "error_codes": ["ENC_UNSUPPORTED", "UNSUPPORTED_ENVELOPE_SCHEME"],
+          "info_codes": []
+        }
+      },
+      "note": "An enc.scheme outside the supported set makes the whole envelope opaque in the public reading: the non-scheme-1 keys receive no shape validation, the item is tagged ENC_UNSUPPORTED (info), and the content-hash claim still validates. The recipient role and strict sealed-crypto mode reject instead, co-firing the scheme-specific code."
+    },
+    {
+      "name": "enc-kem-unregistered-opaque",
+      "cbor_hex": "a2617601656974656d7381a263656e63a6636b656d64703235366461656164781b63686163686132302d706f6c79313330352d73747265616d36346b656e6f6e6365581844444444444444444444444444444444444444444444444465736c6f747381a26365706b5005050505050505050505050505050505647772617048060606060606060666736368656d650169736c6f74735f6d61635820aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa66686173686573a168736861322d32353658201111111111111111111111111111111111111111111111111111111111111111",
+      "expected_by_role": {
+        "public": {
+          "valid": true,
+          "error_codes": [],
+          "info_codes": ["ENC_UNSUPPORTED"]
+        },
+        "recipient_or_strict": {
+          "valid": false,
+          "error_codes": ["ENC_UNSUPPORTED", "UNSUPPORTED_KEM_ALG"],
+          "info_codes": []
+        }
+      },
+      "note": "An unregistered enc.kem makes the envelope opaque in the public reading: no slot-shape or length rule is applied under an unknown KEM (the 16-byte epk and 8-byte wrap here MUST NOT surface KEM_EPK_LENGTH_MISMATCH / WRAP_LENGTH_MISMATCH). The strict reading rejects with the KEM-specific code."
+    },
+    {
+      "name": "enc-aead-unregistered-opaque",
+      "cbor_hex": "a2617601656974656d7381a263656e63a6636b656d6678323535313964616561646b6165732d3235362d67636d656e6f6e63654c44444444444444444444444465736c6f747381a26365706b582005050505050505050505050505050505050505050505050505050505050505056477726170583006060606060606060606060606060606060606060606060606060606060606060606060606060606060606060606060666736368656d650169736c6f74735f6d61635820aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa66686173686573a168736861322d32353658201111111111111111111111111111111111111111111111111111111111111111",
+      "expected_by_role": {
+        "public": {
+          "valid": true,
+          "error_codes": [],
+          "info_codes": ["ENC_UNSUPPORTED"]
+        },
+        "recipient_or_strict": {
+          "valid": false,
+          "error_codes": ["ENC_UNSUPPORTED", "UNSUPPORTED_AEAD_ALG"],
+          "info_codes": []
+        }
+      },
+      "note": "An authenticated but unregistered aead makes the envelope opaque in the public reading \u2014 the 12-byte nonce MUST NOT surface NONCE_LENGTH_MISMATCH, because no nonce-length rule exists under an unknown content format. Unauthenticated cipher families are the carve-out: they reject with UNAUTHENTICATED_CIPHER_FORBIDDEN in every role."
+    },
+    {
+      "name": "enc-scheme-2-content-hash-rule-still-applies",
+      "cbor_hex": "a2617601656974656d7381a263656e63a2626b3148010101010101010166736368656d650266686173686573a1636d64355077777777777777777777777777777777",
+      "expected_by_role": {
+        "public": {
+          "valid": false,
+          "error_codes": ["ENC_REQUIRES_CONTENT_HASH", "UNSUPPORTED_HASH_ALG"],
+          "info_codes": ["ENC_UNSUPPORTED"]
+        },
+        "recipient_or_strict": {
+          "valid": false,
+          "error_codes": [
+            "ENC_REQUIRES_CONTENT_HASH",
+            "ENC_UNSUPPORTED",
+            "UNSUPPORTED_ENVELOPE_SCHEME",
+            "UNSUPPORTED_HASH_ALG"
+          ],
+          "info_codes": []
+        }
+      },
+      "note": "ENC_REQUIRES_CONTENT_HASH inspects the item's hashes map, not the envelope, so it applies even when the envelope is opaque: an enc-bearing item with no registered content-hash key fails in every role."
+    }
+  ]
+}

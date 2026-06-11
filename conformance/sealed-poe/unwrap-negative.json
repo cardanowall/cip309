@@ -1,24 +1,27 @@
 {
   "version": 1,
   "primitive": "sealed-poe-unwrap-negative",
-  "source": "Structured-result and raise vectors over the wrap-n1-empty envelope. Includes the construction header-binding (nonce-swap → TAMPERED_HEADER) and per-slot KEK-reuse (duplicate epk → ENC_SLOTS_DUPLICATE_KEM_MATERIAL) negatives.",
+  "source": "Structured-result and raise vectors over the wrap-n1-empty envelope, plus the hybrid behavioural negatives (garbage kem_ct of valid length, wrong-recipient seed over the honest envelope, and a sibling-slot kem_ct flip proving slots_mac covers every slot's KEM material). Includes the hashes-splice rejection (an honest envelope under a different item hashes map fails slots_mac), the per-slot KEK-reuse rejection (duplicate epk → ENC_SLOTS_DUPLICATE_KEM_MATERIAL), the header-binding nonce swap (the nonce salts every per-slot KEK, so no slot opens), and the exact-length raises for both sides of the hybrid kem_ct check.",
   "matched_false_vectors": [
     {
       "name": "wrong-recipient",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
       "expected_reason": "WRONG_RECIPIENT_KEY"
     },
@@ -26,18 +29,21 @@
       "name": "tampered-slots-mac",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b030"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335170"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
       "expected_reason": "TAMPERED_HEADER"
     },
@@ -45,18 +51,21 @@
       "name": "tampered-ciphertext",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f990",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b0",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
       "expected_reason": "TAMPERED_CIPHERTEXT"
     },
@@ -64,37 +73,135 @@
       "name": "header-binding-nonce-swap",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151610",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
+      "expected_reason": "WRONG_RECIPIENT_KEY"
+    },
+    {
+      "name": "hashes-splice",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "kem": "x25519",
+        "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+        "slots": [
+          {
+            "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
+          }
+        ],
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
+      },
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "99682c172782000c577ed8d4994faf61d482e8e50a3d5fe9832874315659130e"
+      },
+      "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
+      "expected_reason": "TAMPERED_HEADER"
+    },
+    {
+      "name": "garbage-kem-ct-valid-length",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "kem": "mlkem768x25519",
+        "nonce_hex": "88898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
+        "slots": [
+          {
+            "kem_ct_hex": "030a11181f262d343b424950575e656c737a81888f969da4abb2b9c0c7ced5dce3eaf1f8ff060d141b222930373e454c535a61686f767d848b9299a0a7aeb5bcc3cad1d8dfe6edf4fb020910171e252c333a41484f565d646b727980878e959ca3aab1b8bfc6cdd4dbe2e9f0f7fe050c131a21282f363d444b525960676e757c838a91989fa6adb4bbc2c9d0d7dee5ecf3fa01080f161d242b323940474e555c636a71787f868d949ba2a9b0b7bec5ccd3dae1e8eff6fd040b121920272e353c434a51585f666d747b828990979ea5acb3bac1c8cfd6dde4ebf2f900070e151c232a31383f464d545b626970777e858c939aa1a8afb6bdc4cbd2d9e0e7eef5fc030a11181f262d343b424950575e656c737a81888f969da4abb2b9c0c7ced5dce3eaf1f8ff060d141b222930373e454c535a61686f767d848b9299a0a7aeb5bcc3cad1d8dfe6edf4fb020910171e252c333a41484f565d646b727980878e959ca3aab1b8bfc6cdd4dbe2e9f0f7fe050c131a21282f363d444b525960676e757c838a91989fa6adb4bbc2c9d0d7dee5ecf3fa01080f161d242b323940474e555c636a71787f868d949ba2a9b0b7bec5ccd3dae1e8eff6fd040b121920272e353c434a51585f666d747b828990979ea5acb3bac1c8cfd6dde4ebf2f900070e151c232a31383f464d545b626970777e858c939aa1a8afb6bdc4cbd2d9e0e7eef5fc030a11181f262d343b424950575e656c737a81888f969da4abb2b9c0c7ced5dce3eaf1f8ff060d141b222930373e454c535a61686f767d848b9299a0a7aeb5bcc3cad1d8dfe6edf4fb020910171e252c333a41484f565d646b727980878e959ca3aab1b8bfc6cdd4dbe2e9f0f7fe050c131a21282f363d444b525960676e757c838a91989fa6adb4bbc2c9d0d7dee5ecf3fa01080f161d242b323940474e555c636a71787f868d949ba2a9b0b7bec5ccd3dae1e8eff6fd040b121920272e353c434a51585f666d747b828990979ea5acb3bac1c8cfd6dde4ebf2f900070e151c232a31383f464d545b626970777e858c939aa1a8afb6bdc4cbd2d9e0e7eef5fc030a11181f262d343b424950575e656c737a81888f969da4abb2b9c0c7ced5dce3eaf1f8ff060d141b222930373e454c535a61686f767d848b9299a0a7aeb5bcc3cad1d8dfe6edf4fb020910171e252c333a41484f565d646b727980878e959ca3aab1b8bfc6cdd4dbe2e9f0f7fe050c131a21282f363d444b525960676e757c838a91989fa6adb4bbc2c9d0d7dee5ecf3fa01080f161d242b323940474e555c636a71787f868d949ba2a9b0b7bec5ccd3dae1e8eff6fd040b121920272e353c434a51585f666d747b828990979ea5acb3bac1c8cfd6dde4ebf2f900070e151c232a31383f464d545b626970777e858c939aa1a8afb6bdc4cbd2d9e0e7eef5fc030a11181f262d343b424950575e656c737a81888f969da4abb2b9c0c7ced5dce3eaf1f8ff060d141b222930373e454c535a61686f767d848b9299a0a7aeb5bcc3cad1d8dfe6edf4fb020910171e252c333a41484f565d646b727980878e959c",
+            "wrap_hex": "1b2fa2209e306d58fa5bbe8f65b45f890cd0301eef89185adcca246b8f3f8cdf18a0ca0d69fa0bbf48aa9a1d3981e45f"
+          }
+        ],
+        "slots_mac_hex": "82b4ae56737b78397656bd4c76cce872fccec495227f3d6112262507c9894a1c"
+      },
+      "ciphertext_hex": "7a24f629ae58334534f52299c0f0cf9e91996c88d050835b0caf134da788552e533c3344",
+      "hashes": {
+        "sha2-256": "0ba6e4b20520ef0adcadb0d0d9e04e3255f9606056c6f67b53167536ef67e61c"
+      },
+      "recipient_secret_hex": "5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c",
+      "expected_reason": "WRONG_RECIPIENT_KEY"
+    },
+    {
+      "name": "hybrid-wrong-recipient",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "kem": "mlkem768x25519",
+        "nonce_hex": "88898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
+        "slots": [
+          {
+            "kem_ct_hex": "b411a1865410e8a09b3fba2cab38b735e330280d97a0931ec9c3e08505cf0e3b117759485314480a7375ed3004455dd31760af95145d6d5bb369803c4ed3b5732b077e2e3a4629ddcd5d6bbb3adacfdbf8980ec53b8a869e6e3bfaabbf5666ae5870625bec494208e24682d9c842d6365b4be9af574393244209c23ba8239526f15e85d8058c56bc1a02adb9fcc511cbdca4902418809e8ff7c1035363b7267480d17f3a28b81901b1fa7c3fb22c574f86d2dcbfb5a9e2b5a86727170c77572429f900dde213d726c68e8c394faca4ec6bea04c9b582b0f74221f47db0a9666f993ef72e3ae50aba039c4384acbb03747ecaa13d84796e1cfbb8b93e219b9977f3b3cce1becfd2ae84d18597731b72cb0985c5ef6c58e4eddfa455842420683d66332f077d708c2d456da2de71490e269a466745422fb5a7afa8481fb34ce66e1c5910bc52554d05ee80986d0bfc5f3f7d305cbc64ff28d7fbdf66e7c31140f039bf1065b5f5b13e2517ea2cc1e1ada9cc7b15889f65f475f91212b371d63501fc95a4ed4e6487215714caf14cb3fd7afa6e5a908d9c8908bb79a4d925ebc0651525440f8084cc8f47df1bf189a57b623a96aa5ee8765a953a311d4b94b36b065c623da332fc56f3c9fb68b89bf0188bcbfb1cf2053f4c84dddc2f47e050e8e3dbb3f7f32eecbd137263a6a1cbdf687d865fcaab5fff4aec4d9690647c7c990b03923da495e3c768553af02a909fc1fe9fffac8f5f2e0d0b6fadb48cfde7b575712220059cca675063031881a3d908c0e8d6ef3113399f317b320c44c26be75763c288c414bd7e29f8356b3d545d7b4ac064262595106810234aea27ff05634b502fcf42b87b50d93a656b8aa4f9cde8b735c2e4ec0aefaf5302607c20fd4673d54d9aef91866ca3ba1f2c09a1805fd9ce1c7e607b12f205cba57cf392742fdb8c48e8372f2170a3defa21acc5fd703b579c4586de1b2b389bfc5b9a495142885be675fd597864d0b500b9cc56a4ff279b62fa93d893c5829ffd1556699410955ab77e1ed69cde07e177aff90fdcbb79443adee4c6cf563fff28282d7137b4788f7f5e5d578112bd1b72494290a64907c8d66b29c69262f191087f51f1c483a47d424b3328f8f90193503cee68c1a5ebf97210c5e81fdd27bece0c0b9586defc0f1f849f363fad8767eb59cdc17eb6063bcf81b17222e9c493b9e3ba62d868933468ad8ac12ddf05c7e2ffb7985845b3aac1ab9212547669a98d9267cb6d152101d31a5a83d8ab34de0f83b6a39ed59683ebbbcdc7694d29faa8d084fcfd73e84dac193e3a86b50e327e3b12dc2e63733f92bda4ff7c3d4f328b5257371363977365017d67752bd4faf3a6a82258f0bf8da523d6a2de1bb334ed21997b03173c57ea95e5b0f53305085744b39185147364cd23ac409ada4d82ac061a219ac7b113eda4077a86f448df73917c80189f235d75013e7a0ade3a2444d71e52a03500e1d9dd724c359b268aaecb6f1441559cf97cb78820d5deb46d96fbcc291daacc4eba782a2cb40e00bf2a5cb6cc0daf894fe096ee6f027006b5d0b65883d2bf29",
+            "wrap_hex": "1b2fa2209e306d58fa5bbe8f65b45f890cd0301eef89185adcca246b8f3f8cdf18a0ca0d69fa0bbf48aa9a1d3981e45f"
+          }
+        ],
+        "slots_mac_hex": "82b4ae56737b78397656bd4c76cce872fccec495227f3d6112262507c9894a1c"
+      },
+      "ciphertext_hex": "7a24f629ae58334534f52299c0f0cf9e91996c88d050835b0caf134da788552e533c3344",
+      "hashes": {
+        "sha2-256": "0ba6e4b20520ef0adcadb0d0d9e04e3255f9606056c6f67b53167536ef67e61c"
+      },
+      "recipient_secret_hex": "5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d5d",
+      "expected_reason": "WRONG_RECIPIENT_KEY"
+    },
+    {
+      "name": "hybrid-kem-ct-flip-sibling-slot",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "kem": "mlkem768x25519",
+        "nonce_hex": "a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbd",
+        "slots": [
+          {
+            "kem_ct_hex": "befda152a64a8bf9b09a062b291cf6495691e1bdc44137c2a6245215c287a292f99457e35add14ca0759db4226b20ba8d75f8fd6b3772ec58116fe49af007c8fcc36ed70d2ce1401f123dd97868f7ab2cd8d268512e9929d7f7305a29bc8a979c56e1895bd10a75f0d74a8083dc81bc84f22bfd869b941135e6e2d5f48117edf40413c635dd1ab6405f9b431fdb88b9ca5af66efb3bfe006d41070194f6cfb094bc6e5469d210bbaf5a68eaf1fc0399ee6c78dedd93f2c22c9376a5dccecb7c1a9c0c3d2007a419b797ce043b8ada01b11a87ac6041d4488d065d78fdaa409f6bec1f4f2f62abdc7e036e5684775f05ce6dc543c66cbd7e538a85f1bcb34528c79acde0cdf1626ee9d46faad57dcb7670f288dba2fffe8530638e8f44ac82d25fcd9a4857c73c824e24546f8c7ee1c94991c407c901c73996d014cf909504e5c02768e5613810c1e92705cdc154a96253d3aa1444ea137d0a64960062aa09b72f9b01c6a8670f774673423055292a65ff52c1acc506c7988a75985fcf6f7d8f8080b18c4d0d31d0b4024f50389001d339d394d978e75cceb142cf935a60789b7dbc4440660106f112774516ce59da97994d1f15009afe2a1ae6dc87e7c8566d7b8492748b788023e6902be96e953ccb2b3299839d4067e4dbc00390f3e786439d6dbee313b5d3410e63c089adf69533481d6b80f6c0c836917df986c94c6be1f8079aec19437e0608da5f66822860bce25f74c06851a6883177bb5138f55702316adf063e00ac02b365df64b0660da0f4db34cb9eb6c56bd0842c2e74af7e305c07ad7f4732214d7acba94d44f4928215263977d1afc1ab58bd0a6f0f0734d8d896a77560fe5f9be635175a50051305bc76aa7c6f252f2368fdbf022545f201650c655020218e0a2c09fa84e2a78139d5cf3503faf8662676e28e694fc99b1e6d35ac79ec38b2a6a678f70686d5a7236dc92412ddeafa976815342000b5d16021724736f32d7fab3f803fb28e36512d3036107b10ee3c1f5595a6123ba155f58a47504b784c17e86d862e74deb0cd02fde995152876709310be4f288ad31183a613f1fbf0580aaab87170d8814aaf1759d0803276021e0947d708ca3c9da99f809a72c5a2eeb8878cad1df4e64bf227c99fc1cb9c507107179058dd64614453978ab1fba77039fc65b09d9593d545f8812746511298f01385a9cac228ca3f2e07e012610925d2fb873987dec5673b463ef572ccec4374b85472656069c4dfeb4976a448aa7922b43003059092056625810a8f0283a6c87fa948ecea3accf6ea65d28148df588d95fb3de2a71b33a94ae4d4f29e480052fe47fbb5284d7625cddeee78c78ad35c8b447ff86b3304a516a9485be4149f4dd98c92eeafb64d9b2eb49c6038a3297378d3357ed97660c66fee2a6519f57381f22d15e0f91308be7ba2ed549266ba5f49adc2549c9057502a16f7dac96479ca6552f3a55f237f4ec0ad760896975d18c8aa2e2074d1607a16211e1f03eec4cc2fc77c8432c44fb8da96426856ea47bc6c1b6a712eff97e335b6eaa5a796f66618f230b8e75ab22e563",
+            "wrap_hex": "3e29336fb03daece96e2bec2ba8109ce8231a6761f17803550f5f4185f505b62f9040f38423fb0e03c8c55532a15e4f4"
+          },
+          {
+            "kem_ct_hex": "8945937adf2317d43ede1ebe8673989a2c10a943809334aef45b3957f9d5cb8eac19e67877da636128383eb5edc4609a1ae36cad53079c39bd701c6de01fd5295f8df3d93ee544a8674081ded5feeddecab635733e87b56bf93de7ba287242b0bad9fbfe25ea04aceb74321ec8015c9f0e5dbd2e3218667121fec07cd6239d63a85cc089dc4a06c5749196a2196f003ccbcd033b28a3f2747a93df9a72f33481ca8f2fa3c1c9decf739034999f1a224f39baf6eca7b6af5507f8dbad482c17ab34fd3e0371a615e439cc9043b5cabe3d036355ea7368b0da0461befeb8e8b15d9ae2e157d12712b450555aa0682be575d2b2cb85e39f07f121adcd220ce5aeef5206c857a74cc141f260c459f8ea3dc6896bab741b1eb939a6ecfb2819d7bd5ff1767a5606bba49182baabea22858224aa00c3a605647a88994984d2b1a3a50638407c705caaa37e55195d9212f0d7ac3cd7528c9ebc06861aa07f6d3796c18fe5f6e2139f1b3e84b361866a52b3e788e32a3113cb621604c8a7b89fe1a31e67e4420f4e61cb107edd3c1d7fcfc15ad9333664b87773ee1c2fc631cfabdf647a6b36582daf5de8762b395126b76c1849863bbe2f4b8d5114c4ea59d444897d66c05e72a9d4b9f82aadea216dfe78274de0757cf712d590615a90103cf1bc6fb6bbd68e21086372089b1a6b51e17e193ff3ca16ec5f6cf5dfb349370bca03cc54b0c5332c4ae00cc69fc0d651423fce4398b023e01d5e9452ccc5db06abf9c54f9fea5522a84d4c7583e113d18dfb308337fbb10284720520c57b552990986bb88c35c633d2df7b211a111aac3efade5079ee5d33d1dd0347e5d3a4faf908bc66ef05be0f0b70a40d0de00e6aeb0df0814c471940804233d3aeca4549d7d2487c8a27c757bf726fe3a054fb42ede238de6fcb1000068220a1143e603eda92f5b3dbc6a242f420fe3589db058929f47a5f55179986b67a4a2b395b9b21146aa5092448f486710559360f635f3dae96497a4e9441f53e55438aa0f586b15ad652c87885493887eea484dcfae8a985696d7fb5640edc1e68f06cc623da0974da67def25241df3bbb0fd380e43da0026057ab4f136947f3cde3a0d081d4619f86af8324ea6a099e4e0414e8e03afef76dd7f95479754a72e26d9e74ac9dd25461b6b54f1f8c8c1df7ea3e0a851693997a10a0f667fa97c57d3f7c82e4bd5b8b5d6abd1a914bd810bbda5568df4e0033285312fd74cd724810fdb269b56cb3a7a8e7841bf0c776534fbd8ef0f4c3a7e75af0ef86b41a5f3d537532beeda9f81c84a913cd076123c641fe1b7482e25fcb6628849693a251b200c76c0ee4352ce64517db1442b68e792215444f701fabd4b20638306b1433d74e3d322904c1e7eadb2b46134cc4df32ea6ff0693dfb1b3c4c5d4898acfc750b1bc1338871e110a8e63db0288b8bf43dfb05519ef3198a8bb33deb3407796fb6f001ca2ff8ddc6dde7fe8b6193a44bc6c56bb2dd528b9d30183b4781905e075979a81331faa62a5371dd80e0895c817d5f67cd017f0a910a933f63da967f5ba99792b789c4d75675c31950",
+            "wrap_hex": "957848701ede0c4b8703dee79f29a4bbd4e3919be9e247cbf2ffd666438591c2de69f2c6100eec3289c37cf030aa70ab"
+          }
+        ],
+        "slots_mac_hex": "53fa05d64a4e53d98b09fd41537a54b6937a3bc1b8672ec939726514e8ec6a55"
+      },
+      "ciphertext_hex": "a80732824cb1d24bf198825a2d06b9878e97458d69333ff5683255ab1ca14b3428e6cb0c1a1d37c705",
+      "hashes": {
+        "sha2-256": "de62cf945a02e9fabb78468edd2d9a9000053b0a8e64b66b0d3ae0a9c41d0397"
+      },
+      "recipient_secret_hex": "5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
       "expected_reason": "TAMPERED_HEADER"
     },
     {
       "name": "multipriv-mac-fail",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4",
         "slots": [
           {
             "epk_hex": "acfcd7eae2ed3aa827c452b9dbc816ef68435336cac2ccbb643f021f54b75c45",
-            "wrap_hex": "2d366efff43a9e7d538a756a04b9f8a2c4d69a730a2f427edbcd85fd6042a4e0d85872477f6f4b44a89df7731ae62a82"
+            "wrap_hex": "46f01274b401974f65de07d86b2dc08d17abe5e3bf6a3eb148c43d3a955d9984320411e3e9d4fe9ecbe9d0b4d65f361a"
           }
         ],
-        "slots_mac_hex": "7ed87bf211ec77becd2ea96a20c75f7e588cd02931f96863a2594e622ae1c24b"
+        "slots_mac_hex": "d657136e2090113f6dbdced7fc26785209a99112495310a9d714453599bbbd44"
       },
-      "ciphertext_hex": "defcc239d3f1ea417132928a0f589647ef020eb39b182c9bbfd957907749d076",
+      "hashes": {
+        "sha2-256": "be45cb2605bf36bebde684841a28f0fd43c69850a3dce5fedba69928ee3a8991"
+      },
+      "ciphertext_hex": "5490a67c0c5cc9970d6aab08509ed452e40de7535f73f8dd42059bedf7604226",
       "recipient_secret_keys_hex": [
         "5555555555555555555555555555555555555555555555555555555555555555",
         "6666666666666666666666666666666666666666666666666666666666666666",
@@ -108,37 +215,43 @@
       "name": "scheme-not-1",
       "envelope": {
         "scheme": 2,
+        "aead": "chacha20-poly1305-stream64k",
+        "kem": "x25519",
+        "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
+        "slots": [
+          {
+            "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
+          }
+        ],
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
+      },
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
+      "expected_error_code": "UNSUPPORTED_ENVELOPE_SCHEME"
+    },
+    {
+      "name": "aead-unknown",
+      "envelope": {
+        "scheme": 1,
         "aead": "xchacha20-poly1305",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
-      "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
-      "expected_error_code": "UNSUPPORTED_ENC_VERSION"
-    },
-    {
-      "name": "aead-unknown",
-      "envelope": {
-        "scheme": 1,
-        "aead": "xsalsa20-poly1305",
-        "kem": "x25519",
-        "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
-        "slots": [
-          {
-            "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
-          }
-        ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
       "expected_error_code": "UNSUPPORTED_AEAD_ALG"
     },
@@ -146,18 +259,21 @@
       "name": "kem-unknown",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "kyber768",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
       "expected_error_code": "UNSUPPORTED_KEM_ALG"
     },
@@ -165,13 +281,16 @@
       "name": "n0-empty-slots",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
         "slots": [],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
       "expected_error_code": "ENC_SLOTS_EMPTY"
     },
@@ -179,18 +298,21 @@
       "name": "nonce-23b",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f10111213141516",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
       "expected_error_code": "NONCE_LENGTH_MISMATCH"
     },
@@ -198,18 +320,21 @@
       "name": "slots-mac-31b",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b0"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf3351"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
       "expected_error_code": "ENC_SLOTS_MAC_INVALID_LENGTH"
     },
@@ -217,18 +342,21 @@
       "name": "epk-33b",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f00",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
       "expected_error_code": "KEM_EPK_LENGTH_MISMATCH"
     },
@@ -236,18 +364,21 @@
       "name": "wrap-47b",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfe"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a0256"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
       "expected_error_code": "WRAP_LENGTH_MISMATCH"
     },
@@ -255,18 +386,21 @@
       "name": "priv-31b",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
       "expected_error_code": "INVALID_RECIPIENT_KEY"
     },
@@ -274,30 +408,77 @@
       "name": "duplicate-epk-kek-reuse",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000102030405060708090a0b0c0d0e0f1011121314151617",
         "slots": [
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           },
           {
             "epk_hex": "4c2817a9d668ed844d2f95b93b69ecb8485095783a015a424164b0d09702894f",
-            "wrap_hex": "6aaf595503a232e05e6a26f01c279ffe04223fdb5930d61000274272be6263895ec2a49b7f456d2a7b9a6995f2cbfebf"
+            "wrap_hex": "ab146d75a0d33f466537b34a6d3d4b4cb6a82bf3061c28820e258889bc24bc91b92217d2b83de84a3719b1608a025696"
           }
         ],
-        "slots_mac_hex": "0c99498dc5f43af6725d819bed4205ba4c15028a1369475905bbc3564784b033"
+        "slots_mac_hex": "d832ec6269f3d598fdf123132a0b9e50c66748d4e4ffed20b871da3abf335178"
       },
-      "ciphertext_hex": "b92701723fdcbb4080601c880a33f99c",
+      "ciphertext_hex": "b89b263709c327610d744b77307355b5",
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "recipient_secret_hex": "a0a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a161",
       "expected_error_code": "ENC_SLOTS_DUPLICATE_KEM_MATERIAL"
+    },
+    {
+      "name": "kem-ct-1119b",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "kem": "mlkem768x25519",
+        "nonce_hex": "88898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
+        "slots": [
+          {
+            "kem_ct_hex": "b411a1865410e8a09b3fba2cab38b735e330280d97a0931ec9c3e08505cf0e3b117759485314480a7375ed3004455dd31760af95145d6d5bb369803c4ed3b5732b077e2e3a4629ddcd5d6bbb3adacfdbf8980ec53b8a869e6e3bfaabbf5666ae5870625bec494208e24682d9c842d6365b4be9af574393244209c23ba8239526f15e85d8058c56bc1a02adb9fcc511cbdca4902418809e8ff7c1035363b7267480d17f3a28b81901b1fa7c3fb22c574f86d2dcbfb5a9e2b5a86727170c77572429f900dde213d726c68e8c394faca4ec6bea04c9b582b0f74221f47db0a9666f993ef72e3ae50aba039c4384acbb03747ecaa13d84796e1cfbb8b93e219b9977f3b3cce1becfd2ae84d18597731b72cb0985c5ef6c58e4eddfa455842420683d66332f077d708c2d456da2de71490e269a466745422fb5a7afa8481fb34ce66e1c5910bc52554d05ee80986d0bfc5f3f7d305cbc64ff28d7fbdf66e7c31140f039bf1065b5f5b13e2517ea2cc1e1ada9cc7b15889f65f475f91212b371d63501fc95a4ed4e6487215714caf14cb3fd7afa6e5a908d9c8908bb79a4d925ebc0651525440f8084cc8f47df1bf189a57b623a96aa5ee8765a953a311d4b94b36b065c623da332fc56f3c9fb68b89bf0188bcbfb1cf2053f4c84dddc2f47e050e8e3dbb3f7f32eecbd137263a6a1cbdf687d865fcaab5fff4aec4d9690647c7c990b03923da495e3c768553af02a909fc1fe9fffac8f5f2e0d0b6fadb48cfde7b575712220059cca675063031881a3d908c0e8d6ef3113399f317b320c44c26be75763c288c414bd7e29f8356b3d545d7b4ac064262595106810234aea27ff05634b502fcf42b87b50d93a656b8aa4f9cde8b735c2e4ec0aefaf5302607c20fd4673d54d9aef91866ca3ba1f2c09a1805fd9ce1c7e607b12f205cba57cf392742fdb8c48e8372f2170a3defa21acc5fd703b579c4586de1b2b389bfc5b9a495142885be675fd597864d0b500b9cc56a4ff279b62fa93d893c5829ffd1556699410955ab77e1ed69cde07e177aff90fdcbb79443adee4c6cf563fff28282d7137b4788f7f5e5d578112bd1b72494290a64907c8d66b29c69262f191087f51f1c483a47d424b3328f8f90193503cee68c1a5ebf97210c5e81fdd27bece0c0b9586defc0f1f849f363fad8767eb59cdc17eb6063bcf81b17222e9c493b9e3ba62d868933468ad8ac12ddf05c7e2ffb7985845b3aac1ab9212547669a98d9267cb6d152101d31a5a83d8ab34de0f83b6a39ed59683ebbbcdc7694d29faa8d084fcfd73e84dac193e3a86b50e327e3b12dc2e63733f92bda4ff7c3d4f328b5257371363977365017d67752bd4faf3a6a82258f0bf8da523d6a2de1bb334ed21997b03173c57ea95e5b0f53305085744b39185147364cd23ac409ada4d82ac061a219ac7b113eda4077a86f448df73917c80189f235d75013e7a0ade3a2444d71e52a03500e1d9dd724c359b268aaecb6f1441559cf97cb78820d5deb46d96fbcc291daacc4eba782a2cb40e00bf2a5cb6cc0daf894fe096ee6f027006b5d0b65883d2bf",
+            "wrap_hex": "1b2fa2209e306d58fa5bbe8f65b45f890cd0301eef89185adcca246b8f3f8cdf18a0ca0d69fa0bbf48aa9a1d3981e45f"
+          }
+        ],
+        "slots_mac_hex": "82b4ae56737b78397656bd4c76cce872fccec495227f3d6112262507c9894a1c"
+      },
+      "ciphertext_hex": "7a24f629ae58334534f52299c0f0cf9e91996c88d050835b0caf134da788552e533c3344",
+      "hashes": {
+        "sha2-256": "0ba6e4b20520ef0adcadb0d0d9e04e3255f9606056c6f67b53167536ef67e61c"
+      },
+      "recipient_secret_hex": "5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c",
+      "expected_error_code": "KEM_CT_LENGTH_MISMATCH"
+    },
+    {
+      "name": "kem-ct-1121b",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "kem": "mlkem768x25519",
+        "nonce_hex": "88898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f",
+        "slots": [
+          {
+            "kem_ct_hex": "b411a1865410e8a09b3fba2cab38b735e330280d97a0931ec9c3e08505cf0e3b117759485314480a7375ed3004455dd31760af95145d6d5bb369803c4ed3b5732b077e2e3a4629ddcd5d6bbb3adacfdbf8980ec53b8a869e6e3bfaabbf5666ae5870625bec494208e24682d9c842d6365b4be9af574393244209c23ba8239526f15e85d8058c56bc1a02adb9fcc511cbdca4902418809e8ff7c1035363b7267480d17f3a28b81901b1fa7c3fb22c574f86d2dcbfb5a9e2b5a86727170c77572429f900dde213d726c68e8c394faca4ec6bea04c9b582b0f74221f47db0a9666f993ef72e3ae50aba039c4384acbb03747ecaa13d84796e1cfbb8b93e219b9977f3b3cce1becfd2ae84d18597731b72cb0985c5ef6c58e4eddfa455842420683d66332f077d708c2d456da2de71490e269a466745422fb5a7afa8481fb34ce66e1c5910bc52554d05ee80986d0bfc5f3f7d305cbc64ff28d7fbdf66e7c31140f039bf1065b5f5b13e2517ea2cc1e1ada9cc7b15889f65f475f91212b371d63501fc95a4ed4e6487215714caf14cb3fd7afa6e5a908d9c8908bb79a4d925ebc0651525440f8084cc8f47df1bf189a57b623a96aa5ee8765a953a311d4b94b36b065c623da332fc56f3c9fb68b89bf0188bcbfb1cf2053f4c84dddc2f47e050e8e3dbb3f7f32eecbd137263a6a1cbdf687d865fcaab5fff4aec4d9690647c7c990b03923da495e3c768553af02a909fc1fe9fffac8f5f2e0d0b6fadb48cfde7b575712220059cca675063031881a3d908c0e8d6ef3113399f317b320c44c26be75763c288c414bd7e29f8356b3d545d7b4ac064262595106810234aea27ff05634b502fcf42b87b50d93a656b8aa4f9cde8b735c2e4ec0aefaf5302607c20fd4673d54d9aef91866ca3ba1f2c09a1805fd9ce1c7e607b12f205cba57cf392742fdb8c48e8372f2170a3defa21acc5fd703b579c4586de1b2b389bfc5b9a495142885be675fd597864d0b500b9cc56a4ff279b62fa93d893c5829ffd1556699410955ab77e1ed69cde07e177aff90fdcbb79443adee4c6cf563fff28282d7137b4788f7f5e5d578112bd1b72494290a64907c8d66b29c69262f191087f51f1c483a47d424b3328f8f90193503cee68c1a5ebf97210c5e81fdd27bece0c0b9586defc0f1f849f363fad8767eb59cdc17eb6063bcf81b17222e9c493b9e3ba62d868933468ad8ac12ddf05c7e2ffb7985845b3aac1ab9212547669a98d9267cb6d152101d31a5a83d8ab34de0f83b6a39ed59683ebbbcdc7694d29faa8d084fcfd73e84dac193e3a86b50e327e3b12dc2e63733f92bda4ff7c3d4f328b5257371363977365017d67752bd4faf3a6a82258f0bf8da523d6a2de1bb334ed21997b03173c57ea95e5b0f53305085744b39185147364cd23ac409ada4d82ac061a219ac7b113eda4077a86f448df73917c80189f235d75013e7a0ade3a2444d71e52a03500e1d9dd724c359b268aaecb6f1441559cf97cb78820d5deb46d96fbcc291daacc4eba782a2cb40e00bf2a5cb6cc0daf894fe096ee6f027006b5d0b65883d2bf2900",
+            "wrap_hex": "1b2fa2209e306d58fa5bbe8f65b45f890cd0301eef89185adcca246b8f3f8cdf18a0ca0d69fa0bbf48aa9a1d3981e45f"
+          }
+        ],
+        "slots_mac_hex": "82b4ae56737b78397656bd4c76cce872fccec495227f3d6112262507c9894a1c"
+      },
+      "ciphertext_hex": "7a24f629ae58334534f52299c0f0cf9e91996c88d050835b0caf134da788552e533c3344",
+      "hashes": {
+        "sha2-256": "0ba6e4b20520ef0adcadb0d0d9e04e3255f9606056c6f67b53167536ef67e61c"
+      },
+      "recipient_secret_hex": "5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c5c",
+      "expected_error_code": "KEM_CT_LENGTH_MISMATCH"
     },
     {
       "name": "empty-recipient-secret-keys",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000000000000000000000000000000000000000000000000",
         "slots": [
@@ -307,6 +488,9 @@
           }
         ],
         "slots_mac_hex": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       "ciphertext_hex": "00000000000000000000000000000000",
       "recipient_secret_keys_hex": [],
@@ -316,7 +500,7 @@
       "name": "both-forms-supplied",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000000000000000000000000000000000000000000000000",
         "slots": [
@@ -326,6 +510,9 @@
           }
         ],
         "slots_mac_hex": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       "ciphertext_hex": "00000000000000000000000000000000",
       "recipient_secret_hex": "1111111111111111111111111111111111111111111111111111111111111111",
@@ -338,7 +525,7 @@
       "name": "neither-form-supplied",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000000000000000000000000000000000000000000000000",
         "slots": [
@@ -349,6 +536,9 @@
         ],
         "slots_mac_hex": "0000000000000000000000000000000000000000000000000000000000000000"
       },
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
       "ciphertext_hex": "00000000000000000000000000000000",
       "expected_error_code": "INVALID_RECIPIENT_KEY"
     },
@@ -356,7 +546,7 @@
       "name": "multipriv-element-wrong-length",
       "envelope": {
         "scheme": 1,
-        "aead": "xchacha20-poly1305",
+        "aead": "chacha20-poly1305-stream64k",
         "kem": "x25519",
         "nonce_hex": "000000000000000000000000000000000000000000000000",
         "slots": [
@@ -366,6 +556,9 @@
           }
         ],
         "slots_mac_hex": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "hashes": {
+        "sha2-256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
       "ciphertext_hex": "00000000000000000000000000000000",
       "recipient_secret_keys_hex": [

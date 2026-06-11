@@ -1,0 +1,354 @@
+{
+  "version": 1,
+  "primitive": "sealed-poe-passphrase-negative",
+  "source": "Passphrase-path negatives over the passphrase-n1 blob. A wrong passphrase, a tampered salt or params value, a flipped commitment header, an envelope spliced onto a different hashes claim, and a blob below the 48-byte structural floor all surface the single generic failure (TAMPERED_CIPHERTEXT) — the commitment cases fail BEFORE any STREAM chunk opens. Envelope-shape defects raise typed errors before any KDF work: an unregistered aead or passphrase alg, a nonce that is not 24 bytes, a salt outside 16..64 bytes, and Argon2id params below the registry floors. A whitespace-only passphrase normalizes to the empty string and is rejected with ENC_PASSPHRASE_EMPTY before any key derivation; a passphrase carrying a codepoint unassigned in Unicode 16.0 is rejected with ENC_PASSPHRASE_UNNORMALIZABLE before any normalization step runs. Typed caller-input rejections strictly precede the blob structural floor: a blob below 48 bytes paired with an unnormalizable passphrase still raises ENC_PASSPHRASE_UNNORMALIZABLE rather than failing generically.",
+  "matched_false_vectors": [
+    {
+      "name": "wrong-passphrase",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "wrong horse battery staple",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_reason": "TAMPERED_CIPHERTEXT"
+    },
+    {
+      "name": "tampered-salt",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626360",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "correct horse battery staple",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_reason": "TAMPERED_CIPHERTEXT"
+    },
+    {
+      "name": "tampered-params",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 65536,
+            "t": 4,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "correct horse battery staple",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_reason": "TAMPERED_CIPHERTEXT"
+    },
+    {
+      "name": "commitment-header-flip",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252470683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "correct horse battery staple",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_reason": "TAMPERED_CIPHERTEXT"
+    },
+    {
+      "name": "hashes-splice",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "correct horse battery staple",
+      "hashes": {
+        "sha2-256": "48a61148b9f86aca996424f5bf5e9ea87328512c6b1f66da6503f3b8445a644c"
+      },
+      "expected_reason": "TAMPERED_CIPHERTEXT"
+    },
+    {
+      "name": "blob-below-floor-47b",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aa",
+      "passphrase": "correct horse battery staple",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_reason": "TAMPERED_CIPHERTEXT"
+    }
+  ],
+  "raise_vectors": [
+    {
+      "name": "aead-unknown",
+      "envelope": {
+        "scheme": 1,
+        "aead": "xchacha20-poly1305",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "correct horse battery staple",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_error_code": "UNSUPPORTED_AEAD_ALG"
+    },
+    {
+      "name": "alg-scrypt",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "scrypt",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "correct horse battery staple",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_error_code": "ENC_PASSPHRASE_ALG_UNSUPPORTED"
+    },
+    {
+      "name": "nonce-23b",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "correct horse battery staple",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_error_code": "NONCE_LENGTH_MISMATCH"
+    },
+    {
+      "name": "salt-15b",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f60616263",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "correct horse battery staple",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_error_code": "ENC_PASSPHRASE_SALT_TOO_SHORT"
+    },
+    {
+      "name": "salt-65b",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "correct horse battery staple",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_error_code": "ENC_PASSPHRASE_SALT_TOO_LONG"
+    },
+    {
+      "name": "params-below-floor",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 8,
+            "t": 1,
+            "p": 1
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "correct horse battery staple",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_error_code": "ENC_PASSPHRASE_ARGON2_PARAMS_TOO_LOW"
+    },
+    {
+      "name": "whitespace-only-passphrase",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": " \t　   ",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_error_code": "ENC_PASSPHRASE_EMPTY"
+    },
+    {
+      "name": "unassigned-codepoint-passphrase",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
+      "passphrase": "pass͸word",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_error_code": "ENC_PASSPHRASE_UNNORMALIZABLE"
+    },
+    {
+      "name": "short-blob-with-unnormalizable-passphrase",
+      "envelope": {
+        "scheme": 1,
+        "aead": "chacha20-poly1305-stream64k",
+        "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+        "passphrase": {
+          "alg": "argon2id",
+          "salt_hex": "55565758595a5b5c5d5e5f6061626364",
+          "params": {
+            "m": 65536,
+            "t": 3,
+            "p": 4
+          }
+        }
+      },
+      "ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aa",
+      "passphrase": "pass͸word",
+      "hashes": {
+        "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+      },
+      "expected_error_code": "ENC_PASSPHRASE_UNNORMALIZABLE"
+    }
+  ]
+}

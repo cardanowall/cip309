@@ -1,15 +1,18 @@
 {
   "registry": "kdf-algorithms",
-  "description": "Passphrase-KDF registry: the key-derivation functions selectable on the wire via an encryption envelope's `passphrase.alg` field, used to stretch a human passphrase into a content-encryption key for the passphrase key-path (the alternative to recipient KEM slots). The pinned `params` carry the closed parameter set and security floors the structural validator enforces; values below the floor are ENC_PASSPHRASE_ARGON2_PARAMS_TOO_LOW, an out-of-range salt is ENC_PASSPHRASE_SALT_TOO_SHORT or ENC_PASSPHRASE_SALT_TOO_LONG, an unknown params field is SCHEMA_UNKNOWN_FIELD, and an unregistered identifier is ENC_PASSPHRASE_ALG_UNSUPPORTED. Note: HKDF-SHA-256 and HMAC-SHA-256 are FIXED constructions used internally (slot key derivation, MACs) and carry no wire identifier — they are not selectable and are not entries here. PBKDF2-SHA-256 is intentionally excluded: it belongs to the out-of-scope identity key-envelope, not to this wire standard. Additions are additive-only and must ship with conformance vectors.",
+  "description": "Passphrase-KDF registry: the key-derivation functions selectable on the wire via an encryption envelope's `passphrase.alg` field, used to stretch a passphrase into a content-encryption key for the passphrase key-path (the alternative to recipient KEM slots). The pinned `params` carry the closed parameter set and security floors the structural validator enforces: a value below a floor is ENC_PASSPHRASE_ARGON2_PARAMS_TOO_LOW, an out-of-range salt is ENC_PASSPHRASE_SALT_TOO_SHORT or ENC_PASSPHRASE_SALT_TOO_LONG, an unknown `params` sub-field is SCHEMA_UNKNOWN_FIELD (the map is closed), a parameter value above 2^32 − 1 is SCHEMA_TYPE_MISMATCH, and an unregistered identifier is ENC_PASSPHRASE_ALG_UNSUPPORTED. Verifier-side upper bounds on the work factors are deployment policy, not wire rules: implementations MAY enforce non-normative, hardware-dependent ceilings against verifier-side denial of service, reporting ENC_PASSPHRASE_PARAMS_EXCEED_POLICY — a code that MUST NOT be conflated with the floor code. Note: HKDF-SHA-256 and HMAC-SHA-256 are FIXED constructions used internally (per-slot KEK derivation, the slot-set and passphrase-commitment MAC keys, content payload_key derivation, seed-to-key derivation) and carry no wire identifier — they are not selectable and are not entries here; a record carrying `passphrase.alg = \"hkdf-sha256\"` MUST be rejected as ENC_PASSPHRASE_ALG_UNSUPPORTED, because HKDF is designed for high-entropy inputs, not for stretching passphrases. Additions are additive-only and must ship with conformance vectors.",
   "entries": [
     {
       "identifier": "argon2id",
-      "description": "Argon2id memory-hard password-hashing function. The sole wire-selectable passphrase KDF for the passphrase key-path. The validator enforces a closed parameter set {m, t, p} with minimum floors and a bounded salt length.",
+      "description": "Argon2id memory-hard password-hashing function, version pinned at 0x13 (19) per RFC 9106 — there is no version field on the wire and no other Argon2 version is admissible under `enc.scheme: 1`. The sole MANDATORY-to-implement passphrase KDF; v1 producers MUST emit this identifier. `params` is a closed map of exactly {m, t, p}: m (memory KiB) ≥ 65536, t (iterations) ≥ 3, p (parallelism) ≥ 1, each value a uint ≤ 2^32 − 1; the 32-byte output length is fixed and is NOT carried in `params`. The p ≥ 1 floor is a deliberate browser-compatibility constraint — security is dominated by the m × t product — and producers SHOULD use p = 4 (the second recommended profile of RFC 9106 §4) where the platform supports it. The salt MUST be 16–64 bytes inclusive and freshly drawn from a CSPRNG for every passphrase envelope.",
       "output_length_bytes": 32,
+      "argon2_version": 19,
       "params": {
         "m_min_kib": 65536,
         "t_min": 3,
         "p_min": 1,
+        "p_recommended": 4,
+        "param_value_max": 4294967295,
         "salt_length_bytes_min": 16,
         "salt_length_bytes_max": 64
       },

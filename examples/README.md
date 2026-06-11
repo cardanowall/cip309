@@ -1,45 +1,44 @@
 # Examples
 
-This directory holds runnable **reference implementations** that demonstrate the
-Label 309 **wire** primitives in practice: each cryptographic primitive in
-isolation, and an end-to-end publish/verify flow.
+This directory holds **runnable, self-checking examples** that demonstrate the
+[Label 309 standard](../spec/label-309.md) end to end: producing a
+Proof-of-Existence record, carrying it across the metadata-label-309
+transport, validating it structurally, verifying it standalone (with the
+four-state verdict and its exit codes), sealing content to recipients, and
+anchoring batches under a `merkle[]` commitment.
 
-The examples will cover:
+The examples drive the published **reference SDKs** — the same packages any
+integrator installs — rather than re-implementing the cryptography inline:
 
-- content hashing,
-- canonical CBOR encoding of a record,
-- record-level `COSE_Sign1` signatures,
-- seed and key derivation (stopping at the seed — see scope below),
-- sealed-PoE wrap and unwrap (multi-recipient encryption, with the ciphertext
-  referenced by a content-addressed `ar://` / `ipfs://` URI),
-- the standalone verifier and structural validator.
+- [`typescript/`](./typescript) — examples over
+  [`@cardanowall/poe-standard`](https://www.npmjs.com/package/@cardanowall/poe-standard) and
+  [`@cardanowall/sdk-ts`](https://www.npmjs.com/package/@cardanowall/sdk-ts).
+- [`python/`](./python) — the behavioural twin, over
+  [`cardanowall-sdk`](https://pypi.org/project/cardanowall-sdk/).
 
-The examples are provided in two languages:
+Every example runs offline (verification uses an injected explorer stub — no
+operator, no issuer server, per the standalone-verifiability invariant) and
+exits non-zero on a failed check, so each set doubles as a regression suite.
 
-- [`typescript/`](./typescript) — TypeScript reference examples.
-- [`python/`](./python) — Python reference examples.
-
-The examples are kept consistent with the canonical conformance vectors in
-[`../conformance`](../conformance). They are intended as the smallest faithful
-illustration of how to build and verify a PoE record, not as production tooling.
-
-For full, installable reference SDKs and tooling, see the sibling ecosystem
-repositories: [label-309-ts](https://github.com/cardanowall/label-309-ts) (TypeScript),
-[label-309-py](https://github.com/cardanowall/label-309-py) (Python),
-[label-309-rs](https://github.com/cardanowall/label-309-rs) (Rust), and
-[label-309-cli](https://github.com/cardanowall/label-309-cli) (command-line verifier).
+The normative byte-level oracle for **independent** implementations is not
+the example code but the conformance corpus in
+[`../conformance`](../conformance) — pinned wire bytes and expected error
+codes that any conformant implementation (TypeScript, Python, Rust, …) must
+reproduce. Both example sets replay the validator corpus directly, and the
+reference SDKs in
+[label-309-ts](https://github.com/cardanowall/label-309-ts),
+[label-309-py](https://github.com/cardanowall/label-309-py), and
+[label-309-rs](https://github.com/cardanowall/label-309-rs) are pinned to it
+byte-for-byte ([label-309-cli](https://github.com/cardanowall/label-309-cli)
+is the command-line verifier built on the Rust SDK).
 
 ## Out of scope
 
-These examples cover the Label 309 **wire standard only**. The identity
-key-envelope — building or unlocking the envelope, diceware passphrases, the
-passphrase/PIN vault, and envelope discovery — is **out of scope** and will
-**not** appear here. Key derivation is demonstrated only down to the seed; how a
-seed is stored and protected is an implementation concern outside this standard.
-
-## Status
-
-**Working draft — to be authored.**
+These examples cover the Label 309 **wire standard and its verifier roles**.
+Operator-specific machinery — accounts, billing, key custody and recovery,
+identity envelopes — is out of scope and does not appear here. Key derivation
+is demonstrated only down to the seed; how a seed is stored and protected is
+an implementation concern outside this standard.
 
 ## License
 

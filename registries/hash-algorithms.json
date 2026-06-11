@@ -1,6 +1,6 @@
 {
   "registry": "hash-algorithms",
-  "description": "Content-hash algorithm registry. Each identifier names a hash function used to commit to content in a record's `hashes` map and to a Merkle leaf's content digest. The pinned `digest_length_bytes` is the exact byte length the structural validator requires for a digest under that identifier; any other length is a HASH_DIGEST_LENGTH_MISMATCH, and any unregistered identifier is an UNSUPPORTED_HASH_ALG. Additions are additive-only and must ship with conformance vectors.",
+  "description": "Content-hash algorithm registry. Each identifier names a hash function used to commit to content in a record's `hashes` map and to a Merkle leaf's content digest. Both registered identifiers are MANDATORY-to-implement, so a single-hash record under either validates on every conformant implementation. The pinned `digest_length_bytes` is the exact byte length the structural validator requires for a digest under that identifier; any other length is a HASH_DIGEST_LENGTH_MISMATCH, and any unregistered identifier is an UNSUPPORTED_HASH_ALG (rejected, never silently skipped — the content hash is load-bearing for the claim). v1 scope: only 32-byte-digest algorithms may be added without a schema bump, because the grammar pins 32-byte digests; a different digest length requires a successor revision with a top-level `v` bump. Additions are additive-only and must ship with conformance vectors.",
   "entries": [
     {
       "identifier": "sha2-256",

@@ -2,23 +2,25 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://label309.org/schemas/poe-record.schema.json",
   "title": "Label 309 v1 PoE record",
-  "description": "The top-level Label 309 Proof-of-Existence record, as decoded from canonical CBOR carried under transaction metadata label 309. A CBOR map whose only required key is `v` (the version, the literal unsigned integer 1; a future major version is rejected as SCHEMA_INVALID_LITERAL). All payload keys are optional at this structural layer: `items[]` (inline content claims), `merkle[]` (Merkle list commitments), `supersedes` (prior-record tx hash), `sigs[]` (optional authorship signatures), `crit[]` (criticality markers). Beyond these base keys the record has an OPEN extension namespace: keys matching `^x-.+` (vendor) or `^[a-z]+-.+` (companion) are admitted; any other unknown key is rejected (SCHEMA_UNKNOWN_FIELD). STRUCTURAL only — the following are NOT expressible here and are domain-pass checks: at least one of items/merkle must be non-empty; crit[] entry shape; registry membership of all algorithm identifiers; and every cross-field invariant of the sub-structures. The extension-key patterns tolerate exactly one trailing newline, mirroring the reference validators.",
+  "description": "The top-level Label 309 Proof-of-Existence record, as decoded from the reassembled canonical-CBOR record body carried under transaction metadata label 309. A CBOR map whose only required key is `v` (the version, the literal unsigned integer 1; any other value is rejected as SCHEMA_INVALID_LITERAL). All payload keys are optional at this structural layer but non-empty when present: `items[]` (inline content claims), `merkle[]` (Merkle list commitments), `supersedes` (prior-record tx hash), `sigs[]` (optional authorship signatures), `crit[]` (criticality markers). Beyond these base keys the record has an OPEN extension namespace: a key is admissible when it matches `^x-.+` (vendor/experimental) or `^[a-z]+-.+` (companion namespace) and contains no control characters (U+0000–U+001F, U+007F–U+009F) — the patterns below exclude control characters anywhere in the key; any other unknown key is rejected (SCHEMA_UNKNOWN_FIELD). Extension values may be any value the canonical encoding profile admits (floats and semantic tags are already rejected at decode as MALFORMED_CBOR). STRUCTURAL only — the following are NOT expressible here and are domain-pass checks: at least one of items/merkle must be present (SCHEMA_EMPTY_RECORD); crit[] entry shape (CRIT_SHAPE_INVALID / EXTENSION_UNSUPPORTED_CRITICAL); registry membership of all algorithm identifiers; and every cross-field invariant of the sub-structures.",
   "type": "object",
   "required": ["v"],
   "properties": {
     "v": {
       "title": "Record version",
-      "description": "The Label 309 record version. MUST be the literal unsigned integer 1; any other value is rejected as SCHEMA_INVALID_LITERAL.",
+      "description": "The Label 309 record version. MUST be the literal unsigned integer 1 (within the pinned 0 .. 2^32 − 1 exact-integer range); any other value is rejected as SCHEMA_INVALID_LITERAL.",
       "const": 1
     },
     "items": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "$ref": "item-entry.schema.json"
       }
     },
     "merkle": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "$ref": "merkle-commit.schema.json"
       }
@@ -28,20 +30,22 @@
     },
     "sigs": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "$ref": "sig-entry.schema.json"
       }
     },
     "crit": {
       "type": "array",
+      "minItems": 1,
       "items": {
         "type": "string"
       }
     }
   },
   "patternProperties": {
-    "^x-.+\n?$": true,
-    "^[a-z]+-.+\n?$": true
+    "^x-[^\\u0000-\\u001f\\u007f-\\u009f]+$": true,
+    "^[a-z]+-[^\\u0000-\\u001f\\u007f-\\u009f]+$": true
   },
   "additionalProperties": false
 }

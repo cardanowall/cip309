@@ -1,0 +1,306 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://label309.org/schemas/verify-report.schema.json",
+  "title": "Label 309 verifier report",
+  "description": "The structured report a Label 309 verifier (public or recipient role) emits for one verification run, whether the run started from a Cardano transaction reference or from caller-supplied record bytes plus a block-info tuple. This schema pins the report's MINIMUM contract — the fields the standard requires every report to carry; an implementation MAY add fields, so the report object and its sub-objects are deliberately OPEN maps (no additionalProperties: false). A `valid` verdict MUST NOT be reported when any error-severity code is present, and no severity may be softened to make a record pass.",
+  "type": "object",
+  "required": ["verdict", "exitCode", "issues", "items", "merkle", "auditTrail"],
+  "properties": {
+    "verdict": {
+      "title": "Machine verdict",
+      "description": "`failed` is reserved for record-attributable outcomes (integrity, structural, signature, Merkle-mismatch, and service-independence-violation classes, including METADATA_NOT_FOUND); condemnation requires evidence attributable to the record, so provider misbehaviour (TX_INTEGRITY_MISMATCH, URI_PROVIDER_INTEGRITY_MISMATCH) never produces it. `unverifiable` means no record-attributable error is present but a required check could not run or could not be attributed — network, policy, or provider-integrity reasons — including the commitment floor: content checking ran but no content commitment of the record was actually verified. `pending` is the below-confirmation-threshold outcome (INSUFFICIENT_CONFIRMATIONS); no result from a pending record may be presented as final.",
+      "enum": ["valid", "pending", "unverifiable", "failed"]
+    },
+    "exitCode": {
+      "title": "Process exit code",
+      "description": "The four-state mapping of the verdict, so callers can distinguish record-attributable failures from transient operational ones without parsing the report: valid → 0, failed → 1, unverifiable → 2, pending → 3. Exit codes 4 and higher denote verifier-host runtime failures that are not record-attributable and do not correspond to a verdict.",
+      "enum": [0, 1, 2, 3]
+    },
+    "network": {
+      "title": "Network identifier",
+      "description": "Names the network of the resolved transaction (for example `cardano:mainnet`), as established by the explorer chain the verifier is configured against — never taken from the record body, which carries no network value.",
+      "type": "string",
+      "minLength": 1
+    },
+    "confirmationDepth": {
+      "title": "Resolved confirmation depth",
+      "description": "Explorer-asserted depth in blocks: (resolving explorer's tip height) − (height of the block including the transaction) + 1, so a transaction in the tip block has depth exactly 1.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "confirmationThreshold": {
+      "title": "Confirmation-depth threshold",
+      "description": "The deployment-policy threshold the resolved depth was compared against (RECOMMENDED >= 15 blocks, raised for high-value notarisation).",
+      "type": "integer",
+      "minimum": 0
+    },
+    "block_time": {
+      "title": "Block time",
+      "description": "The POSIX timestamp, in integer seconds UTC, of the slot of the block that includes the transaction — the time T in the claim \"this content existed on or before T\". Explorer-asserted: deployments for which it is load-bearing MUST cross-check it across independent explorers.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "block_slot": {
+      "title": "Block slot",
+      "description": "The slot number of the including block. Explorer-asserted; carried when available.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "issues": {
+      "title": "Issue list",
+      "description": "The structural-validation issue list plus every verifier-layer code raised by the run, each with per-issue severity. Issues are sorted segment-wise by path (integer segments numerically, text segments by bytewise UTF-8 order, integer before text where kinds differ, prefix before extension); identical paths tie-break by error-code-registry order.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/issue"
+      }
+    },
+    "items": {
+      "title": "Per-item entries",
+      "description": "One entry per record `items[]` element, positionally aligned: the per-claim content-check status and, for an `enc`-bearing item when the run's decryption keyring is non-empty, the decryption outcome. Empty exactly when the record carries no `items` array — every content claim the record makes must have an entry, so an unchecked claim cannot be silently omitted.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/item-entry"
+      }
+    },
+    "merkle": {
+      "title": "Per-commitment entries",
+      "description": "One entry per record `merkle[]` element, positionally aligned: the per-claim content-check status of the list commitment (leaves-list acquisition, document validation, and root recompute). Empty exactly when the record carries no `merkle` array — every list commitment the record makes must have an entry.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/merkle-entry"
+      }
+    },
+    "auditTrail": {
+      "title": "Audit trail",
+      "description": "A complete record of every outbound network call of the run — success, failure, and retry — captured by the single recording egress wrapper. A verifier that omits or pre-filters this trail cannot prove service-independence. An offline run (no outbound calls) carries an empty array.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/audit-entry"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "valid"
+          }
+        },
+        "required": ["verdict"]
+      },
+      "then": {
+        "properties": {
+          "exitCode": {
+            "const": 0
+          },
+          "issues": {
+            "$comment": "The severity contract: a valid verdict MUST NOT coexist with any error-severity issue, and an issue with omitted severity defaults to error — so under a valid verdict every issue must carry an explicit non-error severity.",
+            "items": {
+              "required": ["severity"],
+              "properties": {
+                "severity": {
+                  "enum": ["warning", "info"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "failed"
+          }
+        },
+        "required": ["verdict"]
+      },
+      "then": {
+        "properties": {
+          "exitCode": {
+            "const": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "unverifiable"
+          }
+        },
+        "required": ["verdict"]
+      },
+      "then": {
+        "properties": {
+          "exitCode": {
+            "const": 2
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "pending"
+          }
+        },
+        "required": ["verdict"]
+      },
+      "then": {
+        "properties": {
+          "exitCode": {
+            "const": 3
+          }
+        }
+      }
+    },
+    {
+      "$comment": "A valid or pending verdict can only arise after the transaction resolved and the confirmation-depth comparison ran, so the chain facts the report must carry are necessarily known.",
+      "if": {
+        "properties": {
+          "verdict": {
+            "enum": ["valid", "pending"]
+          }
+        },
+        "required": ["verdict"]
+      },
+      "then": {
+        "required": ["confirmationDepth", "confirmationThreshold", "block_time"]
+      }
+    }
+  ],
+  "$defs": {
+    "issue": {
+      "title": "Validation / verification issue",
+      "description": "One typed issue. The shape is shared by the structural validator and the verifier layer; verifier-layer codes that concern the run rather than a record location carry an empty path.",
+      "type": "object",
+      "required": ["path", "code", "message"],
+      "properties": {
+        "path": {
+          "description": "Ordered segments from the record root — text map keys and non-negative integer array indices, exactly as traversed (e.g. [\"items\", 0, \"hashes\", \"sha2-256\"]). The segment list is the wire/API form; a dotted string is a display rendering only, since map keys may themselves contain `.`.",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              }
+            ]
+          }
+        },
+        "code": {
+          "description": "A SCREAMING_SNAKE_CASE code from the error-code registry; no lowercase synonyms or free-form reason strings.",
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "severity": {
+          "description": "Defaults to `error` when omitted. A `valid` verdict MUST NOT be reported while any error-severity issue is present; warning- and info-severity issues are surfaced but never fail the record by themselves.",
+          "enum": ["error", "warning", "info"],
+          "default": "error"
+        },
+        "message": {
+          "description": "Human-readable explanation including the offending value.",
+          "type": "string"
+        }
+      }
+    },
+    "content-check": {
+      "title": "Per-claim content-check status",
+      "description": "The three-state status of one content claim, so an unchecked claim can never masquerade as a verified one: `checked` — bytes were obtained and every committed digest matched; `mismatched` — attributable fetched (or decrypted) bytes failed a commitment, a record-attributable integrity outcome; `not_checked` — the claim was not checked (`fetchContent` off, availability failure, unattributable fetched bytes, or the per-URI fetch ceiling).",
+      "enum": ["checked", "mismatched", "not_checked"]
+    },
+    "item-entry": {
+      "title": "Per-item report entry",
+      "type": "object",
+      "required": ["contentCheck"],
+      "properties": {
+        "contentCheck": {
+          "$ref": "#/$defs/content-check"
+        },
+        "decryption": {
+          "$ref": "#/$defs/decryption-outcome"
+        }
+      }
+    },
+    "merkle-entry": {
+      "title": "Per-commitment report entry",
+      "type": "object",
+      "required": ["contentCheck"],
+      "properties": {
+        "contentCheck": {
+          "$ref": "#/$defs/content-check"
+        }
+      }
+    },
+    "decryption-outcome": {
+      "title": "Per-item decryption outcome",
+      "description": "The recipient-verifier outcome for one `enc`-bearing item after every applicable keyring credential was attempted independently (one credential may open several items; different credentials may succeed on different items).",
+      "type": "object",
+      "required": ["decrypted"],
+      "properties": {
+        "decrypted": {
+          "description": "Whether an applicable credential recovered the content-encryption key and the ciphertext opened end-to-end.",
+          "type": "boolean"
+        },
+        "plaintextHashOk": {
+          "description": "The post-decryption recheck: every digest in the item's `hashes` map recomputed over the recovered plaintext. A concrete boolean whenever decryption ran to completion; `false` raises URI_INTEGRITY_MISMATCH and forces the record's verdict to `failed`.",
+          "type": "boolean"
+        },
+        "code": {
+          "description": "The typed code describing why decryption did not succeed (for example WRONG_DECRYPTION_INPUT_SHAPE, WRONG_RECIPIENT_KEY, TAMPERED_HEADER, TAMPERED_CIPHERTEXT, KDF_DERIVATION_FAILED, CIPHERTEXT_UNAVAILABLE); the same code also appears in the issue list.",
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        }
+      }
+    },
+    "audit-entry": {
+      "title": "Audit-trail entry",
+      "description": "One recorded outbound network call. Every call passes through the verifier's single recording egress wrapper, which enforces the closed purpose set (any other target is refused with URI_TARGET_FORBIDDEN) and hard-fails any call to a denyHosts entry with SERVICE_INDEPENDENCE_VIOLATION.",
+      "type": "object",
+      "required": ["url", "method", "status", "bytes", "durationMs", "purpose"],
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        },
+        "status": {
+          "description": "The HTTP status code when a response was received; an implementation-defined transport-failure indicator (or null) when none was.",
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bytes": {
+          "description": "Byte count transferred for the call.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "durationMs": {
+          "description": "Wall-clock duration of the call in milliseconds.",
+          "type": "number",
+          "minimum": 0
+        },
+        "purpose": {
+          "enum": ["cardano", "arweave", "ipfs"]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "registry": "companion-cips",
+  "description": "Companion-CIP namespace-prefix registry. A Label 309 record may carry top-level extension keys matching `^[a-z]+-.+`, where the prefix — the segment before the first hyphen — identifies the registering companion CIP; companion CIPs that move features out of the base specification register their namespace prefix here so extension authors can avoid prefix collisions. Registration is ADVISORY and carries no wire enforcement: a validator does not check that a prefix is registered, and a record carrying an unregistered companion-style key remains structurally valid (the key is surfaced informationally like any other extension key). The single-letter prefix `x` is reserved for the vendor / experimental namespace (`^x-.+`) and MUST NOT be registered here, so an `x-…` key is never ambiguous between the two namespaces. Registering a prefix does not bump the top-level `v`: additive fields under a registered namespace are not a v1-breaking change. Each entry pairs a `prefix` with the registering CIP as its stable public reference. Additions are additive-only; prefixes are never repurposed.",
+  "entries": []
+}

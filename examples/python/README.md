@@ -1,104 +1,99 @@
-# Label 309 Python reference examples
+# Python Examples
 
-Self-contained Python reference implementations of the Label 309 **wire**
-primitives. Each module is the smallest faithful illustration of one operation a
-producer or verifier performs when building and checking a Proof-of-Existence
-record.
+Runnable Python examples for the Label 309 Proof-of-Existence standard. Each
+script is a self-checking walk-through of one part of the standard, driven
+through the published reference SDK
+[`cardanowall-sdk`](https://pypi.org/project/cardanowall-sdk/) (import name
+`cardanowall`): the wire format (`cardanowall.poe_standard`), the standalone
+verifier (`cardanowall.verifier`), sealed-PoE encryption, seed-derived keys,
+and Merkle tooling.
 
-These examples are a **byte-parity twin** of the
-[TypeScript examples](../typescript): fed the same deterministic inputs, the two
-implementations produce **byte-identical** output for every pure-function
-operation (canonical CBOR, COSE_Sign1, Merkle roots, sealed-PoE wrap, ...). The
-canonical conformance vectors that pin this parity live in
-[`../../conformance`](../../conformance).
+These scripts are the **behavioural twin** of the
+[TypeScript examples](../typescript): fed the same inputs, the two SDKs
+produce byte-identical wire bytes and the same verdicts, issue codes, and
+report entries. The byte-level oracle for any independent implementation is
+the conformance corpus in [`../../conformance`](../../conformance) —
+`validate_record.py` replays it directly.
 
-## Self-contained
+The examples never contact a Label 309 operator: verification runs against a
+caller-configured public explorer (here, an injected offline stub), exactly
+as the standard's service-independence invariant requires.
 
-Nothing here imports a published CardanoWall SDK. The implementations build only
-on widely-used, audited public libraries:
+## What each example shows
 
-- [`cryptography`](https://pypi.org/project/cryptography/) — X25519, Ed25519
-  key handling, HKDF, ChaCha20-Poly1305.
-- [`PyNaCl`](https://pypi.org/project/PyNaCl/) — strict RFC 8032 Ed25519
-  verify, XChaCha20-Poly1305 AEAD.
-- [`cbor2`](https://pypi.org/project/cbor2/) — canonical CBOR (RFC 8949 §4.2.1).
-- [`argon2-cffi`](https://pypi.org/project/argon2-cffi/) — Argon2id (sealed-PoE
-  passphrase path).
-- [`kyber-py`](https://pypi.org/project/kyber-py/) — ML-KEM-768, over which the
-  X-Wing hybrid KEM combiner is rebuilt explicitly.
-- [`httpx`](https://pypi.org/project/httpx/) — outbound HTTP for the standalone
-  verifier only (every other module is pure and offline).
-
-## What each file shows
-
-Modules live under [`label309_examples/`](./label309_examples):
-
-| Module                     | Primitive                                                      |
-| -------------------------- | -------------------------------------------------------------- |
-| `hash_dual.py`             | SHA-256 + BLAKE2b-256 content hashing.                         |
-| `cbor_canonical.py`        | Canonical CBOR encode/decode; float rejection.                 |
-| `cose_sign1.py`            | COSE_Sign1 encode/decode + RFC 9052 Sig_structure.             |
-| `ed25519.py`               | Strict (RFC 8032 §5.1.7) Ed25519 sign / verify / keygen.       |
-| `x25519.py`                | X25519 keygen + ECDH.                                          |
-| `mlkem768x25519.py`        | X-Wing hybrid KEM (ML-KEM-768 + X25519).                       |
-| `hkdf.py`                  | HKDF-SHA-256.                                                  |
-| `seed_derive.py`           | Seed → Ed25519 / X25519 / X-Wing keypairs (stops at the seed). |
-| `merkle_sha2_256.py`       | RFC 6962 Merkle tree, roots + inclusion proofs.                |
-| `merkle_leaves_list.py`    | Canonical-CBOR Merkle leaves-list codec.                       |
-| `cid_validator.py`         | IPFS CID (v0/v1) structural validator.                         |
-| `off_host_sign.py`         | Off-host (KMS / HSM / air-gapped) record signing helper.       |
-| `label309_validator.py`    | Pure-function structural validator over record CBOR bytes.     |
-| `ecies_sealed_poe.py`      | Multi-recipient sealed-PoE wrap / unwrap (x25519 + X-Wing).    |
-| `passphrase_kdf_unwrap.py` | Passphrase (Argon2id) sealed-PoE wrap / unwrap.                |
-| `passphrase.py`            | Passphrase normalization (NFKC + whitespace) for the KDF.      |
-| `cbor_walker.py`           | Position-aware walker: extract label-309 bytes from a tx.      |
-| `standalone_verifier.py`   | Service-independent verifier: fetch tx → validate → verify.    |
-
-Two runnable entry points:
-
-- [`end_to_end.py`](./end_to_end.py) — a full publish/verify walkthrough: build
-  a record → canonical-CBOR encode → attach a COSE_Sign1 → decode → validate →
-  verify the signature → recompute content hashes → sealed-PoE wrap then unwrap.
-  It asserts byte-parity against a pinned vector along the way.
-- `label309_examples/standalone_verifier.py` exposes `verify_tx(...)`, which
-  resolves a Cardano transaction through a caller-supplied gateway (Koios /
-  Blockfrost), extracts the label-309 record, runs the structural validator,
-  checks confirmation depth, and verifies record-level signatures, sealed-PoE
-  decryption, and Merkle commitments. No issuer server is contacted.
+| Script               | Demonstrates                                                                                                                                                                                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `end_to_end.py`      | The full produce → carry → verify loop: dual-hash content, sign the record (COSE_Sign1), canonical CBOR + the whole-body ≤ 64-byte chunk-array transport, structural validation, standalone verification with the four-state verdict, and a sealed-PoE round trip. |
+| `verify_offline.py`  | The verifier surface in depth: all four verdicts (`valid` / `pending` / `unverifiable` / `failed`) with their exit codes, the `fetch_content` switch, the audit trail, and the attribution split on fetched content.                                               |
+| `sealed_poe.py`      | The sealed-PoE construction: both KEMs (`x25519` and the X-Wing hybrid `mlkem768x25519`), the single-byte-string `kem_ct`, the segmented STREAM content format, the hash-claim binding, trial-decrypt, and the typed decryption outcomes.                          |
+| `merkle_batch.py`    | Batch anchoring with a top-level `merkle[]` commitment: the RFC 9162 root, the normative CBOR leaves-list document, inclusion proofs, and verifying the commitment through the report's per-commitment entries.                                                    |
+| `validate_record.py` | The structural validator's discriminated result and typed issues, then a replay of the validator conformance corpus (`../../conformance/validator/`) — code-for-code agreement with the cross-language oracle.                                                     |
 
 ## How to run
 
-With [uv](https://docs.astral.sh/uv/):
+With [uv](https://docs.astral.sh/uv/) (Python 3.11+):
 
 ```bash
-uv sync                      # create the venv and install dependencies
-uv run python end_to_end.py  # run the end-to-end demo
+uv sync                            # create the venv and install the SDK
+
+uv run python end_to_end.py        # produce → carry → verify walk-through
+uv run python verify_offline.py    # the four verdicts + attribution split
+uv run python sealed_poe.py        # sealed-PoE construction tour
+uv run python merkle_batch.py      # merkle[] batch anchoring
+uv run python validate_record.py   # validator + conformance replay
 ```
 
-Or, with any environment where the package is installed / on the path:
+Every example is offline and deterministic in outcome, and exits non-zero on
+a failed check, so the set doubles as a regression suite. Expected tail of a
+run:
 
-```bash
-python -m label309_examples.merkle_sha2_256   # module self-test
-python -m label309_examples.cid_validator     # module self-test
+```
+PASS  attributable mismatch: verdict failed, exit 1
+PASS  attributable mismatch: URI_INTEGRITY_MISMATCH raised
+PASS  attributable mismatch: claim reported mismatched
+
+ALL verifier-tour checks PASSED
 ```
 
-Quality gates (linter + type checker):
+Quality gates (linter, formatter, type checker):
 
 ```bash
+uv sync --extra dev
 uv run ruff check .
 uv run ruff format --check .
-uv run mypy label309_examples end_to_end.py
+uv run mypy end_to_end.py verify_offline.py sealed_poe.py merkle_batch.py validate_record.py
 ```
+
+The dependency range tracks the current published `0.x` line of the SDK; the
+examples in this repository are written against the same revision of the
+standard as the specification beside them, so install the latest published
+package. To run the examples against a local checkout of the SDK source
+instead, install it editable into the venv
+(`uv pip install -e <path-to-sdk>`).
+
+## Reading the verdict
+
+`verify_tx` / `verify_record_bytes` emit a report whose minimum contract is
+pinned by [`../../schemas/verify-report.schema.json`](../../schemas/verify-report.schema.json):
+the four-state `verdict` with its exit-code mapping (`valid` → 0, `failed` → 1,
+`unverifiable` → 2, `pending` → 3), the sorted issue list, one per-claim
+`content_check` entry per record item and per `merkle[]` commitment
+(`checked` / `mismatched` / `not_checked` — an unchecked claim can never
+masquerade as a verified one), and the audit trail of every outbound call.
+
+`failed` is reserved for record-attributable outcomes. On fetched content
+that means the attribution split: bytes that provably belong to the published
+URI and fail a committed digest condemn the record
+(`URI_INTEGRITY_MISMATCH` → `failed`), while bytes a gateway merely served
+indict the provider (`URI_PROVIDER_INTEGRITY_MISMATCH`, warning) and leave
+the record `unverifiable`.
 
 ## Out of scope
 
-These examples cover the **wire standard only**. The identity key-envelope —
-building or unlocking the envelope, diceware passphrases, the passphrase/PIN
-vault, and envelope discovery — is **out of scope** and does not appear here.
-Key derivation is demonstrated only down to the seed (`seed_derive.py`); how a
-seed is stored and protected is an implementation concern outside this standard.
-The sealed-PoE passphrase path (an Argon2id-derived content-encryption key)
-**is** in scope and is included; the separate envelope-discovery KDF is not.
+These examples cover the Label 309 wire standard and its verifier roles.
+Operator-specific concerns — accounts, billing, key custody, how a seed is
+stored and protected — are implementation concerns outside the standard and
+do not appear here.
 
 ## License
 

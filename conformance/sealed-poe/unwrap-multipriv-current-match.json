@@ -10,20 +10,23 @@
       "3333333333333333333333333333333333333333333333333333333333333333",
       "4444444444444444444444444444444444444444444444444444444444444444"
     ],
+    "hashes": {
+      "sha2-256": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd"
+    },
     "envelope": {
       "scheme": 1,
-      "aead": "xchacha20-poly1305",
+      "aead": "chacha20-poly1305-stream64k",
       "kem": "x25519",
       "nonce_hex": "b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0",
       "slots": [
         {
           "epk_hex": "1c78fc71ef01855f670c555c82226397f0e73b0aaf443a491d4110dc22f28236",
-          "wrap_hex": "fa93c39fb422450bdbf8e9373e39aef4eecc2a71449179cbc429058b7d3544f1fed99b8af500c2c780376b5e9db9230f"
+          "wrap_hex": "b6c91761d85e991798de7bed28301560383b131d3734cfdbea6e33a8e30292dce717a2f869896098f65b3ff261399e12"
         }
       ],
-      "slots_mac_hex": "8a4bada9b1eaf9989b3005497986876f912db9ed84d5e7d21ac14befd5c68de9"
+      "slots_mac_hex": "550d08cea51d0d6b865f6c054a998870350ae85487428f2fac3aadf08ce6f06c"
     },
-    "ciphertext_hex": "a4e3080eb27b389b4ed3b4b7d54e80585c28c91680069d3991fd63e642c5028b11f3b479bfffde0e3c120f08ee13d4f3",
+    "ciphertext_hex": "8d6fbfb7271e6d29a0792e2ec6fbf124a6e1c6ce48a7967d87d16b18d7ce66e3db5eb4a6f8615ce17e9038375afff221",
     "expected_plaintext_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
     "expected_matching_priv_index": 0,
     "expected_outer_loop_count": 1,

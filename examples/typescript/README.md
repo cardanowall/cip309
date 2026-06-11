@@ -1,107 +1,99 @@
 # TypeScript Examples
 
-Self-contained TypeScript reference implementations of the Label 309 **wire
-primitives**. Each module is the smallest faithful illustration of one piece of
-the standard — content hashing, canonical CBOR, record-level `COSE_Sign1`
-signatures, key derivation, sealed-PoE encryption, the structural validator, and
-the standalone verifier — plus end-to-end demos that wire them together into a
-publish → verify flow.
+Runnable TypeScript examples for the Label 309 Proof-of-Existence standard.
+Each script is a self-checking walk-through of one part of the standard,
+driven through the published reference packages:
 
-These examples exist to show that Label 309 is **implementable from public
-cryptographic libraries alone**, independent of any SDK. They depend only on
-audited, widely-used primitives (`@noble/*`, `cbor2`, `hash-wasm`, `zod`) and
-import **none** of the `@cardanowall/*` packages. The pinned wire bytes in
-`src/smoke-parity.ts` are the cross-language conformance vectors; any conformant
-implementation (TypeScript, Python, Rust, …) MUST reproduce them byte-for-byte.
+- [`@cardanowall/poe-standard`](https://www.npmjs.com/package/@cardanowall/poe-standard) —
+  the wire format: record schema, canonical-CBOR encoder, the metadata-label-309
+  chunk-array transport, and the pure structural validator.
+- [`@cardanowall/sdk-ts`](https://www.npmjs.com/package/@cardanowall/sdk-ts) —
+  the standalone verifier (`verifyTx` / `verifyResolved`), record signing
+  helpers, sealed-PoE encryption, seed-derived keys, and Merkle tooling.
 
-## Self-contained note
-
-There is no dependency on any published Label 309 SDK. Every module here is
-standalone and copy-pasteable; the cross-file imports are only between the
-example modules in `src/`. If you want the installable, batteries-included
-library instead, use the published packages — but these examples are
-deliberately reduced to the wire standard so they can be audited line by line.
+The examples never contact a Label 309 operator: verification runs against a
+caller-configured public explorer (here, an injected offline stub), exactly as
+the standard's service-independence invariant requires. The byte-level oracle
+for any independent implementation is the conformance corpus in
+[`../../conformance`](../../conformance) — `src/validate-record.ts` replays it
+directly.
 
 ## What each example shows
 
-Primitive modules (`src/`):
-
-| File                       | Demonstrates                                                                    |
-| -------------------------- | ------------------------------------------------------------------------------- |
-| `hash-dual.ts`             | SHA-256 + BLAKE2b-256 dual content hashing.                                     |
-| `cbor-canonical.ts`        | Deterministic (canonical) CBOR encode/decode, with float rejection.             |
-| `cbor-walker.ts`           | Byte-slicing the label-309 value out of a serialised Cardano tx (no re-encode). |
-| `cose-sign1.ts`            | `COSE_Sign1` encode/decode + `Sig_structure` builder.                           |
-| `ed25519.ts`               | Ed25519 keygen / sign / strict verify.                                          |
-| `x25519.ts`                | X25519 keygen / ECDH.                                                           |
-| `mlkem768x25519.ts`        | X-Wing hybrid KEM (ML-KEM-768 + X25519) wrapper.                                |
-| `hkdf.ts`                  | HKDF-SHA-256.                                                                   |
-| `seed-derive.ts`           | Deriving Ed25519 / X25519 / X-Wing keypairs from a 32-byte seed.                |
-| `merkle-sha2-256.ts`       | RFC 6962 / RFC 9162 Merkle tree, roots + inclusion proofs (self-test).          |
-| `merkle-leaves-list.ts`    | Canonical-CBOR codec for the off-chain Merkle leaves-list.                      |
-| `cid-validator.ts`         | Full IPFS CID (v0/v1) structural parsing (self-test).                           |
-| `label-309-encoder.ts`     | Encoding a PoE record to canonical CBOR + the record-signature payload.         |
-| `label-309-validator.ts`   | Pure-function structural validator over record bytes.                           |
-| `ecies-sealed-poe.ts`      | Multi-recipient sealed-PoE wrap/unwrap (X25519 and X-Wing KEMs).                |
-| `passphrase-kdf-unwrap.ts` | Sealed-PoE passphrase path (Argon2id → XChaCha20-Poly1305).                     |
-| `off-host-sign.ts`         | Off-host (HSM/KMS/air-gap) signing helper + CIP-8 hashed mode.                  |
-| `standalone-verifier.ts`   | The full service-independent verifier (`verifyTx`).                             |
-
-Runnable demos and tests (`src/`):
-
-| File                           | Shows                                                                               |
-| ------------------------------ | ----------------------------------------------------------------------------------- |
-| `end-to-end.ts`                | Publish + verify a signed hash-only PoE, then a sealed-PoE wrap → unwrap roundtrip. |
-| `standalone-verify-example.ts` | Driving `verifyTx` against a synthetic tx via an injected (offline) gateway.        |
-| `smoke-parity.ts`              | Canonical-CBOR byte-parity against the pinned conformance vectors.                  |
-| `smoke-validator.ts`           | Structural-validator accept/reject behaviour across many record shapes.             |
-| `smoke-tx-extract.ts`          | Positional byte-slice extraction of the label-309 value (and non-laundering proof). |
+| Script                   | Demonstrates                                                                                                                                                                                                                                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/end-to-end.ts`      | The full produce → carry → verify loop: dual-hash content, sign the record (COSE_Sign1), canonical CBOR + the whole-body ≤ 64-byte chunk-array transport, structural validation, standalone verification with the four-state verdict, and a sealed-PoE round trip. |
+| `src/verify-offline.ts`  | The verifier surface in depth: all four verdicts (`valid` / `pending` / `unverifiable` / `failed`) with their exit codes, the `fetchContent` switch, the audit trail, and the attribution split on fetched content.                                                |
+| `src/sealed-poe.ts`      | The sealed-PoE construction: both KEMs (`x25519` and the X-Wing hybrid `mlkem768x25519`), the single-byte-string `kem_ct`, the segmented STREAM content format, the hash-claim binding, trial-decrypt, and the typed decryption outcomes.                          |
+| `src/merkle-batch.ts`    | Batch anchoring with a top-level `merkle[]` commitment: the RFC 9162 root, the normative CBOR leaves-list document, inclusion proofs, and verifying the commitment through the report's per-commitment entries.                                                    |
+| `src/validate-record.ts` | The structural validator's discriminated result and typed issues, then a replay of the validator conformance corpus (`../../conformance/validator/`) — code-for-code agreement with the cross-language oracle.                                                     |
 
 ## How to run
 
-Requires Node.js 22.18+ (which runs TypeScript ESM directly — no transpiler,
-no build step) and [pnpm](https://pnpm.io). Install once:
+Requires Node.js 22.18+ (which runs TypeScript directly — no transpiler, no
+build step) and [pnpm](https://pnpm.io) or npm. Install once, then run any
+script:
 
 ```sh
 pnpm install --ignore-workspace
-```
 
-Run a single example directly:
-
-```sh
-node src/end-to-end.ts               # publish/verify + sealed-PoE roundtrip
-node src/standalone-verify-example.ts # standalone verifier over a synthetic tx
-node src/smoke-parity.ts             # canonical-CBOR byte-parity vectors
-node src/smoke-validator.ts          # structural-validator behaviour
-node src/smoke-tx-extract.ts         # label-309 byte-slice extraction
-node src/merkle-sha2-256.ts          # Merkle root + inclusion-proof self-test
-node src/cid-validator.ts            # IPFS CID self-test
+node src/end-to-end.ts       # produce → carry → verify walk-through
+node src/verify-offline.ts   # the four verdicts + attribution split
+node src/sealed-poe.ts       # sealed-PoE construction tour
+node src/merkle-batch.ts     # merkle[] batch anchoring
+node src/validate-record.ts  # validator + conformance replay
 ```
 
 Or use the package scripts:
 
 ```sh
 pnpm demo            # src/end-to-end.ts
-pnpm verify          # src/standalone-verify-example.ts
-pnpm smoke           # run every demo + smoke test + self-test in sequence
+pnpm verify          # src/verify-offline.ts
+pnpm smoke           # run every example in sequence
 pnpm typecheck       # tsc --noEmit over the whole project
 ```
 
-The only runtime dependencies are the audited cryptographic libraries; the lone
-dev dependencies are `typescript` (for `pnpm typecheck`) and `@types/node`.
-Every example exits non-zero on a failed assertion, so the scripts double as a
-regression suite.
+Every example is offline and deterministic in outcome, and exits non-zero on
+a failed check, so `pnpm smoke` doubles as a regression suite. Expected tail
+of a run:
+
+```
+PASS  attributable mismatch: verdict failed, exit 1
+PASS  attributable mismatch: URI_INTEGRITY_MISMATCH raised
+PASS  attributable mismatch: claim reported mismatched
+
+ALL verifier-tour checks PASSED
+```
+
+The dependency ranges track the current published `0.x` line of the reference
+packages; the examples in this repository are written against the same
+revision of the standard as the specification beside them, so install the
+latest published packages. To run the examples against a local checkout of
+the SDK source instead, link the built packages into `node_modules/@cardanowall/`.
+
+## Reading the verdict
+
+`verifyTx` / `verifyResolved` emit a report whose minimum contract is pinned
+by [`../../schemas/verify-report.schema.json`](../../schemas/verify-report.schema.json):
+the four-state `verdict` with its `exitCode` mapping (`valid` → 0, `failed` → 1,
+`unverifiable` → 2, `pending` → 3), the sorted `issues` list, one per-claim
+`contentCheck` entry per record item and per `merkle[]` commitment
+(`checked` / `mismatched` / `not_checked` — an unchecked claim can never
+masquerade as a verified one), and the `auditTrail` of every outbound call.
+
+`failed` is reserved for record-attributable outcomes. On fetched content
+that means the attribution split: bytes that provably belong to the published
+URI and fail a committed digest condemn the record
+(`URI_INTEGRITY_MISMATCH` → `failed`), while bytes a gateway merely served
+indict the provider (`URI_PROVIDER_INTEGRITY_MISMATCH`, warning) and leave
+the record `unverifiable`.
 
 ## Out of scope
 
-These examples cover the Label 309 **wire standard only**. The identity
-key-envelope — building or unlocking the envelope, diceware passphrases, the
-passphrase/PIN vault, and envelope discovery/recovery — is **out of scope** and
-does not appear here. Key derivation is demonstrated only down to the seed; how
-a seed is stored and protected is an implementation concern outside this
-standard. The sealed-PoE **passphrase path** (Argon2id-derived content key) is
-in scope, since it is part of the record wire format; Argon2id used for envelope
-discovery is not.
+These examples cover the Label 309 wire standard and its verifier roles.
+Operator-specific concerns — accounts, billing, key custody, how a seed is
+stored and protected — are implementation concerns outside the standard and
+do not appear here.
 
 ## License
 

@@ -1,7 +1,10 @@
 {
   "wallet": "typhon",
+  "kind": "shape-vector",
   "tamper_variant": "tampered-address",
-  "captured_from_positive_fixture": "typhon-cose.json",
+  "derived_from": "typhon-cose.json",
+  "cardano_network": "mainnet",
+  "note": "Shape-vector negative: the protected-header address does not recompute from the resolved public key; the verifier MUST reject with WALLET_ADDRESS_MISMATCH.",
   "record_body_cbor_hex": "a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
   "to_sign_bytes_hex": "63617264616e6f2d706f652d7265636f72642d7369672d7631a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
   "tamper_signer_pubkey_hex": "87011b9efa828a319305dfb91a5425f4f30cc86bdef8c762fa4841e1d9c87090",

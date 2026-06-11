@@ -1,18 +1,18 @@
 {
   "registry": "error-codes",
-  "description": "The complete Label 309 v1 error-code catalogue. Codes are SCREAMING_SNAKE_CASE and stable; implementations MUST emit them byte-exact and MUST NOT introduce lowercase synonyms. Part A codes are emitted by the structural validator (a pure function over CBOR bytes — no I/O, no signature verification, no decryption). Part B codes are emitted by the public verifier and recipient verifier (which fetch metadata, verify signatures, resolve URIs, and decrypt). Severities are taken from the frozen severity map: `error` fails the record, `warning` is a non-fatal runtime anomaly, and `info` is a deliberate non-check that does not fail the record. Two codes carry dual severity (`dual_severity: true`): their default reading is `info`, and a strict / merkle-only verifier promotes them to `error`. Additions are additive-only and must ship with conformance vectors.",
+  "description": "The complete Label 309 v1 error-code catalogue. Codes are SCREAMING_SNAKE_CASE and stable; implementations MUST emit them byte-exact and MUST NOT introduce lowercase synonyms, parser-internal codes, or free-form reason strings. `part` names the layer that emits the code: \"A\" — the structural validator (a pure function over the reassembled CBOR record body: no I/O, no cryptographic signature verification, no decryption); \"B\" — the public verifier and recipient verifier (which resolve transactions, verify signatures, fetch content, and decrypt); \"carriage\" — the pre-validator transport step that unwraps the auxiliary data and reassembles the label-309 chunk array, before the validator runs. Severities: `error` fails the record, `warning` is a non-fatal runtime anomaly, and `info` is a deliberate non-failing disposition. Dual-severity convention: an entry with `dual_severity: true` carries its DEFAULT reading in `severity`, and its description names the context that promotes it to `error` — the recipient role / strict sealed-crypto mode for ENC_UNSUPPORTED, the merkle-only escalation for MERKLE_UNSUPPORTED, strict end-to-end mode for OUT_OF_PROFILE_SKIPPED, and the no-verified-content-commitment floor for MERKLE_LEAVES_UNAVAILABLE. No layer may soften an `error` into a `warning` to make a record pass. Registry maintenance is additive-only: codes are never removed or repurposed, and the trigger semantics of an existing code are immutable — a new failure mode gets a new code, shipped with conformance vectors.",
   "entries": [
     {
       "code": "MALFORMED_CBOR",
       "part": "A",
       "severity": "error",
-      "description": "Canonical-CBOR decode failed. A single code covers every decode failure: malformed or truncated bytes, indefinite-length (streaming) encodings, non-canonical (unsorted) map-key ordering, duplicate map keys, non-minimal integers, and invalid UTF-8."
+      "description": "Canonical-CBOR decode failed. A single code covers every decode failure of the record body: malformed or truncated bytes, indefinite-length (streaming) encodings, non-canonical (unsorted) map-key ordering, duplicate map keys, non-minimal integers, and invalid UTF-8. The carriage layer reuses it for a non-conformant label-309 transport value — a non-array value, an array containing a non-byte-string element, or an indefinite-length array or element — and for auxiliary data whose top-level shape is not one of the three accepted envelope forms."
     },
     {
       "code": "SCHEMA_TYPE_MISMATCH",
       "part": "A",
       "severity": "error",
-      "description": "A field is present but has the wrong CBOR type or shape (e.g. a non-map `hashes`, a non-integer Argon2id parameter, or an empty `crit[]`)."
+      "description": "A field is present but has the wrong CBOR type or shape, or a numeric field exceeds the pinned wire range 0..2^32 − 1 (e.g. a non-map `hashes`, a non-integer Argon2id parameter, an Argon2id parameter above 2^32 − 1, or an empty `crit[]`)."
     },
     {
       "code": "SCHEMA_MISSING_REQUIRED",
@@ -24,13 +24,13 @@
       "code": "SCHEMA_UNKNOWN_FIELD",
       "part": "A",
       "severity": "error",
-      "description": "An unrecognized field appears where the map is closed — an unknown top-level key outside the base set and the extension-key namespaces, or an unknown Argon2id params field."
+      "description": "An unrecognized field appears where the map is closed — a top-level key outside the base set that matches neither extension-key namespace (`^x-.+` vendor / experimental, `^[a-z]+-.+` companion), an extension-style key containing control characters, an unknown key inside any sub-map (every map below the top level is closed), or an unknown Argon2id `params` sub-field."
     },
     {
       "code": "SCHEMA_INVALID_LITERAL",
       "part": "A",
       "severity": "error",
-      "description": "A field that must equal a fixed literal carries a present-but-wrong value (e.g. the record version `v` set to a value other than the required literal)."
+      "description": "A field that must equal a fixed literal carries a present-but-wrong value (e.g. the record version `v` set to a value other than 1)."
     },
     {
       "code": "SCHEMA_EMPTY_RECORD",
@@ -48,25 +48,31 @@
       "code": "UNSUPPORTED_HASH_ALG",
       "part": "A",
       "severity": "error",
-      "description": "An item's `hashes` map names a content-hash algorithm that is not in the hash-algorithm registry."
+      "description": "An item's `hashes` map names a content-hash algorithm that is not in the hash-algorithm registry. Rejected hard, never silently skipped: the content hash is load-bearing for the claim being validated."
     },
     {
       "code": "UNSUPPORTED_MERKLE_COMMIT_ALG",
       "part": "A",
       "severity": "error",
-      "description": "A `merkle[]` commitment names an algorithm that is not in the Merkle-commitment-algorithm registry."
+      "description": "A `merkle[]` commitment names an algorithm outside the Merkle-commitment-algorithm registry. Reserved for unregistered identifiers: a registered OPT-INFO identifier that this verifier merely does not implement is MERKLE_UNSUPPORTED, not this code."
+    },
+    {
+      "code": "SCHEMA_MERKLE_LEAF_COUNT_INVALID",
+      "part": "A",
+      "severity": "error",
+      "description": "A `merkle[]` commitment's REQUIRED `leaf_count` is 0 (an empty tree is forbidden under the registered construction) or above 2^32 − 1. A purely structural check requiring no off-chain bytes."
     },
     {
       "code": "INVALID_URI",
       "part": "A",
       "severity": "error",
-      "description": "A reconstructed URI is not a valid absolute URI under the profile — it carries a fragment, lacks a scheme, uses a scheme outside {ar://, ipfs://}, or fails the per-scheme shape check (Arweave 43-char base64url txid, or the IPFS CID profile)."
+      "description": "A `uris[]` entry is not a valid absolute URI under the profile — it carries a fragment, lacks a scheme, names a scheme outside the closed fetch set {ar://, ipfs://} (the scheme alone is case-folded before matching; the body is matched verbatim), or fails the per-scheme shape check (the 43-character base64url Arweave txid with no path or query, or the offline CID profile)."
     },
     {
       "code": "CHUNK_TOO_LARGE",
-      "part": "A",
+      "part": "carriage",
       "severity": "error",
-      "description": "A chunk in a chunked byte-string or text array exceeds the maximum per-chunk byte length."
+      "description": "A byte-string element of the label-309 transport chunk array exceeds 64 bytes. Emitted by the pre-validator reassembly step, not by the structural validator. Such a value cannot appear on chain — Cardano nodes refuse oversized metadata strings at submission — but an implementation validating caller-supplied bytes MUST still pin this rejection."
     },
     {
       "code": "UNAUTHENTICATED_CIPHER_FORBIDDEN",
@@ -78,19 +84,26 @@
       "code": "UNSUPPORTED_AEAD_ALG",
       "part": "A",
       "severity": "error",
-      "description": "An encryption envelope's `aead` names a cipher that is not in the content-AEAD registry (and is not in the forbidden unauthenticated-cipher family)."
+      "description": "An encryption envelope's `aead` names a content format outside the content-AEAD registry (and outside the forbidden unauthenticated-cipher family). Emitted as an error by the recipient verifier and in strict sealed-crypto mode, co-firing with the ENC_UNSUPPORTED escalation; in the default public reading the envelope instead degrades to opaque with ENC_UNSUPPORTED."
     },
     {
       "code": "NONCE_LENGTH_MISMATCH",
       "part": "A",
       "severity": "error",
-      "description": "An encryption envelope's `nonce` byte length does not match the length pinned for its `aead` algorithm."
+      "description": "An encryption envelope's `nonce` byte length does not match the `enc.nonce` length registered for its content format (24 bytes for chacha20-poly1305-stream64k). Checked only under a supported `aead`: under an unknown identifier the envelope is opaque and no nonce-length check runs."
     },
     {
       "code": "UNSUPPORTED_ENVELOPE_SCHEME",
       "part": "A",
       "severity": "error",
-      "description": "An encryption envelope's `scheme` is not the supported unsigned integer scheme identifier."
+      "description": "An encryption envelope's `scheme` is not a supported sealed-PoE construction version. Emitted as an error by the recipient verifier and in strict sealed-crypto mode, co-firing with the ENC_UNSUPPORTED escalation; in the default public reading the envelope instead degrades to opaque with ENC_UNSUPPORTED."
+    },
+    {
+      "code": "ENC_UNSUPPORTED",
+      "part": "A",
+      "severity": "info",
+      "dual_severity": true,
+      "description": "An encryption envelope's `scheme`, `kem`, or `aead` names an identifier this implementation does not support — whether registered by a successor revision or simply unknown — so the envelope is treated as opaque: no shape, key-path, or length rules are applied against an unknown identifier, the unrecognised identifier(s) are carried in the message, and the item's content-hash claim is still validated (ENC_REQUIRES_CONTENT_HASH still applies). One carve-out: an `aead` naming a forbidden unauthenticated cipher family never takes the opaque reading and is rejected with UNAUTHENTICATED_CIPHER_FORBIDDEN in every role - a forbidden primitive is a recognised hazard, not an unknown identifier. Dual severity: info in the default public reading — a public verifier never decrypts, so an envelope it cannot shape-validate subtracts nothing from the timestamped hash commitment it actually verifies; escalates to error for the recipient verifier and in strict sealed-crypto mode, co-firing with the specific UNSUPPORTED_ENVELOPE_SCHEME / UNSUPPORTED_KEM_ALG / UNSUPPORTED_AEAD_ALG. In every role, a record tagged with this code MUST NOT be presented as a verified sealed delivery — only its timestamp/hash claim is verified."
     },
     {
       "code": "ENC_SLOTS_EMPTY",
@@ -108,7 +121,7 @@
       "code": "UNSUPPORTED_KEM_ALG",
       "part": "A",
       "severity": "error",
-      "description": "An encryption envelope's `kem` names a key-encapsulation mechanism that is not in the KEM registry."
+      "description": "An encryption envelope's `kem` names a key-encapsulation mechanism outside the KEM registry. Emitted as an error by the recipient verifier and in strict sealed-crypto mode, co-firing with the ENC_UNSUPPORTED escalation; in the default public reading the envelope instead degrades to opaque with ENC_UNSUPPORTED."
     },
     {
       "code": "ENC_KEM_REQUIRED",
@@ -120,13 +133,13 @@
       "code": "KEM_EPK_LENGTH_MISMATCH",
       "part": "A",
       "severity": "error",
-      "description": "A classical-KEM slot's ephemeral public key `epk` has the wrong byte length for its KEM."
+      "description": "A classical-KEM slot's ephemeral public key `epk` has the wrong byte length for its KEM (32 bytes for x25519). A pure byte-length check; the validator runs no decapsulation."
     },
     {
       "code": "KEM_CT_LENGTH_MISMATCH",
       "part": "A",
       "severity": "error",
-      "description": "A hybrid-KEM slot's KEM ciphertext `kem_ct` does not reassemble to the byte length pinned for its KEM."
+      "description": "A hybrid-KEM slot's KEM ciphertext `kem_ct` has the wrong byte length for its KEM (a single 1120-byte byte string for mlkem768x25519). A pure byte-length check; the validator runs no decapsulation."
     },
     {
       "code": "WRAP_LENGTH_MISMATCH",
@@ -138,7 +151,7 @@
       "code": "ENC_SLOTS_MAC_INVALID_LENGTH",
       "part": "A",
       "severity": "error",
-      "description": "An encryption envelope's `slots_mac` (the MAC binding the recipient-slot set) has the wrong byte length."
+      "description": "An encryption envelope's `slots_mac` (the MAC binding the recipient-slot set) is not 32 bytes."
     },
     {
       "code": "ENC_SLOTS_MAC_REQUIRED",
@@ -156,13 +169,13 @@
       "code": "ENC_SLOTS_DUPLICATE_KEM_MATERIAL",
       "part": "A",
       "severity": "error",
-      "description": "Two slots in one `slots[]` carry identical encapsulation material — the same `epk` (x25519) or the same reassembled `kem_ct` (mlkem768x25519). Rejected before any KEM or AEAD primitive: a within-record duplicate breaks per-slot KEK uniqueness, on which the zero-nonce wrap depends."
+      "description": "Two slots in one `slots[]` carry identical encapsulation material — the same `epk` (x25519) or the same `kem_ct` (mlkem768x25519). Rejected before any KEM or AEAD primitive: a within-record duplicate breaks per-slot KEK uniqueness, on which the zero-nonce wrap depends."
     },
     {
       "code": "ENC_SLOTS_TOO_MANY",
       "part": "A",
       "severity": "error",
-      "description": "An encryption envelope's `slots[]` exceeds the verifier's slot-count resource bound (reference bound 1024; deployments MAY tighten). Rejected before any KEM or AEAD primitive to bound parser resource use."
+      "description": "An encryption envelope's `slots[]` exceeds the verifier's slot-count resource bound (reference bound MAX_SLOTS = 1024; deployments MAY tighten). Rejected before any KEM or AEAD primitive to bound parser resource use; the bound sits far above the transaction-metadata ceiling that bounds honest records."
     },
     {
       "code": "ENC_ENVELOPE_TOO_LARGE",
@@ -186,25 +199,25 @@
       "code": "ENC_REQUIRES_CONTENT_HASH",
       "part": "A",
       "severity": "error",
-      "description": "An item carries an `enc` envelope but its `hashes` map declares no content-hash (sha2-256 / blake2b-256), so the ciphertext is not bound to any plaintext digest."
+      "description": "An item carries an `enc` envelope but its `hashes` map holds no key from the content-hash registry, so the ciphertext is not bound to any plaintext digest. Applies even when the envelope itself is opaque (the check inspects the item's `hashes` map, not the envelope) and MAY co-fire with UNSUPPORTED_HASH_ALG on the same item."
     },
     {
       "code": "ENC_PASSPHRASE_ALG_UNSUPPORTED",
       "part": "A",
       "severity": "error",
-      "description": "A passphrase envelope's `alg` names a KDF that is not in the passphrase-KDF registry."
+      "description": "A passphrase envelope's `alg` names a KDF outside the passphrase-KDF registry — including the internal building block hkdf-sha256, which carries no wire identifier and must never be used to stretch a passphrase."
     },
     {
       "code": "ENC_PASSPHRASE_SALT_TOO_SHORT",
       "part": "A",
       "severity": "error",
-      "description": "A passphrase envelope's salt is shorter than the minimum salt length."
+      "description": "A passphrase envelope's salt is shorter than the 16-byte minimum."
     },
     {
       "code": "ENC_PASSPHRASE_SALT_TOO_LONG",
       "part": "A",
       "severity": "error",
-      "description": "A passphrase envelope's salt is longer than the maximum salt length."
+      "description": "A passphrase envelope's salt is longer than the 64-byte maximum."
     },
     {
       "code": "ENC_PASSPHRASE_ARGON2_PARAMS_TOO_LOW",
@@ -216,19 +229,19 @@
       "code": "ENC_PASSPHRASE_PARAMS_EXCEED_POLICY",
       "part": "A",
       "severity": "error",
-      "description": "A passphrase envelope's KDF parameters exceed the upper policy bound (a denial-of-service backstop against unbounded work factors)."
+      "description": "A passphrase envelope's KDF parameters exceed the verifier deployment's upper policy ceiling — a non-normative, hardware-dependent denial-of-service backstop, distinct from the normative floor code and never to be conflated with it."
     },
     {
       "code": "MALFORMED_SIG_COSE_SIGN1",
       "part": "A",
       "severity": "error",
-      "description": "A signature entry's COSE_Sign1 (or its inline COSE_Key sidecar) is structurally invalid — fails to decode, carries an attached (non-detached) payload, or its COSE_Key has the wrong key type, curve, or public-key shape."
+      "description": "A signature entry's COSE_Sign1 (or its inline COSE_Key sidecar) is structurally invalid — fails to decode as the 4-element COSE_Sign1, carries an attached (non-null) payload where detached-only is required, or its COSE_Key has the wrong key type, curve, or public-key shape."
     },
     {
       "code": "SIGNATURE_UNSUPPORTED",
       "part": "A",
       "severity": "info",
-      "description": "A signature entry's COSE_Sign1 protected `alg` is not a registered signature algorithm label. Info severity: an unrecognized signature algorithm does not fail the record (signatures are always optional)."
+      "description": "A signature entry's COSE_Sign1 protected `alg` is not a registered signature-algorithm label (including the reserved labels). Info severity: signatures are always optional, so an unrecognized signature algorithm is tagged on the offending `sigs[i]` entry and does not fail the record — the verifier simply never claims to have verified it."
     },
     {
       "code": "SIG_ENTRY_INVALID_SHAPE",
@@ -252,171 +265,202 @@
       "code": "SUPERSEDES_TX_INVALID_LENGTH",
       "part": "A",
       "severity": "error",
-      "description": "A `supersedes` transaction reference does not have the required byte length."
+      "description": "A `supersedes` transaction reference is not exactly 32 bytes (a Cardano transaction id)."
     },
     {
       "code": "EXTENSION_UNSUPPORTED_CRITICAL",
       "part": "A",
       "severity": "error",
-      "description": "The record's `crit[]` names a critical extension that this validator does not implement, so the record cannot be safely processed."
+      "description": "The record's `crit[]` names a critical extension outside the validator's supported set, so the record cannot be safely processed. The default supported set is empty, so a default-configured validator fails every `crit`-bearing record — by design."
     },
     {
       "code": "CRIT_SHAPE_INVALID",
       "part": "A",
       "severity": "error",
-      "description": "A `crit[]` entry violates the list-shape rules — it names a base key, does not match the extension-key form, is named but absent from the record map, or is duplicated."
+      "description": "A `crit[]` entry violates the list-shape rules — it names a base key, does not match the extension-key form (or names a key containing control characters), is named but absent from the record map, or is duplicated."
     },
     {
-      "code": "METADATA_NOT_FOUND",
+      "code": "TX_NOT_FOUND",
       "part": "B",
       "severity": "error",
-      "description": "No Label 309 metadata (label 309) was found at the referenced transaction."
-    },
-    {
-      "code": "INSUFFICIENT_CONFIRMATIONS",
-      "part": "B",
-      "severity": "info",
-      "description": "The transaction has fewer confirmations than the verifier's threshold. Info severity: the record may still be structurally valid; the depth is reported for the caller to weigh."
-    },
-    {
-      "code": "SIGNATURE_INVALID",
-      "part": "B",
-      "severity": "error",
-      "description": "A record-level signature failed cryptographic verification against its claimed public key."
-    },
-    {
-      "code": "SIGNER_KEY_UNRESOLVED",
-      "part": "B",
-      "severity": "error",
-      "description": "A signature's signing key could not be resolved (no inline COSE_Key and no resolvable key-by-reference)."
-    },
-    {
-      "code": "WALLET_ADDRESS_MISMATCH",
-      "part": "B",
-      "severity": "error",
-      "description": "A claimed publishing wallet does not match the address that submitted the transaction."
-    },
-    {
-      "code": "URI_TARGET_FORBIDDEN",
-      "part": "B",
-      "severity": "error",
-      "description": "A URI resolves to a forbidden network target (e.g. a host on the deny-list), blocked to prevent server-side request forgery."
-    },
-    {
-      "code": "URI_INTEGRITY_MISMATCH",
-      "part": "B",
-      "severity": "error",
-      "description": "Content fetched from a content-addressed URI does not match the digest the URI commits to."
-    },
-    {
-      "code": "URI_FETCH_FAILED",
-      "part": "B",
-      "severity": "warning",
-      "description": "A URI fetch failed transiently. Warning severity: a non-fatal runtime anomaly (e.g. a gateway error) that does not by itself invalidate the record."
-    },
-    {
-      "code": "CONTENT_UNAVAILABLE",
-      "part": "B",
-      "severity": "error",
-      "description": "The referenced plaintext content could not be retrieved from any provided URI, so the content hash could not be recomputed."
-    },
-    {
-      "code": "CIPHERTEXT_UNAVAILABLE",
-      "part": "B",
-      "severity": "error",
-      "description": "The sealed-PoE ciphertext could not be retrieved from any provided URI, so decryption could not proceed."
+      "description": "No consulted explorer knows the requested transaction. A single provider's negative answer is not chain-authoritative — the transaction may be on chain and merely unindexed by, unknown to, or withheld by that provider — so the verifier SHOULD consult every remaining provider in the chain before emitting it. Network class: the verdict is `unverifiable`, never `failed`."
     },
     {
       "code": "PROVIDER_UNAVAILABLE",
       "part": "B",
       "severity": "error",
-      "description": "A required external provider (chain explorer or storage gateway) was unavailable for the verification."
+      "description": "Every configured provider (chain explorer or storage gateway) was unreachable or returned no usable response. Network class: the verdict is `unverifiable`, never `failed` — the same record may verify on retry."
+    },
+    {
+      "code": "TX_INTEGRITY_MISMATCH",
+      "part": "B",
+      "severity": "error",
+      "description": "No provider yielded a response surviving the integrity binding: the blake2b-256 of the fetched transaction-body bytes must equal the requested transaction hash, and the blake2b-256 of the fetched auxiliary-data bytes must equal the verified body's `auxiliary_data_hash` — both computed over the bytes exactly as fetched, never over a re-encoding. A provider actively served bytes that do not match the requested reference — distinct from mere unavailability, but provable against the providers, not the record: no record bytes were obtained, so the verdict is `unverifiable`, never `failed`, and the code in the issue list is what distinguishes active provider misbehaviour from simple unreachability."
+    },
+    {
+      "code": "METADATA_NOT_FOUND",
+      "part": "B",
+      "severity": "error",
+      "description": "The integrity-bound transaction carries no metadata under label 309. Record-attributable, not a network outcome: the fetched bytes are hash-bound to the requested transaction, so the absence is proven by the transaction itself — no provider could have stripped the metadata without failing the binding. The verdict is `failed`."
+    },
+    {
+      "code": "INSUFFICIENT_CONFIRMATIONS",
+      "part": "B",
+      "severity": "info",
+      "description": "The transaction is on chain but below the verifier's confirmation-depth threshold (depth = explorer tip height − including-block height + 1). The verdict is `pending`, never `failed`: the record is structurally well-formed and may settle on retry. The pipeline SHOULD halt here — signature, content-fetch, and decryption results computed against a transaction that may yet be orphaned must not be presented as final."
+    },
+    {
+      "code": "SIGNATURE_INVALID",
+      "part": "B",
+      "severity": "error",
+      "description": "A record-level signature failed strict, non-cofactored Ed25519 verification (canonical R/S, low-order public-key rejection, no cofactor multiplication) against its resolved public key."
+    },
+    {
+      "code": "SIGNER_KEY_UNRESOLVED",
+      "part": "B",
+      "severity": "error",
+      "description": "Neither of the two mutually-exclusive key-resolution paths — the in-signature protected-header `kid`, or the inline `cose_key` sidecar — yielded a 32-byte Ed25519 public key for a signature entry."
+    },
+    {
+      "code": "WALLET_ADDRESS_MISMATCH",
+      "part": "B",
+      "severity": "error",
+      "description": "A wallet-path signature's protected-header `address` does not equal the recomputed expected_network_header ‖ Blake2b-224(pubkey) across all 29 bytes — the expected network header byte is derived from the containing transaction's network, never echoed from the record — or the `address` header, REQUIRED on the wallet path, is missing. Distinct from SIGNATURE_INVALID."
+    },
+    {
+      "code": "URI_TARGET_FORBIDDEN",
+      "part": "B",
+      "severity": "error",
+      "description": "An outbound fetch was refused because its target is outside the closed egress set — a URI scheme outside {ar://, ipfs://} that bypassed structural validation (defence-in-depth), an egress purpose outside {cardano, arweave, ipfs}, or a scheme the deployment declines to fetch at all (e.g. a deployment that accepts ipfs:// structurally but refuses every IPFS fetch)."
+    },
+    {
+      "code": "URI_INTEGRITY_MISMATCH",
+      "part": "B",
+      "severity": "error",
+      "description": "Attributable fetched bytes — their content-address binding to the URI verified — fail a digest in the item's `hashes` commitment: a hard, record-attributable integrity failure regardless of what any sibling URI holds, because the producer asserted at publication that every listed URI resolves to committed bytes. Also emitted when a sealed item decrypts successfully but the post-decryption plaintext-hash recheck fails (decrypted bytes are attributed by the AEAD itself). In every case the verdict is `failed`, and no decrypted or valid verdict may surface."
+    },
+    {
+      "code": "URI_PROVIDER_INTEGRITY_MISMATCH",
+      "part": "B",
+      "severity": "warning",
+      "description": "Fetched bytes fail a commitment of the record — an item digest, the Merkle leaves-list validation or root recompute, or the sealed-ciphertext decryption layer — but cannot be held against the record: their content-address binding to the URI was not verified, or was verified and failed, so the serving provider returned bytes that are not (or are not proven to be) what the URI addresses. Provider-attributable or unattributed, never record-attributable: the verifier continues with the remaining URIs and gateways, and a claim left with no attributable bytes satisfying it ends in the applicable availability code (CONTENT_UNAVAILABLE, MERKLE_LEAVES_UNAVAILABLE, or CIPHERTEXT_UNAVAILABLE) with verdict `unverifiable`. The storage-side counterpart of TX_INTEGRITY_MISMATCH: condemning a record requires evidence a misbehaving gateway cannot fabricate."
+    },
+    {
+      "code": "URI_FETCH_FAILED",
+      "part": "B",
+      "severity": "warning",
+      "description": "A single fetch attempt failed transiently (e.g. a gateway error). A non-fatal runtime anomaly: other URIs or gateways may still yield the committed bytes, and the failure does not by itself invalidate the record."
+    },
+    {
+      "code": "CONTENT_UNAVAILABLE",
+      "part": "B",
+      "severity": "error",
+      "description": "An item's URI list was exhausted with no attributable bytes satisfying the commitment — nothing fetched, or everything fetched indicted the provider rather than the record (URI_PROVIDER_INTEGRITY_MISMATCH) — so the content claim could not be checked. Network class: the claim is unchecked, the record is not condemned — the verdict is `unverifiable`, never `failed`."
+    },
+    {
+      "code": "CONTENT_FETCH_LIMIT_EXCEEDED",
+      "part": "B",
+      "severity": "error",
+      "description": "A fetch was aborted at the deployment's maxFetchBytes ceiling, enforced incrementally during streaming. Network/policy class — a statement about the verifier's policy, never about the record: the verdict is `unverifiable`, and the same record may verify under a deployment with a higher ceiling."
+    },
+    {
+      "code": "CIPHERTEXT_UNAVAILABLE",
+      "part": "B",
+      "severity": "error",
+      "description": "The sealed-PoE ciphertext could not be obtained for an `enc`-bearing item — no out-of-band bytes were supplied and no URI yielded an attributable blob — so decryption could not proceed. Network class: the verdict is `unverifiable`."
     },
     {
       "code": "SERVICE_INDEPENDENCE_VIOLATION",
       "part": "B",
       "severity": "error",
-      "description": "Verification could not be completed without trusting a single issuer-controlled service, violating the standalone-verifiability requirement."
+      "description": "An outbound call targeted a host on the deployment's denyHosts list; the recording egress wrapper hard-fails the call. A conformant verifier must complete every conformant record with every operator domain denied — needing a forbidden host to verify violates the standalone-verifiability requirement."
     },
     {
       "code": "WRONG_DECRYPTION_INPUT_SHAPE",
       "part": "B",
       "severity": "error",
-      "description": "The inputs supplied to recipient decryption have the wrong shape (e.g. the wrong slot or envelope structure)."
+      "description": "The decryption keyring holds no credential of the shape the item's on-wire key path requires — for example, only passphrases supplied against a slots-path item, or only recipient private keys against a passphrase-path item."
     },
     {
       "code": "WRONG_RECIPIENT_KEY",
       "part": "B",
       "severity": "error",
-      "description": "The recipient private key does not unwrap any slot in the envelope; this key is not a recipient of the sealed PoE."
+      "description": "The trial-decrypt loop accepted no slot for the supplied recipient private key — the per-slot constant-time decision folding the KEM validity bit, the wrap-open, and the slot-set MAC accepted nothing. The key is not a recipient of this sealed PoE."
     },
     {
       "code": "TAMPERED_HEADER",
       "part": "B",
       "severity": "error",
-      "description": "The authenticated encryption-envelope header failed its integrity check (the slot MAC or associated data did not verify)."
+      "description": "A slot wrap-opened but no candidate content-encryption key reproduces `slots_mac` (the MAC over the slots-transcript hash): the authenticated envelope header — scheme, path, aead, kem, nonce, the slot set, or the hashes binding — fails its integrity check."
     },
     {
       "code": "TAMPERED_CIPHERTEXT",
       "part": "B",
       "severity": "error",
-      "description": "The content ciphertext failed its AEAD authentication tag check during decryption."
+      "description": "The segmented STREAM ciphertext failed during decryption: a per-chunk authentication-tag failure, truncation (a last chunk without the final flag), a final flag on a non-last chunk, data following the final chunk, a non-final chunk of the wrong size, or any other chunk-layout violation. On the passphrase path the in-ciphertext key-commitment mismatch — wrong passphrase, tampered salt / params / header fields, or an envelope spliced onto a different hash claim — surfaces as this same code, indistinguishable by design. Fires against an attributable ciphertext blob (supplied out-of-band, or fetched with a verified content-address binding); the same failures over an unattributable fetched blob surface as URI_PROVIDER_INTEGRITY_MISMATCH instead."
     },
     {
       "code": "KDF_DERIVATION_FAILED",
       "part": "B",
       "severity": "error",
-      "description": "Key derivation from the passphrase (or from the KEM shared secret) failed."
+      "description": "The passphrase KDF (Argon2id) rejected its inputs at runtime — a derivation failure distinct from the structural parameter-floor checks, which fire before any KDF runs."
+    },
+    {
+      "code": "ENC_PASSPHRASE_UNNORMALIZABLE",
+      "part": "B",
+      "severity": "error",
+      "description": "A supplied passphrase contains a codepoint unassigned in Unicode 16.0, rejected before any normalization step runs: normalization of unassigned codepoints is not stable across Unicode versions, so accepting one could silently change the derived key later. Invisible to honest users — every character in actual written use is assigned."
+    },
+    {
+      "code": "ENC_PASSPHRASE_EMPTY",
+      "part": "B",
+      "severity": "error",
+      "description": "A supplied passphrase normalizes to the empty string under the pinned normalization profile — a whitespace-only or otherwise vacuous passphrase. Rejected because the KDF would silently accept zero bytes, keying the record to a content-encryption key any party can derive."
     },
     {
       "code": "SCHEMA_MERKLE_LEAF_COUNT_MISMATCH",
       "part": "B",
       "severity": "error",
-      "description": "The number of supplied Merkle leaves does not match the leaf count the commitment declares."
+      "description": "A leaf-count disagreement involving the obtained Merkle leaves-list — internal to the leaves-list document, or between the leaves-list and the on-chain commitment's `leaf_count`. Fires against an attributable leaves-list; an unattributable fetched document surfaces as URI_PROVIDER_INTEGRITY_MISMATCH instead."
     },
     {
       "code": "SCHEMA_MERKLE_LEAVES_FORMAT_UNSUPPORTED",
       "part": "B",
       "severity": "error",
-      "description": "The supplied Merkle-leaves payload uses a format the verifier does not support."
+      "description": "The obtained Merkle leaves-list is a recognisable container whose declared format the verifier does not support. Fires against an attributable leaves-list; an unattributable fetched document surfaces as URI_PROVIDER_INTEGRITY_MISMATCH instead."
     },
     {
       "code": "SCHEMA_MERKLE_LEAVES_MALFORMED",
       "part": "B",
       "severity": "error",
-      "description": "The supplied Merkle-leaves payload is structurally malformed."
+      "description": "The obtained Merkle leaves-list bytes are not the leaves-list container at all, or the container is structurally malformed. Fires against an attributable leaves-list; an unattributable fetched document surfaces as URI_PROVIDER_INTEGRITY_MISMATCH instead."
     },
     {
       "code": "MERKLE_ROOT_MISMATCH",
       "part": "B",
       "severity": "error",
-      "description": "The Merkle root recomputed from the supplied leaves does not match the committed root."
+      "description": "The Merkle root recomputed from an attributable leaves-list — supplied out-of-band, or fetched with a verified content-address binding — does not byte-equal the committed on-chain root. A record-attributable integrity failure: the verdict is `failed`. An unattributable fetched document surfaces as URI_PROVIDER_INTEGRITY_MISMATCH instead."
     },
     {
       "code": "MERKLE_LEAVES_UNAVAILABLE",
       "part": "B",
       "severity": "warning",
-      "description": "The Merkle leaves could not be retrieved, so the root could not be recomputed. Warning severity: a non-fatal availability anomaly."
-    },
-    {
-      "code": "MERKLE_LEAVES_INFORMATIVE_FORM",
-      "part": "B",
-      "severity": "info",
-      "description": "The Merkle leaves were provided only in an informative (non-verifiable) form. Info severity: reported, but not a verification failure."
+      "dual_severity": true,
+      "description": "No attributable Merkle leaves-list could be obtained, so the root could not be recomputed. Dual severity: warning when at least one other content commitment of the record was verified; escalates to error (network class, verdict `unverifiable`) when the unavailability leaves the record with no verified content commitment — the commitment floor, as on a merkle-only record."
     },
     {
       "code": "MERKLE_UNSUPPORTED",
       "part": "B",
       "severity": "info",
       "dual_severity": true,
-      "description": "A Merkle commitment uses an algorithm the verifier does not support. Dual severity: the default reading is info when another commitment in the same record was validated; promoted to error for a merkle-only record (no content claim was validated alongside it)."
+      "description": "A `merkle[]` commitment uses a registered algorithm this verifier does not implement (Merkle-fold is OPT-INFO). Dual severity: info when the record also carries an `items[]` content claim the verifier validated; escalates to error — and the record-level verdict to `failed` — on a merkle-only record, where the commitment was the record's only content claim. An identifier outside the registered set is UNSUPPORTED_MERKLE_COMMIT_ALG, not this code."
     },
     {
       "code": "OUT_OF_PROFILE_SKIPPED",
       "part": "B",
       "severity": "info",
       "dual_severity": true,
-      "description": "A check was skipped because its target is out of the verifier's profile. Dual severity: the default reading is info (render mode); a strict end-to-end verifier promotes it to error."
+      "description": "A v1-schema field outside the verifier's declared conformance profile was skipped (e.g. a core verifier encountering `enc` or `sigs`); the hash claim is still reported, and the record is not invalid solely because the verifier does not implement a profile extension. Dual severity: info in the default render reading; a strict end-to-end verifier promotes it to error."
     }
   ]
 }

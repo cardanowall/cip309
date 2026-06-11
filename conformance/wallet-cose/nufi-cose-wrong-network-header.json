@@ -1,7 +1,10 @@
 {
   "wallet": "nufi",
+  "kind": "shape-vector",
   "tamper_variant": "wrong-network-header",
-  "captured_from_positive_fixture": "nufi-cose.json",
+  "derived_from": "nufi-cose.json",
+  "cardano_network": "mainnet",
+  "note": "Shape-vector negative: the expected network header byte is derived from the containing transaction's network (mainnet, 0xe1), never echoed from the record; a testnet-headed (0xe0) address fails the full-29-byte comparison with WALLET_ADDRESS_MISMATCH.",
   "record_body_cbor_hex": "a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
   "to_sign_bytes_hex": "63617264616e6f2d706f652d7265636f72642d7369672d7631a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
   "tamper_signer_pubkey_hex": "dd2cfd7b718a741ea3fefa8f7fd72771822d1622011d0c707fae59960e7783cc",

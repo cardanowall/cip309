@@ -1,11 +1,11 @@
 {
   "registry": "signature-algorithms",
-  "description": "Record-signature algorithm registry, keyed by COSE algorithm label as it appears in a COSE_Sign1 protected header. Record-level signatures are ALWAYS OPTIONAL in Label 309: authorship is an opt-in claim, never required for a record to verify. A signature's COSE protected `alg` MUST name a registered label; any other label surfaces as SIGNATURE_UNSUPPORTED at info severity (it does not fail the record). Verification is strict, non-cofactored Ed25519 per RFC 8032 §5.1.7 regardless of which registered label is used. Additions are additive-only and must ship with conformance vectors.",
+  "description": "Record-signature algorithm registry, keyed by COSE algorithm label as it appears in a COSE_Sign1 protected header (the integer labels live in the IANA COSE Algorithms registry; this registry pins which of them Label 309 accepts). Record-level signatures are ALWAYS OPTIONAL in Label 309: authorship is an opt-in claim, never required for a record to verify. A signature's COSE protected `alg` MUST name a registered label; any other label surfaces as SIGNATURE_UNSUPPORTED at info severity and does not fail the record. Verification is strict, non-cofactored Ed25519 per RFC 8032 §5.1.7 regardless of which registered label is used. Reserved labels — -7 (ES256, RFC 9053 §2.1), -49 (ML-DSA-65, RFC 9964 / FIPS 204), and the hash-based slh-dsa-sha2-128s (FIPS 205) — are not registered under v1 and surface as SIGNATURE_UNSUPPORTED; the record's content claim remains valid. Additions are additive-only and must ship with conformance vectors.",
   "entries": [
     {
       "identifier": "EdDSA",
       "cose_alg_label": -8,
-      "description": "EdDSA, the curve-agnostic COSE label, pinned to Ed25519 by Label 309. This is the mandatory baseline label that every conforming verifier MUST accept.",
+      "description": "EdDSA, the curve-agnostic COSE label, pinned to Ed25519 by Label 309. The MANDATORY baseline label every conforming verifier MUST accept, and the only `alg` CIP-30 wallets emit on the signData path. IANA marks -8 deprecated as of RFC 9864 in favour of fully-specified codepoints, but v1 keeps it MANDATORY because the curve ambiguity the deprecation targets does not apply: the curve is pinned to Ed25519 at two layers — the COSE_Key carries kty = 1 (OKP) and crv = 6 (Ed25519), and the path-1 32-byte protected-header kid convention is unambiguously an Ed25519 public key.",
       "curve": "Ed25519",
       "mandatory": true,
       "reference": "RFC 9053 §2.2 (CBOR Object Signing and Encryption — EdDSA) and RFC 8032 (Edwards-Curve Digital Signature Algorithm, Ed25519)"
@@ -13,10 +13,10 @@
     {
       "identifier": "Ed25519",
       "cose_alg_label": -19,
-      "description": "Ed25519 fully-specified COSE label. Optional; verified identically to the -8 baseline under the same strict non-cofactored Ed25519 primitive when accepted.",
+      "description": "Ed25519, the fully-specified COSE label registered alongside -8. OPT-INFO: a producer MAY emit it and a verifier MAY implement it. A verifier that implements it verifies it identically to the -8 baseline under the same strict non-cofactored Ed25519 primitive; one that does not surfaces the affected `sigs[i]` as SIGNATURE_UNSUPPORTED (info) and the record's content claim still validates.",
       "curve": "Ed25519",
       "mandatory": false,
-      "reference": "RFC 8032 (Edwards-Curve Digital Signature Algorithm, Ed25519)"
+      "reference": "RFC 8032 §5.1 (Edwards-Curve Digital Signature Algorithm, Ed25519) and RFC 9864 §2.2 (IANA assignment of the fully-specified -19 codepoint)"
     }
   ]
 }

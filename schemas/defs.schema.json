@@ -2,11 +2,17 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://label309.org/schemas/defs.schema.json",
   "title": "Label 309 shared definitions",
-  "description": "Shared $defs reused across the Label 309 JSON Schema set: fixed-length byte-string types and the open algorithm-identifier string types for each registry. CBOR has a native byte-string type; JSON does not. Every CBOR `bstr` is therefore modelled here as a lowercase-hex JSON string whose character count is twice the documented byte length (e.g. a 32-byte digest is a 64-character hex string). The algorithm-identifier `$defs` are deliberately OPEN strings: structural validation cannot decide registry membership (whether `sha2-256`, `xchacha20-poly1305`, etc. is registered) — that is a typed error-code check performed by the validator's domain pass against the extensible registries, proven by the conformance vectors. These schemas describe only the PERMISSIVE structural superset; cross-field invariants and per-algorithm digest/field lengths are not expressible here.",
+  "description": "Shared $defs reused across the Label 309 JSON Schema set: byte-string types, the pinned unsigned-integer range, the URI text-string type, and the open algorithm-identifier string types for each registry. CBOR has a native byte-string type; JSON does not. Every CBOR `bstr` is therefore modelled here as a lowercase-hex JSON string whose character count is twice the documented byte length (e.g. a 32-byte digest is a 64-character hex string). The algorithm-identifier `$defs` are deliberately OPEN strings: structural validation cannot decide registry membership (whether `sha2-256`, `chacha20-poly1305-stream64k`, etc. is registered) — that is a typed error-code check performed by the validator's domain pass against the extensible registries, proven by the conformance vectors. These schemas describe only the PERMISSIVE structural superset; cross-field invariants and per-algorithm digest/field lengths are not expressible here.",
   "$defs": {
+    "bytes": {
+      "title": "Byte string of any length (hex-encoded)",
+      "description": "A CBOR `bstr` of any length, modelled as an even-length lowercase-hex JSON string. Used where the grammar carries an unbounded byte string (the COSE_Sign1 and COSE_Key payloads of a signature entry); the inner structure of those bytes is a domain-pass check, not a length rule.",
+      "type": "string",
+      "pattern": "^([0-9a-f]{2})*$"
+    },
     "bytes32": {
       "title": "32-byte byte string (hex-encoded)",
-      "description": "A CBOR `bstr` of exactly 32 bytes, modelled as a 64-character lowercase-hex JSON string. Used for content-hash digests, Merkle roots, the supersedes tx hash, and slots_mac.",
+      "description": "A CBOR `bstr` of exactly 32 bytes, modelled as a 64-character lowercase-hex JSON string. Used for content-hash digests, Merkle roots, Merkle leaves, the supersedes tx hash, the per-slot ephemeral public key, and slots_mac.",
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"
     },
@@ -15,6 +21,24 @@
       "description": "A CBOR `bstr` of exactly 48 bytes (32-byte content-encryption key + 16-byte AEAD tag), modelled as a 96-character lowercase-hex JSON string. Used for the per-slot `wrap` field on every KEM.",
       "type": "string",
       "pattern": "^[0-9a-f]{96}$"
+    },
+    "bytes1120": {
+      "title": "1120-byte byte string (hex-encoded)",
+      "description": "A CBOR `bstr` of exactly 1120 bytes, modelled as a 2240-character lowercase-hex JSON string. Used for the X-Wing (mlkem768x25519) encapsulation `kem_ct` of a hybrid slot; a wrong length is the typed code KEM_CT_LENGTH_MISMATCH.",
+      "type": "string",
+      "pattern": "^[0-9a-f]{2240}$"
+    },
+    "uint32": {
+      "title": "Unsigned 32-bit integer",
+      "description": "A CBOR unsigned integer pinned to the range 0 .. 2^32 − 1, decoded and compared as an EXACT integer (never through a lossy float path). Every numeric field the standard defines carries this range; a value outside it is rejected with the field's typed code rather than wrapped, truncated, or coerced.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "uri": {
+      "title": "Absolute URI",
+      "description": "One absolute URI in a single CBOR text string (e.g. ar://, ipfs://), carried with no length cap — the whole-body transport satisfies the ledger's string cap. OPEN here: absoluteness, fragment-freeness, the closed fetch scheme set, and the per-scheme body shape are domain-pass checks (INVALID_URI), not expressible structurally.",
+      "type": "string"
     },
     "content-hash-alg": {
       "title": "Content-hash algorithm identifier",
@@ -30,7 +54,7 @@
     },
     "aead-alg": {
       "title": "Content AEAD algorithm identifier",
-      "description": "Named identifier of an authenticated-encryption cipher from the extensible AEAD registry (e.g. xchacha20-poly1305). OPEN string here: registry membership (UNSUPPORTED_AEAD_ALG), the unauthenticated-cipher denylist (UNAUTHENTICATED_CIPHER_FORBIDDEN), and the per-AEAD nonce length (NONCE_LENGTH_MISMATCH) are domain-pass checks.",
+      "description": "Named identifier of an authenticated-encryption content format from the extensible AEAD registry (e.g. chacha20-poly1305-stream64k). OPEN string here: registry membership (UNSUPPORTED_AEAD_ALG), the unauthenticated-cipher denylist (UNAUTHENTICATED_CIPHER_FORBIDDEN), and the per-format nonce length (NONCE_LENGTH_MISMATCH) are domain-pass checks.",
       "type": "string",
       "minLength": 1
     },

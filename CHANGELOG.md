@@ -10,6 +10,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 > backward-incompatible ways until a 1.0 release. Pre-1.0 versions do not carry
 > the stability guarantees of [Semantic Versioning](https://semver.org/).
 
+## [0.4.0] - 2026-06-11
+
+### Changed
+
+- **BREAKING (wire format):** The sealed-PoE construction is finalized: nonce-salted key derivation, a content-hash-bound slot transcript, segmented STREAM content encryption (`chacha20-poly1305-stream64k`), an in-ciphertext passphrase commitment, and passphrase normalization pinned to Unicode 16.0 NFKC. Records sealed under earlier releases do not decrypt or verify under 0.4.0, and vice versa.
+- **BREAKING (wire format):** Record fields are de-chunked: `kem_ct` is a single byte string, URIs are plain text strings, and COSE fields are single byte strings. The only remaining chunking is the ledger-imposed ≤64-byte segmentation of the whole record body for transport.
+- **BREAKING (verifier):** Verification concludes in a four-state verdict — `valid`, `pending`, `unverifiable`, or `failed` — with paired exit codes (0/3/2/1) and a defined report schema (camelCase fields, positional `items`/`merkle` results, severity-tagged issues). Verifiers enforce transaction-hash and auxiliary-data binding, never fabricate confirmation depth, never follow redirects, and treat a deny-host violation as terminal on the resolve path and per-attempt on the content path. Bytes that fail a URI's own content address are attributed to the provider as `URI_PROVIDER_INTEGRITY_MISMATCH`, distinct from a content-hash failure.
+- Conformance vectors regenerated under the finalized wire format; every transaction vector is fully bound (transaction hash and auxiliary-data hash).
+
+### Added
+
+- Identity-seed string encoding: a checksummed bech32 form rendered uppercase as `L309-SEED-1…` (HRP `l309-seed-`), accepted alongside raw hex, with a byte-pinned conformance vector.
+- The error-code registry now holds 76 codes.
+- New conformance families: carriage, Cardano, KDF, Unicode normalization, seed encoding, and recipient-scan negatives.
+
 ## [0.3.0] - 2026-06-06
 
 ### Changed

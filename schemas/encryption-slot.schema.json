@@ -2,20 +2,46 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://label309.org/schemas/encryption-slot.schema.json",
   "title": "Label 309 encryption recipient slot",
-  "description": "A single per-recipient slot in a sealed-PoE envelope, carrying the content-encryption key wrapped to one recipient. The slot shape is KEM-DRIVEN, but the envelope-level `kem` identifier is not visible from a slot in isolation, so this schema is deliberately PERMISSIVE: `epk`, `kem_ct`, and `wrap` are all OPTIONAL, the map is NOT closed, and no cross-KEM exclusion is asserted. The two registered shapes are: classical x25519 = `{ epk: bstr(32), wrap: bstr(48) }` (ephemeral X25519 public key + wrapped CEK); hybrid mlkem768x25519 = `{ kem_ct: [bstr 1..64] (reassembling to 1120 bytes), wrap: bstr(48) }` (X-Wing encapsulation as a chunked byte array, with NO per-slot epk). Which field MUST/MUST NOT be present for the declared kem, each field's exact length, and rejection of cross-KEM contamination (an x25519 slot carrying kem_ct, or a hybrid slot carrying epk) are domain-pass checks emitting ENC_SLOT_INVALID_SHAPE / KEM_EPK_LENGTH_MISMATCH / KEM_CT_LENGTH_MISMATCH / WRAP_LENGTH_MISMATCH. CBOR byte strings are modelled as lowercase-hex JSON strings.",
-  "type": "object",
-  "properties": {
-    "epk": {
-      "$comment": "Classical (x25519) ephemeral public key. 32-byte bstr. Present only on the classical path; absence/presence is enforced by the KEM-driven domain pass, not structurally.",
-      "$ref": "defs.schema.json#/$defs/bytes32"
+  "description": "A single per-recipient slot in a sealed-PoE envelope, carrying the content-encryption key wrapped to one recipient. A slot is one of two KEM-discriminated CLOSED shapes — mirroring the grammar's `slot = classical-slot / hybrid-slot` — and the envelope-level `enc.kem` selects which: classical x25519 = `{ epk: bstr(32), wrap: bstr(48) }` (per-slot ephemeral X25519 public key + wrapped CEK); hybrid mlkem768x25519 = `{ kem_ct: bstr(1120), wrap: bstr(48) }` (the single 1120-byte X-Wing encapsulation — there is NO per-slot epk: the X25519 ephemeral is the trailing 32 bytes of `kem_ct`). `wrap` is the KEM-independent 48-byte wrapped CEK (32-byte CEK + 16-byte AEAD tag) in both shapes. This schema admits either shape structurally; binding the chosen shape to `enc.kem` (ENC_SLOT_INVALID_SHAPE) and the no-mixing rule (every slot in one envelope shares one `enc.kem`) are domain-pass checks. CBOR byte strings are modelled as lowercase-hex JSON strings.",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/classical-slot"
     },
-    "kem_ct": {
-      "$comment": "Hybrid (mlkem768x25519) X-Wing encapsulation, carried chunked. Reassembled length (1120 bytes) is a domain-pass check.",
-      "$ref": "chunked-bytes-array.schema.json"
+    {
+      "$ref": "#/$defs/hybrid-slot"
+    }
+  ],
+  "$defs": {
+    "classical-slot": {
+      "title": "Classical (x25519) slot",
+      "description": "The per-slot X25519 ephemeral public key plus the wrapped CEK. Selected by `enc.kem` = x25519.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["epk", "wrap"],
+      "properties": {
+        "epk": {
+          "$comment": "32-byte ephemeral X25519 public key; a wrong length emits KEM_EPK_LENGTH_MISMATCH.",
+          "$ref": "defs.schema.json#/$defs/bytes32"
+        },
+        "wrap": {
+          "$ref": "defs.schema.json#/$defs/bytes48"
+        }
+      }
     },
-    "wrap": {
-      "$comment": "Wrapped content-encryption key: 32-byte CEK + 16-byte AEAD tag = 48-byte bstr, on every KEM.",
-      "$ref": "defs.schema.json#/$defs/bytes48"
+    "hybrid-slot": {
+      "title": "Hybrid (mlkem768x25519) slot",
+      "description": "The single 1120-byte X-Wing encapsulation plus the wrapped CEK. Selected by `enc.kem` = mlkem768x25519.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kem_ct", "wrap"],
+      "properties": {
+        "kem_ct": {
+          "$ref": "defs.schema.json#/$defs/bytes1120"
+        },
+        "wrap": {
+          "$ref": "defs.schema.json#/$defs/bytes48"
+        }
+      }
     }
   }
 }

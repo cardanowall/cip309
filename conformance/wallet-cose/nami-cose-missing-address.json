@@ -1,7 +1,10 @@
 {
   "wallet": "nami",
+  "kind": "shape-vector",
   "tamper_variant": "missing-address",
-  "captured_from_positive_fixture": "nami-cose.json",
+  "derived_from": "nami-cose.json",
+  "cardano_network": "mainnet",
+  "note": "Shape-vector negative: a path-2 wallet signature whose protected header carries no address gives the verifier nothing to bind; REQUIRED on the wallet path, rejected with WALLET_ADDRESS_MISMATCH.",
   "record_body_cbor_hex": "a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
   "to_sign_bytes_hex": "63617264616e6f2d706f652d7265636f72642d7369672d7631a2617601656974656d7381a166686173686573a168736861322d32353658200000000000000000000000000000000000000000000000000000000000000000",
   "tamper_signer_pubkey_hex": "e4834180fc35a60025fa416884062f5cc548c64b7a175052f4c2e8eaa6a6024f",

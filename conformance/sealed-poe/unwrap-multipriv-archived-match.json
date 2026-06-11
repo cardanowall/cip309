@@ -10,28 +10,31 @@
       "3333333333333333333333333333333333333333333333333333333333333333",
       "4444444444444444444444444444444444444444444444444444444444444444"
     ],
+    "hashes": {
+      "sha2-256": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd"
+    },
     "envelope": {
       "scheme": 1,
-      "aead": "xchacha20-poly1305",
+      "aead": "chacha20-poly1305-stream64k",
       "kem": "x25519",
       "nonce_hex": "b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1",
       "slots": [
         {
           "epk_hex": "42575d5c8a93833255e09f04054a4f6246d36ed163c1c7f80c1fc9a58a0e912d",
-          "wrap_hex": "8ac8f62f307041e7f73ae409b539f1997a815defe46c3881a4bbdac25fed5cfb6ba5ac6fea77d4da8af9cf8d656f25c6"
+          "wrap_hex": "4874b10b8eccc703077d513898b30f11338d0caa178d5aee6396a865c460d431a16e75671f1ae40a0f0830b463c7cd39"
         },
         {
           "epk_hex": "b63d05558f21e85cf2e5721509301077a508733b05dff3e6f518ea04aec42c65",
-          "wrap_hex": "0f62a2f056dd4c9dbbed0bde00dc69c1df3d09a15591034a677aa73ec2584b8da17da55f0ddab4919a09535f27166f6a"
+          "wrap_hex": "a2a95e72a53143ca26a6baac7183f8970644d77b7e9b96587d0ce315a5797ea1567952cf008388d39e8d22943a006c13"
         },
         {
           "epk_hex": "bfda3768f927db529fe9f0f6ee4ba469e432c93bb6fbb8ed5d04e87ed0a45d7b",
-          "wrap_hex": "1f242d63b53f0425621bc2c6f357bad74e3aa82ec6dfe02e4624ac1c978bd65c28f22546b4e5b1e4b5aa005111221a11"
+          "wrap_hex": "0957d95f1fcd73829c7ffddbfca13db8675b897cbdc241d119cce76f8cd77465b4d5c4a28334b0f225e989b276867a02"
         }
       ],
-      "slots_mac_hex": "654677af909273a82775726d7f38c0b5924f101ec3530d9765725ce1dc2fa3b0"
+      "slots_mac_hex": "e7359abf7c6dfebb52ff48fa5216d58ff331c0bb628cde76ced111e6857652a1"
     },
-    "ciphertext_hex": "b81d354e76c6961effcc5430e95ae814685f0c9ef674a0994272b54590bae8dacd2bb4d374470d423e603fa11f84f4b5",
+    "ciphertext_hex": "d7d9df0fe4e81eb7416d61ee1ad69a2c1294d3d54d1d3545eea3edcaa0c7c2038d6b2b359bdf80f91e5ab95ff85bc7dc",
     "expected_plaintext_hex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
     "expected_matching_priv_index": 2,
     "expected_outer_loop_count": 3,

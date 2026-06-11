@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://label309.org/schemas/merkle-leaves.schema.json",
+  "title": "Label 309 Merkle leaves-list document",
+  "description": "The normative off-chain leaves-list document binding an on-chain `merkle[i]` commitment to its ordered leaf list: a single canonical-CBOR map, the ONLY normative leaves-list form (no JSON projection or alternative serialisation exists on the wire; this schema is the JSON-tooling view under the set's hex-modelling convention). `format` is the document-format identifier, exactly `cardano-poe-merkle-leaves-v1` — a well-typed `format` string outside the registered set is the typed code SCHEMA_MERKLE_LEAVES_FORMAT_UNSUPPORTED, while bytes that are not this container at all are SCHEMA_MERKLE_LEAVES_MALFORMED; a generic schema tool reports only an undifferentiated mismatch. `tree_alg` is the registered list-commitment algorithm identifier under which `root` was computed; it MUST equal the on-chain `merkle[i].alg` (a disagreement is SCHEMA_MERKLE_LEAVES_MALFORMED — not expressible here). `root` is the 32-byte root over `leaves`, included so the document is self-checking offline; a recompute mismatch against the on-chain root is MERKLE_ROOT_MISMATCH. `leaves` is the producer's ordered leaf list, each entry exactly 32 bytes, in tree order. `leaf_count` is a uint in 1 .. 2^32 − 1 that MUST equal the length of `leaves` and the on-chain `merkle[i].leaf_count` (either disagreement is SCHEMA_MERKLE_LEAF_COUNT_MISMATCH — a domain check, not expressible here). `leaf_alg` (optional) is an informative annotation naming how the leaves were produced; it carries NO verification semantics and a verifier MUST NOT reject a document for any `leaf_alg` value. CBOR byte strings are modelled as lowercase-hex JSON strings. The map is closed: unknown keys are rejected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "tree_alg", "root", "leaves", "leaf_count"],
+  "properties": {
+    "format": {
+      "const": "cardano-poe-merkle-leaves-v1"
+    },
+    "tree_alg": {
+      "$ref": "defs.schema.json#/$defs/merkle-commit-alg"
+    },
+    "root": {
+      "$ref": "defs.schema.json#/$defs/bytes32"
+    },
+    "leaves": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "defs.schema.json#/$defs/bytes32"
+      }
+    },
+    "leaf_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4294967295
+    },
+    "leaf_alg": {
+      "type": "string"
+    }
+  }
+}

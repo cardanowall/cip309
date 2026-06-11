@@ -1,19 +1,23 @@
 {
   "version": 1,
   "primitive": "sealed-poe-passphrase",
-  "source": "Passphrase path: CEK = Argon2id(normalize(pw)); payload_key = HKDF(CEK, salt=nonce, info='cardano-poe-payload-passphrase-v1'); AAD = canonicalEncode(AD_CONTENT_PASSPHRASE). Argon2id params are CI-cheap pins; the normalization profile id is in the AAD only.",
+  "source": "Passphrase path: CEK = Argon2id(normalize(pw)); ciphertext blob = commitment(32) || STREAM chunks where commitment = HMAC-SHA-256(HKDF(CEK, '', 'cardano-poe-passphrase-mac-v1'), SHA-256('cardano-poe-passphrase-transcript-v1' || canonicalEncode(PASSPHRASE_TRANSCRIPT))). Argon2id params are the producer default (the registry floors with p=4); the normalization profile id is bound in the transcript only, never on the wire.",
   "vector": {
     "name": "passphrase-n1",
     "passphrase": "correct horse battery staple",
     "salt_hex": "55565758595a5b5c5d5e5f6061626364",
     "params": {
-      "m": 8,
-      "t": 1,
-      "p": 1
+      "m": 65536,
+      "t": 3,
+      "p": 4
     },
     "nonce_hex": "666768696a6b6c6d6e6f707172737475767778797a7b7c7d",
+    "hashes": {
+      "sha2-256": "7057bb6e7e49cd272e1a66655b07210ff40cd74756647ccfbd1f5a5d42439b71"
+    },
     "plaintext_hex": "70617373706872617365207365616c6564207061796c6f6164",
-    "expected_ciphertext_hex": "6b4e8a97dff32f3cce144820dbe9803f51c80ef6d81c183883f91c92ffe6d0d1620ea79459d50d73be",
+    "expected_commitment_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475",
+    "expected_ciphertext_hex": "9d747860109fd2d452b8458cb2fbe4a52d75dc340920347b7f94b3b35e252475683f242c3d0d08dfe50417b89277aaee42bfecbdb46d39a9effb890ec3e1e77703b82b9f42b47522cd",
     "expected_plaintext_hex": "70617373706872617365207365616c6564207061796c6f6164"
   }
 }

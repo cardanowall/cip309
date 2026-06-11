@@ -2,38 +2,64 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://label309.org/schemas/encryption-envelope.schema.json",
   "title": "Label 309 sealed-PoE encryption envelope",
-  "description": "The `enc` block of an item: a CLOSED CBOR map describing a sealed-PoE envelope whose ciphertext lives at the item's content-addressed URI (ar:// / ipfs://). `scheme` MUST be the unsigned integer 1 — modelled here as an unconstrained value (the structural superset), with the literal-1 requirement enforced by the domain pass (UNSUPPORTED_ENVELOPE_SCHEME). `aead` is the content cipher identifier (open). `nonce` is the AEAD nonce (hex byte string; its exact length is the per-AEAD NONCE_LENGTH_MISMATCH domain check — e.g. 24 bytes for xchacha20-poly1305). `kem`, `slots`, `slots_mac`, and `passphrase` are all OPTIONAL at this structural layer. STRUCTURAL only — the following cross-field invariants are NOT expressible here and are domain-pass checks emitting typed codes: slots XOR passphrase (mutually exclusive); slots requires both kem and slots_mac; slots non-empty; the KEM-driven per-slot shape; the argon2id floors; content-hash binding. The map is closed: unknown keys are rejected.",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["scheme", "aead", "nonce"],
-  "properties": {
-    "scheme": {
-      "$comment": "MUST equal unsigned integer 1; modelled as any value structurally (mirrors the permissive Zod `z.unknown()`), value enforced by the domain pass (UNSUPPORTED_ENVELOPE_SCHEME).",
-      "type": ["integer", "string", "number", "boolean", "array", "object", "null"]
+  "description": "The `enc` block of an item: a CBOR map describing a sealed-PoE envelope whose ciphertext lives at the item's content-addressed URI (ar:// / ipfs://). The envelope is a CHOICE between two readings, mirroring the grammar's `enc = enc-scheme-1 / enc-opaque`: the scheme-1 shape (the closed map this revision defines, `scheme` = the literal 1) and the opaque reading (`scheme` is any unsigned integer; every other entry is bounded, unconstrained metadata). The opaque alternative exists so an envelope sealed under an identifier the implementation does not support still parses at the schema layer instead of being rejected before the typed pass can apply the degrade-to-opaque rule (public reading: ENC_UNSUPPORTED, info; recipient role / strict sealed-crypto mode: the specific UNSUPPORTED_ENVELOPE_SCHEME / UNSUPPORTED_KEM_ALG / UNSUPPORTED_AEAD_ALG, error). It carries no licence to relax validation of supported envelopes: when `scheme`, `kem`, and `aead` are all supported identifiers, the typed pass holds the envelope to the scheme-1 shape and key-path rules — an envelope that fails them is rejected with its typed code, never reclassified as opaque. STRUCTURAL only — these cross-field invariants are domain-pass checks emitting typed codes: exactly one of slots / passphrase (ENC_NO_KEY_PATH / ENC_EXCLUSIVITY_VIOLATION); slots requires both kem and slots_mac (ENC_KEM_REQUIRED / ENC_SLOTS_MAC_REQUIRED); slots_mac without slots (ENC_SLOTS_REQUIRED); the KEM-driven per-slot shape and the no-mixing rule; the argon2id parameter floors; registry membership of `aead` / `kem`; the content-hash binding (ENC_REQUIRES_CONTENT_HASH).",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/enc-scheme-1"
     },
-    "aead": {
-      "$ref": "defs.schema.json#/$defs/aead-alg"
-    },
-    "nonce": {
-      "$comment": "AEAD nonce, hex byte string; exact length per-AEAD (NONCE_LENGTH_MISMATCH) is a domain-pass check, not asserted structurally.",
-      "type": "string",
-      "pattern": "^([0-9a-f]{2})+$"
-    },
-    "kem": {
-      "$ref": "defs.schema.json#/$defs/kem-alg"
-    },
-    "slots": {
-      "type": "array",
-      "items": {
-        "$ref": "encryption-slot.schema.json"
+    {
+      "$ref": "#/$defs/enc-opaque"
+    }
+  ],
+  "$defs": {
+    "enc-scheme-1": {
+      "title": "Scheme-1 envelope",
+      "description": "The closed scheme-1 map. The shape is itself a permissive superset: a single map admits both the recipient-slot key path (`kem` + `slots` + `slots_mac`) and the passphrase key path (`passphrase`); which keys must and must not co-occur is the domain pass. `nonce` is the 24-byte envelope nonce — the envelope-unique salt of the payload-key derivation; 24 bytes is the registered `enc.nonce` length of scheme-1's content format (the typed code for a wrong length is NONCE_LENGTH_MISMATCH). The map is closed: unknown keys are rejected.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scheme", "aead", "nonce"],
+      "properties": {
+        "scheme": {
+          "const": 1
+        },
+        "aead": {
+          "$ref": "defs.schema.json#/$defs/aead-alg"
+        },
+        "nonce": {
+          "$comment": "24-byte bstr, modelled as a 48-character lowercase-hex string.",
+          "type": "string",
+          "pattern": "^[0-9a-f]{48}$"
+        },
+        "kem": {
+          "$ref": "defs.schema.json#/$defs/kem-alg"
+        },
+        "slots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "encryption-slot.schema.json"
+          }
+        },
+        "slots_mac": {
+          "$comment": "32-byte MAC over the slot-set transcript; a wrong length emits ENC_SLOTS_MAC_INVALID_LENGTH.",
+          "$ref": "defs.schema.json#/$defs/bytes32"
+        },
+        "passphrase": {
+          "$ref": "passphrase-block.schema.json"
+        }
       }
     },
-    "slots_mac": {
-      "$comment": "32-byte MAC over the slot set; wrong length emits ENC_SLOTS_MAC_INVALID_LENGTH.",
-      "$ref": "defs.schema.json#/$defs/bytes32"
-    },
-    "passphrase": {
-      "$ref": "passphrase-block.schema.json"
+    "enc-opaque": {
+      "title": "Opaque envelope reading",
+      "description": "The opaque reading of an envelope under an unsupported identifier: `scheme` is the only structurally required key (any CBOR unsigned integer), and every other entry is any key/value pair the canonical encoding profile admits, subject to the generic decode bounds. A verifier escape hatch, never a producer surface. Note the choice is not a discriminator: a map with `scheme` = 1 that fails the scheme-1 shape still matches this reading, so the schema layer admits it and the typed pass — not the schema — decides between the scheme-1 rules and the degrade-to-opaque disposition.",
+      "type": "object",
+      "required": ["scheme"],
+      "properties": {
+        "scheme": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
     }
   }
 }
