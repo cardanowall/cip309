@@ -24,6 +24,11 @@ dev = [
 
 # Example scripts, not a distributable package: nothing is built or installed
 # beyond the dependencies above.
+# A flat collection of runnable example scripts, not a distributable package:
+# installing this project pulls in its dependencies only.
+[tool.setuptools]
+py-modules = []
+
 [tool.uv]
 package = false
 
