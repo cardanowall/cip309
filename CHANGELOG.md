@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 > backward-incompatible ways until a 1.0 release. Pre-1.0 versions do not carry
 > the stability guarantees of [Semantic Versioning](https://semver.org/).
 
+## [0.6.0] - 2026-06-13
+
+### Added
+
+- Negative-case conformance vectors for the CIDv1 URI profile: a multibase body whose case disagrees with the prefix it advertises is non-canonical and is rejected. No change to the specification text, registries, or wire format.
+
 ## [0.5.0] - 2026-06-12
 
 ### Changed
